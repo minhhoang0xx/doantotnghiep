@@ -39,46 +39,6 @@ const createUser = (newUser) => {
     
 }
 
-const loginUser1 = (data) => {
-    return new Promise(async (resolve, reject) => {
-        const { email, password } = data;
-        try {
-            const checkUser = await User.findOne({ email: email })
-            if (checkUser == null) {
-                resolve({
-                    status: 'ERR',
-                    message: 'The user is not defined',
-                })
-            }
-            const isPasswordTrue = await bcrypt.compare(password, checkUser.password)
-            if (!isPasswordTrue) {
-                resolve({
-                    status: 'ERR',
-                    message: 'The password or username is not correct'
-                })
-            }
-            const access_token = await generalAccessToken({
-                id: checkUser.id,
-                role: checkUser.role,
-                faculty: checkUser.faculty
-            })
-            const refresh_token = await generalRefreshToken({
-                id: checkUser.id,
-                role: checkUser.role,
-                faculty: checkUser.faculty
-            })
-            resolve({
-                status: 'OK',
-                message: 'SUCCESS',
-                access_token: access_token,
-                refresh_token: refresh_token
-            })
-        } catch (e) {
-            reject(e)
-        }
-    })
-}
-
 
 const loginUser = (userLogin) => {
     return new Promise(async (resolve, reject) => {
