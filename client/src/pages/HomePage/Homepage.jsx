@@ -1,5 +1,6 @@
 import React from "react";
 import { Carousel } from 'antd';
+import CardComponent from "../../components/CardComponet/CartComponent";
 const contentStyle = {
     margin: '20px 0',
     height: '500px',
@@ -37,6 +38,14 @@ const HomePage = () =>{
             fontSize: '36px',
         }}>
             CHAO MUNG BAN DEN VOI HOANG SYSTEM EDUCATION</h1>
+            <div style={{margin:'20px 0 20px 20px',display:'flex', alignItems:'center', gap:'20px'}}>
+            <CardComponent/>
+            <CardComponent/>
+            <CardComponent/>
+            <CardComponent/>
+            <CardComponent/>
+            
+            </div>
     </div>
         </>
         
