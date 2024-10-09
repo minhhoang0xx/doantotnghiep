@@ -1,5 +1,5 @@
 import React from 'react';
-import { Col, Input } from 'antd'
+import { Badge, Col, Input } from 'antd'
 import { WrapperAccount, WrapperHeader, WrapperText } from './style';
 import { UserOutlined, CaretDownOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 
@@ -23,14 +23,18 @@ const HeaderComponent = () => {
                     <Input.Search placeholder="input search text" allowClear style={{ width: '90%' }} />
                 </Col>
                 <Col span={4}>
+                    
                     <WrapperAccount>
+                    <div>
                         <UserOutlined style={{ fontSize: '30px' }} />
-                        <div>
-                            <span>Account</span>
-                            <CaretDownOutlined />
+   
                         </div>
+                        <div>
+                        <Badge count={1} size='small'>
                         <ShoppingCartOutlined style={{ fontSize: '30px' }} />
-                        <div><span>Cart</span></div>
+                        </Badge>
+
+                        </div>
                     </WrapperAccount>
 
                 </Col>

@@ -1,5 +1,5 @@
 import React from "react";
-import { EditOutlined, EllipsisOutlined, ShoppingCartOutlined } from '@ant-design/icons';
+import { ShoppingCartOutlined } from '@ant-design/icons';
 import { Card } from 'antd';
 import Meta from "antd/es/card/Meta";
 const CardComponent = () => {

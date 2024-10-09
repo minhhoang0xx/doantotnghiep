@@ -32,19 +32,18 @@ const HomePage = () =>{
         <h1 
         className="title"
         style={{ 
-            color: 'darkgreen', 
+            color: '#000000', 
             textAlign: 'center', 
             marginTop: '20px', 
             fontSize: '36px',
         }}>
-            CHAO MUNG BAN DEN VOI HOANG SYSTEM EDUCATION</h1>
-            <div style={{margin:'20px 0 20px 20px',display:'flex', alignItems:'center', gap:'20px'}}>
+            WELCOME TO HOANG SYSTEM EDUCATION</h1>
+            <div style={{margin:'20px 0 20px 20px',display:'flex', alignItems:'center', gap:'20px',  flexWrap:'wrap'}}>
             <CardComponent/>
             <CardComponent/>
             <CardComponent/>
             <CardComponent/>
-            <CardComponent/>
-            
+            <CardComponent/>  
             </div>
     </div>
         </>
