@@ -1,8 +1,18 @@
 import React from "react";
+import { WrapperSigninLeft } from "./style";
+import SignInForm from "../../components/InputForm/SignInForm";
 
-const SignInPage = () =>{
+const SignInPage = () => {
     return (
-        <div> NOT FOUND</div>
-        )
+        <div >
+           
+            <WrapperSigninLeft>
+                <SignInForm />
+
+            </WrapperSigninLeft>
+
+
+        </div>
+    )
 }
- export default SignInPage
+export default SignInPage
