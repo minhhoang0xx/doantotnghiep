@@ -1,3 +1,5 @@
+import AboutPage from "../pages/About/About";
+import ContactPage from "../pages/Contact/Contact";
 import HomePage from "../pages/HomePage/Homepage";
 import NotFoundPage from "../pages/NotFound/NotFoundPage";
 import OrderPage from "../pages/OrderPage/OrderPage";
@@ -21,6 +23,16 @@ export const routes =[
     {
         path: '/product',
         page: ProductPage,
+        isShowHeader: true,
+    },
+    {
+        path: '/about',
+        page: AboutPage,
+        isShowHeader: true,
+    },
+    {
+        path: '/contact',
+        page: ContactPage,
         isShowHeader: true,
     },
     {
