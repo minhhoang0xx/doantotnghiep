@@ -9,6 +9,7 @@ const contentStyle = {
     textAlign: 'center',
     background: '#364d79',
     objectFit: 'cover',
+    width: '100%',
   };
   
 const HomePage = () =>{

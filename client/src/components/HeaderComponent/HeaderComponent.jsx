@@ -3,8 +3,16 @@ import { Badge, Col, Input } from 'antd'
 import { Link } from "react-router-dom";
 import { WrapperAccount, WrapperHeader, WrapperText } from './style';
 import { UserOutlined, ShoppingCartOutlined } from '@ant-design/icons';
-
+// import { useCookies } from 'react-cookie';
 const HeaderComponent = () => {
+    // const [cookies, setCookie] = useCookies(['name']);
+    // const login = () => {
+    //     setCookie("access_token", "456")
+    // }
+    // const logout = () => {
+    //     setCookie("access_token");
+    // }
+    // console.log(cookies.access_token)
     return (
         <div>
             <WrapperHeader>
@@ -27,7 +35,7 @@ const HeaderComponent = () => {
 
                     <WrapperAccount>
                         <div>
-                            <Link to="/User" style={{
+                            <Link to="/sign-in" style={{
                                 color: '#000000',
                             }}>
                                 <UserOutlined style={{ fontSize: '30px' }} />
@@ -40,6 +48,8 @@ const HeaderComponent = () => {
                                 </Badge>
                             </Link>
                         </div>
+                        {/* {cookies.access_token !==undefined ? <div onClick={logout}>Logout</div> : <></>} */}
+
                     </WrapperAccount>
 
 

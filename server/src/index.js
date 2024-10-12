@@ -2,11 +2,13 @@ const express = require('express');
 const mongoose = require('mongoose');
 const routes = require('./routes');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 require('dotenv').config();
 
 const app = express()
 const port = process.env.PORT || 3001
 
+app.use(cors())
 app.use(bodyParser.json())// tai sao no phai de truoc route
 
 routes(app);
