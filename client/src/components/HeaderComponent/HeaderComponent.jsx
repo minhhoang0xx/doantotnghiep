@@ -4,17 +4,18 @@ import { Link, useNavigate } from "react-router-dom";
 import { WrapperAccount, WrapperHeader, WrapperText } from './style';
 import { UserOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 // import { useCookies } from 'react-cookie';
+import { useSelector } from 'react-redux'
 
 
 
 
 const HeaderComponent = () => {
     const navigate = useNavigate() 
+    const user = useSelector((state) => state.user)
     const handleNavigateLogin = () => {
         navigate('/sign-in')
-
     }
-
+    console.log('user',user)
 
     // const [cookies, setCookie] = useCookies(['name']);
     // const login = () => {
@@ -45,10 +46,14 @@ const HeaderComponent = () => {
                 <Col span={4}>
 
                     <WrapperAccount>
+                        {user?.name ? (
+                            <div>{user.name}</div>
+                        ):(
                         <div onClick={handleNavigateLogin} style={{cursor: 'pointer'}} >
                         
                                 <UserOutlined style={{ fontSize: '30px' }} />
                         </div>
+                        )}
                         <div>
                             <Link to="/Cart">
                                 <Badge count={1} size='small'>

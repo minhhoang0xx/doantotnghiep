@@ -21,7 +21,7 @@ function App() {
 
   
   const query = useQuery({ queryKey:['todos'], queryFn:fetchApi})
-console.log('456', query)
+  console.log('456', query)
 
 
   return (

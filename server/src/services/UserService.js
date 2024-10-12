@@ -13,7 +13,7 @@ const createUser = (newUser) => {
             })
             if(checkUser !== null){
                 resolve({
-                    status: 'OK',
+                    status: 'null',
                     message: 'Email already exists',
                 })
             }
@@ -70,7 +70,7 @@ const loginUser = (userLogin) => {
                 id: checkUser.id,
                 isAdmin: checkUser.isAdmin,
             })
-
+            console.log(access_token)
             resolve ({
                 status: 'OK',
                 message: 'succes',

@@ -2,7 +2,12 @@ import React from "react";
 import { Button, Checkbox, Form, Input, message } from 'antd';
 import { useNavigate } from "react-router-dom";
 import * as UserService from '../../services/UserService';
+import { jwtDecode } from "jwt-decode";
+import {useDispatch} from  'react-redux'
+import { updateUser } from "../../redux/slices/userSlice";
 const SignInForm = () => {
+    const dispatch = useDispatch();
+    
     const navigate = useNavigate()
     const handleNavigateSignUp = () => {
         navigate('/sign-up');
@@ -10,6 +15,19 @@ const SignInForm = () => {
     const handleNavigateHome = () => {
         navigate('/');
     }
+    const handleGetDetailUser = async (id, token) => {
+        try {
+            const res = await UserService.getDetailUser(id, token);
+            console.log('Response data:', res.data); 
+            const payload = { ...res?.data, access_token: token }; 
+            console.log('Dispatching payload:', payload);
+            dispatch(updateUser(payload));
+        } catch (error) {
+            console.error('Error fetching user details:', error);
+        }
+    };
+    
+
 
     const onFinish = async (values) => {
         try {
@@ -20,13 +38,21 @@ const SignInForm = () => {
             // check db
             if (data.status === 'OK') {
                 message.success('Login successful!');
-                localStorage.setItem('token', data.access_token); // luu access_token vào localStorage
+                console.log('data', data)
                 navigate('/');
+                localStorage.setItem('access_token', data?.access_token); // luu access_token vào localStorage
+                if(data?.access_token){
+                    const decoded = jwtDecode(data?.access_token)
+                    console.log('decode', decoded)
+                    if(decoded?.id){
+                        handleGetDetailUser(decoded?.id,data?.access_token)
+                    }
+                }
             } else {
                 message.error(data.message || 'Login failed!');
             }
         } catch (error) {
-            // check server co tra ve khong
+            // check server co tra ve loi khong
             if (error.response) {
                 message.error(error.response.data.message || 'An error occurred. Please try again later.');
             } else {

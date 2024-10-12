@@ -37,7 +37,7 @@ const authUserMiddleware = (req, res, next) => {
             next()
         }else{
             return res.status(404).json({
-                message: 'the authentication token1',
+                message: 'the authentication token2',
                 status: err
             })
         }

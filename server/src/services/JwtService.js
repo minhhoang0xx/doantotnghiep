@@ -32,7 +32,6 @@ const refreshTokenJwt = (token) => {// cap token moi khi refreshtoken cu het han
                     id: payload?.id,
                     isAdmin :payload?.isAdmin
                 })
-                console.log('123',access_token)
                 resolve ({
                     status: 'OK',
                     message: 'success',
