@@ -21,37 +21,6 @@ const createProduct = async (req,res)=>{
     }
 }
 //////
-const loginUser = async (req,res)=>{
-    try{
-        const {name,email,password,confirmPassword,phone} = req.body
-        const reg = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/
-        const isCheckEmail = reg.test(email)
-        if(!name || !email || !password || !confirmPassword || !phone){
-            return res.status(200).json({
-                status: 'error',
-                message: 'the input is invalid'
-            })
-        }else if(!isCheckEmail){
-            return res.status(200).json({
-                status: 'error',
-                message: 'Email incorrect'
-            })
-        }else if(password !== confirmPassword){
-            return res.status(200).json({
-                status: 'error',
-                message: 'Your password is incorrect'
-            })
-        } 
-        const response = await UserService.loginUser(req.body) // response de khac voi thang res khong bi nham
-        return res.status(200).json(response) 
-    }catch(e){
-        return res.status(404).json({ 
-            status: 'error0',
-            message: e.message,
-            error: e
-        })
-    }
-}
 
 const logOut = (req, res) => {
     try {
@@ -165,7 +134,6 @@ const refreshToken = async (req,res)=>{
 }
 module.exports = {
     createProduct,
-    loginUser,
     logOut,
     updateProduct,
     deleteProduct,

@@ -38,50 +38,6 @@ const createProduct = (newProduct) => {
     
 }
 
-const loginUser = (userLogin) => {
-    return new Promise(async (resolve, reject) => {
-        const {email,password} = userLogin
-       
-        try {
-            const checkUser = await User.findOne({
-                email: email
-            })
-            if(checkUser === null){
-                resolve({
-                    status: 'error',
-                    message: 'the User is not Defined',
-                })
-            }
-           const comparePassword = bcrypt.compareSync(password, checkUser.password)
-            
-            if(!comparePassword) {
-                resolve({
-                    status: 'OK',
-                    message: 'The password or user is not true'
-                })
-            }
-
-            const access_token = await generalAccessToken({
-                id: checkUser.id,
-                isAdmin: checkUser.isAdmin,
-            })
-            const refresh_token = await generalRefreshToken({
-                id: checkUser.id,
-                isAdmin: checkUser.isAdmin,
-            })
-
-            resolve ({
-                status: 'OK',
-                message: 'succes',
-                access_token,
-                refresh_token
-            })
-        }catch(err){
-            reject(err);
-        }
-    })
-    
-}
 
 const updateProduct = (id,data) => {
     return new Promise(async (resolve, reject) => {
@@ -220,7 +176,6 @@ const detailProduct = (id) => {
 
 module.exports = {
     createProduct,
-    loginUser,
     updateProduct,
     deleteProduct,
     getAllProduct,

@@ -59,6 +59,7 @@ const loginUser = async (req,res)=>{
         })
     }
 }
+
 const logOut = (req, res) => {
     try {
         return res.status(200).json({

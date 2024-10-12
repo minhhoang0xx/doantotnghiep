@@ -1,10 +1,21 @@
 import React from 'react';
 import { Badge, Col, Input } from 'antd'
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { WrapperAccount, WrapperHeader, WrapperText } from './style';
 import { UserOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 // import { useCookies } from 'react-cookie';
+
+
+
+
 const HeaderComponent = () => {
+    const navigate = useNavigate() 
+    const handleNavigateLogin = () => {
+        navigate('/sign-in')
+
+    }
+
+
     // const [cookies, setCookie] = useCookies(['name']);
     // const login = () => {
     //     setCookie("access_token", "456")
@@ -34,12 +45,9 @@ const HeaderComponent = () => {
                 <Col span={4}>
 
                     <WrapperAccount>
-                        <div>
-                            <Link to="/sign-in" style={{
-                                color: '#000000',
-                            }}>
+                        <div onClick={handleNavigateLogin} style={{cursor: 'pointer'}} >
+                        
                                 <UserOutlined style={{ fontSize: '30px' }} />
-                            </Link>
                         </div>
                         <div>
                             <Link to="/Cart">

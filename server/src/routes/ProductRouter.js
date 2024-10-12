@@ -5,7 +5,6 @@ const { authAdminMiddleware } = require('../middleware/authMiddleware');
 
 router.post('/createProduct', authAdminMiddleware,ProductController.createProduct);
 router.post('/logout', ProductController.logOut);
-router.post('/sign-in', ProductController.loginUser)
 router.put('/updateProduct/:id', authAdminMiddleware, ProductController.updateProduct)
 router.delete('/deleteProduct/:id', authAdminMiddleware, ProductController.deleteProduct)// :id la dinh truyen dong
 router.get('/getAllProduct', ProductController.getAllProduct)

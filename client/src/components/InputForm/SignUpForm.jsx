@@ -1,17 +1,38 @@
 import React from "react";
-import { Button, Form, Input } from 'antd';
-import {Link} from "react-router-dom";
-
-
-const onFinishSignUp = (values) => {
-    console.log('Sign Up Success:', values);
-};
-
-const onFinishSignUpFailed = (errorInfo) => {
-    console.log('Sign Up Failed:', errorInfo);
-};
+import { Button, Form, Input, message } from 'antd';
+import { useNavigate} from "react-router-dom";
+import * as UserService from "../../services/UserService";
 
 const SignUpForm = () => {
+    const [form] = Form.useForm();
+    // const [email, password] = useState('')
+
+
+
+    const navigate = useNavigate() 
+    const handleNavigateLogin = () => {
+        navigate('/sign-in')
+    }
+    const handleNavigateHome = () => {
+        navigate('/')
+    }
+
+    const onFinishSignUp = async (values) => {
+        try {
+            // POST toi API backend
+            const response = await UserService.signUpUser(values);
+            console.log('res',response)
+            
+            message.success('Sign Up Success!');
+            navigate('/sign-in');
+        } catch (error) {
+            message.error('Sign Up Failed: ' + (error.response?.data?.message || 'Unknown error'));
+        }
+    };
+    const onFinishSignUpFailed = (errorInfo) => {
+        console.log('Sign Up Failed:', errorInfo);
+    };
+    
     return (
         
         <div style={{
@@ -35,14 +56,15 @@ const SignUpForm = () => {
               backgroundColor: '#f5f5f5',
               width: '45%',
             }}>
-                 <Link to="/" style={{
+                 <span onClick={handleNavigateHome} style={{
                     fontSize: '16px',
                     color: '#333',
                     textDecoration: 'none', 
                     marginRight:'620px',
+                    cursor: 'pointer',
                 }}>
                     Home
-                </Link>
+                </span>
                 <h2 style={{
                     fontSize: '32px', 
                     fontWeight: 'bold', 
@@ -54,6 +76,7 @@ const SignUpForm = () => {
                     SIGN UP
                 </h2>
                 <Form
+                form={form}
                     name="signUp"
                     labelCol={{ span: 8 }}
                     wrapperCol={{ span: 16 }}
@@ -62,10 +85,18 @@ const SignUpForm = () => {
                     onFinishFailed={onFinishSignUpFailed}
                     autoComplete="off"
                 >
+                        
                     <Form.Item
-                        label={<span style={{ textAlign:'left' }}>Username</span>}
-                        name="username"
-                        rules={[{ required: true, message: 'Please input your username!' }]}
+                        label={<span style={{ textAlign:'left' }}>Name</span>}
+                        name="name"
+                        rules={[{ required: true, message: 'Please input your name!' }]}
+                    >
+                        <Input />
+                    </Form.Item>
+                    <Form.Item
+                        label={<span style={{ textAlign:'left' }}>Phone Number</span>}
+                        name="phone"
+                        rules={[{ required: true, message: 'Please input your phone number!' }]}
                     >
                         <Input />
                     </Form.Item>
@@ -110,7 +141,7 @@ const SignUpForm = () => {
                         </Button>
                     </Form.Item>
                 </Form>
-                <p style={{ marginTop: '5px' }}>Already have an account? <Link to="/sign-in">Sign In</Link></p>
+                <p style={{ marginTop: '5px' }}>Already have an account? <span onClick={handleNavigateLogin} style={{color:'blue', textDecoration:'underline', cursor:'pointer'}}>Sign up</span></p>
                 </div>
         </div>
     );

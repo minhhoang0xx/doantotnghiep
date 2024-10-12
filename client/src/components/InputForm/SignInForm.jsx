@@ -1,16 +1,45 @@
 import React from "react";
-import { Button, Checkbox, Form, Input } from 'antd';
-import { Link } from "react-router-dom";
-
-const onFinish = (values) => {
-    console.log('Success:', values);
-};
-
-const onFinishFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo);
-};
-
+import { Button, Checkbox, Form, Input, message } from 'antd';
+import { useNavigate } from "react-router-dom";
+import * as UserService from '../../services/UserService';
 const SignInForm = () => {
+    const navigate = useNavigate()
+    const handleNavigateSignUp = () => {
+        navigate('/sign-up');
+    }
+    const handleNavigateHome = () => {
+        navigate('/');
+    }
+
+    const onFinish = async (values) => {
+        try {
+            // Post den BE
+            const res = await UserService.loginUser(values)
+            //lay du lieu phan hoi
+            const data = res.data;
+            // check db
+            if (data.status === 'OK') {
+                message.success('Login successful!');
+                localStorage.setItem('token', data.access_token); // luu access_token vào localStorage
+                navigate('/');
+            } else {
+                message.error(data.message || 'Login failed!');
+            }
+        } catch (error) {
+            // check server co tra ve khong
+            if (error.response) {
+                message.error(error.response.data.message || 'An error occurred. Please try again later.');
+            } else {
+                message.error('An error occurred. Please try again later.');
+            }
+            console.error('Error during login:', error);
+        }
+    };
+    const onFinishFailed = (errorInfo) => {
+        console.log('Failed:', errorInfo);
+    };
+
+
     return (
         <div style={{
             display: 'flex',
@@ -32,14 +61,15 @@ const SignInForm = () => {
                 backgroundColor: '#f5f5f5',
                 width: '45%',
             }}>
-                <Link to="/" style={{
+                <span onClick={handleNavigateHome} style={{
                     fontSize: '16px',
                     color: '#333',
                     textDecoration: 'none',
                     marginRight: '620px',
+                    cursor: 'pointer',
                 }}>
                     Home
-                </Link>
+                </span>
                 <h2 style={{
                     fontSize: '32px',
                     fontWeight: 'bold',
@@ -62,9 +92,9 @@ const SignInForm = () => {
 
                 >
                     <Form.Item
-                        label="Username"
-                        name="username"
-                        rules={[{ required: true, message: 'Please input your username!' }]}
+                        label="Email"
+                        name="email"
+                        rules={[{ required: true, message: 'Please input your Email!' }]}
                     >
                         <Input />
                     </Form.Item>
@@ -81,15 +111,16 @@ const SignInForm = () => {
                         name="remember"
                         valuePropName="checked"
                         wrapperCol={{ offset: 4, span: 20 }}
+                        style={{ marginTop: '' }}
                     >
-                        <Checkbox>Remember me</Checkbox>
+                        <Checkbox >Remember me</Checkbox>
                         <p style={{ marginTop: '5px' }}>
-                            Don't have an account? <Link to="/sign-up">Sign Up</Link>
+                            Don't have an account? <span onClick={handleNavigateSignUp} style={{ color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}>Sign up</span>
                         </p>
                     </Form.Item>
 
                     <Form.Item wrapperCol={{ offset: 4, span: 20 }}>
-                        <Button type="primary" htmlType="submit" style={{ width: '50%' }}>
+                        <Button type="primary" htmlType="submit" style={{ width: '50%' }} >
                             Submit
                         </Button>
                     </Form.Item>
