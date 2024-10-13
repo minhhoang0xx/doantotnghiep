@@ -56,7 +56,7 @@ const loginUser = async (req,res)=>{
             Secure: true, // de bao mat client
 
         })
-        return res.status(200).json(newResponse) 
+        return res.status(200).json(newResponse)  
     }catch(e){
         return res.status(404).json({ 
             status: 'error0',
@@ -168,7 +168,6 @@ const refreshToken = async (req,res)=>{
         }
         const response = await JwtService.refreshTokenJwt(token) // response de khac voi thang res khong bi nham
         return res.status(200).json(response) 
-        return
     }catch(e){
         return res.status(404).json({ 
             status: 'error1',

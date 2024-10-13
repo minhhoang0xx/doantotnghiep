@@ -1,14 +1,25 @@
 import React from "react";
+import { useState } from "react";
 import { Button, Checkbox, Form, Input, message } from 'antd';
 import { useNavigate } from "react-router-dom";
 import * as UserService from '../../services/UserService';
-import { jwtDecode } from "jwt-decode";
-import {useDispatch} from  'react-redux'
+import {jwtDecode}  from "jwt-decode";
+import { useDispatch } from 'react-redux'
 import { updateUser } from "../../redux/slices/userSlice";
 const SignInForm = () => {
     const dispatch = useDispatch();
-    
     const navigate = useNavigate()
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
+    const handleOnChangeEmail = (e) => {
+        setEmail(e.target.value);
+    };
+
+    const handleOnChangePassword = (e) => {
+        setPassword(e.target.value);
+    };
+
     const handleNavigateSignUp = () => {
         navigate('/sign-up');
     }
@@ -19,44 +30,42 @@ const SignInForm = () => {
         try {
             const res = await UserService.getDetailUser(id, token);
             console.log('Response data:', res.data); 
-            const payload = { ...res?.data, access_token: token }; 
+            const payload = { ...res.data, access_token: token };
             console.log('Dispatching payload:', payload);
             dispatch(updateUser(payload));
         } catch (error) {
             console.error('Error fetching user details:', error);
         }
     };
-    
 
+    // o trang nay khong su dung useEffect(theo doi su thay doi) nen no se reload lai cho sau khi state duoc cap nhat
+    // dispatch la nguyen nhan cho thay gia tri cu
 
-    const onFinish = async (values) => {
+    const onFinish = async () => {
         try {
             // Post den BE
-            const res = await UserService.loginUser(values)
-            //lay du lieu phan hoi
-            const data = res.data;
+            const res = await UserService.loginUser({ email, password });
             // check db
-            if (data.status === 'OK') {
+            // userService tra ve res.data nen res = res.data
+            if (res.status === 'OK') {
                 message.success('Login successful!');
-                console.log('data', data)
-                navigate('/');
-                localStorage.setItem('access_token', data?.access_token); // luu access_token vào localStorage
-                if(data?.access_token){
-                    const decoded = jwtDecode(data?.access_token)
-                    console.log('decode', decoded)
-                    if(decoded?.id){
-                        handleGetDetailUser(decoded?.id,data?.access_token)
-                    }
+                localStorage.setItem('access_token', res?.access_token); // luu access_token vào localStorage
+                console.log('data', res)
+                const decoded = jwtDecode(res?.access_token)
+                console.log('decode', decoded)
+                if (decoded?.id) {
+                    handleGetDetailUser(decoded?.id, res?.access_token)
                 }
+                navigate('/');
             } else {
-                message.error(data.message || 'Login failed!');
+                message.error(res.message || 'Login failed!');
             }
         } catch (error) {
             // check server co tra ve loi khong
             if (error.response) {
                 message.error(error.response.data.message || 'An error occurred. Please try again later.');
             } else {
-                message.error('An error occurred. Please try again later.');
+                message.error('An error occurred. Please try again later 2.');
             }
             console.error('Error during login:', error);
         }
@@ -122,7 +131,7 @@ const SignInForm = () => {
                         name="email"
                         rules={[{ required: true, message: 'Please input your Email!' }]}
                     >
-                        <Input />
+                        <Input  onChange={handleOnChangeEmail} />
                     </Form.Item>
 
                     <Form.Item
@@ -130,14 +139,13 @@ const SignInForm = () => {
                         name="password"
                         rules={[{ required: true, message: 'Please input your password!' }]}
                     >
-                        <Input.Password />
+                        <Input.Password onChange={handleOnChangePassword} />
                     </Form.Item>
 
                     <Form.Item
                         name="remember"
                         valuePropName="checked"
                         wrapperCol={{ offset: 4, span: 20 }}
-                        style={{ marginTop: '' }}
                     >
                         <Checkbox >Remember me</Checkbox>
                         <p style={{ marginTop: '5px' }}>

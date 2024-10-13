@@ -141,7 +141,7 @@ const SignUpForm = () => {
                         </Button>
                     </Form.Item>
                 </Form>
-                <p style={{ marginTop: '5px' }}>Already have an account? <span onClick={handleNavigateLogin} style={{color:'blue', textDecoration:'underline', cursor:'pointer'}}>Sign up</span></p>
+                <p style={{ marginTop: '5px' }}>Already have an account? <span onClick={handleNavigateLogin} style={{color:'blue', textDecoration:'underline', cursor:'pointer'}}>Sign in</span></p>
                 </div>
         </div>
     );
