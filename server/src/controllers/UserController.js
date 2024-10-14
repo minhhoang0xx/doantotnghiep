@@ -3,10 +3,10 @@ const JwtService = require('../services/JwtService');
 
 const createUser = async (req,res)=>{
     try{
-        const {name,email,password,confirmPassword,phone} = req.body
+        const {name,email,password,confirmPassword,phone, address, avatar} = req.body
         const reg = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/
         const isCheckEmail = reg.test(email)
-        if(!name || !email || !password || !confirmPassword || !phone){
+        if(!name || !email || !password || !confirmPassword || !phone || !address ){
             return res.status(200).json({
                 status: 'error',
                 message: 'the input is invalid'

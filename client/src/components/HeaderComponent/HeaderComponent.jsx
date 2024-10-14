@@ -45,7 +45,7 @@ const HeaderComponent = () => {
     // const handleNavigateUserDetail = () => {
     //     navigate('/detailUser/:id')
     // }
-
+    
     return (
         <div>
             <WrapperHeader>

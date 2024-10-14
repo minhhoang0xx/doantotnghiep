@@ -1,12 +1,10 @@
 import React from "react";
-import { Button, Form, Input, message } from 'antd';
+import { Button, Form, Input, message, Upload } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
 import { useNavigate} from "react-router-dom";
 import * as UserService from "../../services/UserService";
 
 const SignUpForm = () => {
-    const [form] = Form.useForm();
-    // const [email, password] = useState('')
-
 
 
     const navigate = useNavigate() 
@@ -22,7 +20,6 @@ const SignUpForm = () => {
             // POST toi API backend
             const response = await UserService.signUpUser(values);
             console.log('res',response)
-            
             message.success('Sign Up Success!');
             navigate('/sign-in');
         } catch (error) {
@@ -32,6 +29,8 @@ const SignUpForm = () => {
     const onFinishSignUpFailed = (errorInfo) => {
         console.log('Sign Up Failed:', errorInfo);
     };
+
+    
     
     return (
         
@@ -76,7 +75,6 @@ const SignUpForm = () => {
                     SIGN UP
                 </h2>
                 <Form
-                form={form}
                     name="signUp"
                     labelCol={{ span: 8 }}
                     wrapperCol={{ span: 16 }}
@@ -133,6 +131,22 @@ const SignUpForm = () => {
                         ]}
                     >
                         <Input.Password />
+                    </Form.Item>
+                      
+                    <Form.Item
+                        label="Address"
+                        name="address"
+                        rules={[{ required: true, message: 'Please input your address!' }]}
+                    >
+                    <Input />
+                    </Form.Item>
+
+                    <Form.Item
+                        label="Avatar"
+                        name="avatar"
+                        rules={[{  message: 'Please input your avatar!' }]}
+                    >
+                    <Input />
                     </Form.Item>
 
                     <Form.Item wrapperCol={{offset:8, span: 16 }}>
