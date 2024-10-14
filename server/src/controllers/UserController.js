@@ -52,8 +52,9 @@ const loginUser = async (req,res)=>{
         const response = await UserService.loginUser(req.body) // response de khac voi thang res khong bi nham
         const {refresh_token, ...newResponse} = response
         res.cookie('refresh_token', refresh_token,{
-            HttpOnly: true, // de chi lay cookie thong qua cookie
-            Secure: true, // de bao mat client
+            httpOnly: true, // de chi lay cookie thong qua cookie
+            Secure: false, // chi gui cookie qua HTTPS
+            samesite: 'strict' // khong cho cookie tu noi khac
 
         })
         return res.status(200).json(newResponse)  
@@ -68,15 +69,15 @@ const loginUser = async (req,res)=>{
 
 const logOut = (req, res) => {
     try {
-        return res.status(200).json({
-            status: 'OK',
-            message: 'Logout successful'
-        });
+       res.clearCookie('refresh_token')
+       return res.status(200).json({
+        status: 'logOuted',
+        message: 'Logout successfully'
+       })
     } catch (e) {
         return res.status(500).json({
             status: 'error',
-            message: 'Something went wrong',
-            error: e.message
+            message: e,
         });
     }
 }
@@ -157,6 +158,7 @@ const getAllUser = async (req,res)=>{
 }
 
 const refreshToken = async (req,res)=>{
+    console.log('refresh token',req.cookies.refresh_token);
     try{
 
         const token = req.cookies.refresh_token

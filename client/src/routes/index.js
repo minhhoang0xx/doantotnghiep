@@ -1,4 +1,5 @@
 import AboutPage from "../pages/About/About";
+import CartPage from "../pages/CartPage/Cart";
 import ContactPage from "../pages/Contact/Contact";
 import HomePage from "../pages/HomePage/Homepage";
 import NotFoundPage from "../pages/NotFound/NotFoundPage";
@@ -7,6 +8,8 @@ import ProductDetailPage from "../pages/ProductPage/ProductDetailPage";
 import ProductPage from "../pages/ProductPage/ProductPage";
 import SignInPage from "../pages/SignIn/SignInPage";
 import SignUpPage from "../pages/SignIn/SignUpPage";
+import UserDetailPage from "../pages/UserPage/UserDetailPage";
+
 
 
 export const routes =[
@@ -36,6 +39,11 @@ export const routes =[
         isShowHeader: true,
     },
     {
+        path: '/cart',
+        page: CartPage,
+        isShowHeader: true,
+    },
+    {
         path: '*',
         page: NotFoundPage,
         isShowHeader: true,
@@ -53,6 +61,12 @@ export const routes =[
     {
         path: '/product/detail',
         page: ProductDetailPage,
+        isShowHeader: true,
+    
+    },
+    {
+        path: '/userDetail',
+        page: UserDetailPage,
         isShowHeader: true,
     
     },

@@ -6,12 +6,13 @@ import * as UserService from '../../services/UserService';
 import {jwtDecode}  from "jwt-decode";
 import { useDispatch } from 'react-redux'
 import { updateUser } from "../../redux/slices/userSlice";
+
 const SignInForm = () => {
-    const dispatch = useDispatch();
-    const navigate = useNavigate()
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
+    const dispatch = useDispatch();
+    const navigate = useNavigate()
     const handleOnChangeEmail = (e) => {
         setEmail(e.target.value);
     };
@@ -45,14 +46,11 @@ const SignInForm = () => {
         try {
             // Post den BE
             const res = await UserService.loginUser({ email, password });
-            // check db
             // userService tra ve res.data nen res = res.data
             if (res.status === 'OK') {
                 message.success('Login successful!');
-                localStorage.setItem('access_token', res?.access_token); // luu access_token vào localStorage
-                console.log('data', res)
+                localStorage.setItem('access_token', JSON.stringify(res?.access_token)); // luu access_token vào localStorage
                 const decoded = jwtDecode(res?.access_token)
-                console.log('decode', decoded)
                 if (decoded?.id) {
                     handleGetDetailUser(decoded?.id, res?.access_token)
                 }
