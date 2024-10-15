@@ -45,7 +45,7 @@ const HeaderComponent = () => {
     // const handleNavigateUserDetail = () => {
     //     navigate('/detailUser/:id')
     // }
-    
+
     return (
         <div>
             <WrapperHeader>
@@ -61,10 +61,10 @@ const HeaderComponent = () => {
                 <Col span={2} style={{ textAlign: 'center' }}>
                     <div onClick={handleNavigateContact} style={{ cursor: 'pointer' }} ><WrapperText>Contact</WrapperText></div>
                 </Col>
-                <Col span={9} style={{ display: 'flex', justifyContent: 'center' }}>
+                <Col span={8} style={{ display: 'flex', justifyContent: 'center' }}>
                     <Input.Search placeholder="input search text" allowClear style={{ width: '90%' }} />
                 </Col>
-                <Col span={4}>
+                <Col span={5}>
 
                     <WrapperAccount>
                         <div style={{ display: 'flex', alignItems: 'center' }}>

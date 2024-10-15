@@ -9,7 +9,7 @@ const initialState = { // trang thai ban dau
   phone: '',
   address: '',
   avatar: '',
-  id: '',
+  id: null,
   access_token: '',
 }
 
