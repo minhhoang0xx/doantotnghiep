@@ -18,7 +18,7 @@ const UserDetailPage = () => {
         const storedUser = JSON.parse(localStorage.getItem('user'));
         console.log('Stored User from localStorage:', storedUser); 
         const currentUser = storedUser || user;
-        console.log('Current User:', currentUser); // Log để kiểm tra
+        console.log('Current User:', currentUser); 
         if (currentUser) {
             setName(currentUser?.name || '');
             setEmail(currentUser?.email || '');
@@ -41,13 +41,13 @@ const UserDetailPage = () => {
 
 const handleUpdate = async () => {
         const updatedUser = { name, email, phone, address, avatar, 
-                _id: user?.id || JSON.parse(localStorage.getItem('user'))?.id // Sử dụng _id
+                _id: user?.id || JSON.parse(localStorage.getItem('user'))?.id // set _id vi lay dtb tu mongo
         }; 
         try {
             const update = await UserService.updateUser(updatedUser._id, updatedUser);
     
             if (update) {
-                const newUser = { ...user, ...updatedUser };
+                const newUser = { ...user, ...updatedUser }; // ghi de updateUser len user xong truyen vao newUser
                 dispatch(updateUser(newUser)); // update vào Redux
                 localStorage.setItem('user', JSON.stringify(newUser)); // luu vao localStrorage
                 message.success('Update successful!');

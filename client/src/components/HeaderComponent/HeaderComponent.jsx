@@ -72,7 +72,7 @@ const HeaderComponent = () => {
                                 onClick={user?.name ? () => navigate('/userDetail') : handleNavigateLogin}
                                 style={{ cursor: 'pointer', marginRight: '10px' }}
                             >
-                                <UserOutlined style={{ fontSize: '30px' }} />
+                           <UserOutlined style={{ fontSize: '30px' }} />
                             </div>
                             {storageData && (
                                 <div

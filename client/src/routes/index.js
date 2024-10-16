@@ -65,6 +65,12 @@ export const routes =[
     
     },
     {
+        path: '/product/getAllProduct',
+        page: ProductDetailPage,
+        isShowHeader: true,
+    
+    },
+    {
         path: '/userDetail',
         page: UserDetailPage,
         isShowHeader: true,
