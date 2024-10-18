@@ -9,12 +9,13 @@ import { Fragment } from 'react';
 import { isJsonString } from './ultils';
 import { jwtDecode } from 'jwt-decode';
 import * as UserService from './services/UserService';
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { updateUser } from './redux/slices/userSlice';
 
 
 function App() {
   const dispatch = useDispatch();
+  const user = useSelector((state) => state.user )
 
 // kiem tra token
   const handleDecoded = () =>{
@@ -59,9 +60,10 @@ function App() {
         <Routes>
           {routes.map((route) => {
             const Page = route.page
+            const checkAuth = !route.isPrivate || user.isAdmin
             const Layout = route.isShowHeader ? DefaultComponent : Fragment
             return(
-              <Route key = {route.path} path={route.path} element={
+              <Route key = {route.path} path={checkAuth ? route.path: undefined} element={
                 <Layout>
                 <Page/>
                 </Layout>

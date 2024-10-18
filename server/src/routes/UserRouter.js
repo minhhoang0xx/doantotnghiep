@@ -9,7 +9,7 @@ router.post('/logout', userController.logOut);
 router.post('/sign-in', userController.loginUser)
 router.put('/updateUser/:id', userController.updateUser)
 router.delete('/deleteUser/:id', authAdminMiddleware, userController.deleteUser)// :id la dinh truyen dong
-router.get('/getAllUser',authAdminMiddleware, userController.getAllUser)
+router.get('/getAllUser', userController.getAllUser)
 router.get('/detailUser/:id', authUserMiddleware, userController.detailUser)
 router.post('/refreshToken', userController.refreshToken)
 // router.post('/sign-up', userController.updateUser)

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button, Checkbox, Form, Input, message } from 'antd';
 import { useNavigate } from "react-router-dom";
 import * as UserService from '../../services/UserService';
-import {jwtDecode}  from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import { useDispatch } from 'react-redux'
 import { updateUser } from "../../redux/slices/userSlice";
 
@@ -30,7 +30,7 @@ const SignInForm = () => {
     const handleGetDetailUser = async (id, token) => {
         try {
             const res = await UserService.getDetailUser(id, token);
-            console.log('Response data:', res.data); 
+            console.log('Response data:', res.data);
             const payload = { ...res.data, access_token: token };
             console.log('Dispatching payload:', payload);
             dispatch(updateUser(payload));
@@ -54,7 +54,11 @@ const SignInForm = () => {
                 if (decoded?.id) {
                     handleGetDetailUser(decoded?.id, res?.access_token)
                 }
-                navigate('/');
+                if (decoded?.isAdmin) {
+                    navigate('/admin'); 
+                } else {
+                    navigate('/'); 
+                }
             } else {
                 message.error(res.message || 'Login failed!');
             }
@@ -129,7 +133,7 @@ const SignInForm = () => {
                         name="email"
                         rules={[{ required: true, message: 'Please input your Email!' }]}
                     >
-                        <Input  onChange={handleOnChangeEmail} />
+                        <Input onChange={handleOnChangeEmail} />
                     </Form.Item>
 
                     <Form.Item

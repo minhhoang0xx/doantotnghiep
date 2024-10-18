@@ -9,6 +9,7 @@ import ProductPage from "../pages/ProductPage/ProductPage";
 import SignInPage from "../pages/SignIn/SignInPage";
 import SignUpPage from "../pages/SignIn/SignUpPage";
 import UserDetailPage from "../pages/UserPage/UserDetailPage";
+import AdminPage from "../pages/AdminPage/AdminPage";
 
 
 
@@ -74,6 +75,13 @@ export const routes =[
         path: '/userDetail',
         page: UserDetailPage,
         isShowHeader: true,
+    
+    },
+    {
+        path: '/admin',
+        page: AdminPage,
+        isShowHeader: false,
+        isPrivate: true
     
     },
 ]

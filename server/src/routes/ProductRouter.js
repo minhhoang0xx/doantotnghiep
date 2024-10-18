@@ -10,4 +10,5 @@ router.delete('/deleteProduct/:id', authAdminMiddleware, ProductController.delet
 router.get('/getAllProduct', ProductController.getAllProduct)
 router.get('/detailProduct/:id', ProductController.detailProduct)
 router.post('/refreshToken', ProductController.refreshToken)
+
 module.exports = router

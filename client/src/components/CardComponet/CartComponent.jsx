@@ -5,10 +5,10 @@ import Meta from "antd/es/card/Meta";
 
 
 const CardComponent = (props) => {
-    const { countInStock, description, image, name, price, rating } = props;
+    const { countInStock, image, name, price, rating, sold } = props;
     return (
         <Card
-        hoverable
+        hoverable // hover 
             style={{ width: '18.7%', borderRadius: '8px',  overflow: 'hidden', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)'}}
             cover={ 
                 <div style={{ height: '200px', overflow: 'hidden',  }}>
@@ -24,9 +24,9 @@ const CardComponent = (props) => {
                 title={<span style={{ fontWeight: 'bold', fontSize: '20px' }}>{name}</span>}
                 description={
                     <div style={{ marginTop: '10px' }}>
-                    <p style={{ margin: 0, color: '#555' }}>{description}</p> 
                     <p style={{ margin: '10px 0', fontSize: '14px', fontWeight: 'bold', color: 'darkgreen' }}>Price: ${price}</p> 
                     <p style={{ margin: '5px 0', fontSize: '12px', color: '#999' }}>Stock: {countInStock}</p> 
+                    <p style={{ margin: '5px 0', fontSize: '12px', color: '#999' }}>Sold: {sold}</p> 
                     <p style={{ margin: '5px 0', fontSize: '12px', color: '#999' }}>Rating: {rating}</p> 
                   </div>
                 }

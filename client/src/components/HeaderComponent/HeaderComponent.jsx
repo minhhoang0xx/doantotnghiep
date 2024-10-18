@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Badge, Col, Input, message } from 'antd'
 import { useNavigate } from "react-router-dom";
 import { WrapperAccount, WrapperHeader, WrapperText } from './style';
-import { UserOutlined, ShoppingCartOutlined, LogoutOutlined } from '@ant-design/icons';
+import { UserOutlined, ShoppingCartOutlined, LogoutOutlined, SettingOutlined } from '@ant-design/icons';
 // import { useCookies } from 'react-cookie';
 import { useDispatch, useSelector } from 'react-redux';
 import * as UserService from '../../services/UserService';
@@ -12,7 +12,6 @@ import { resetUser } from '../../redux/slices/userSlice'
 const HeaderComponent = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
-    const [storedUser, setStoredUser] = useState(null);
     const user = useSelector((state) => state.user)
     const handleNavigateHome = () => {
         navigate('/')
@@ -29,9 +28,6 @@ const HeaderComponent = () => {
     const handleNavigateContact = () => {
         navigate('/contact')
     }
-    const handleNavigateCart = () => {
-        navigate('/cart')
-    }
     const handleLogout = async () => {
         await UserService.logOut()
         dispatch(resetUser)
@@ -41,10 +37,16 @@ const HeaderComponent = () => {
         message.success('Login successful!');
 
     }
+    const handleNavigateCartOrAdmin = () => {
+        if (user.isAdmin) {
+            navigate('/admin');
+        } else {
+            navigate('/cart');
+        }
+    };
+
+
     const storageData = localStorage.getItem('access_token');
-    // const handleNavigateUserDetail = () => {
-    //     navigate('/detailUser/:id')
-    // }
 
     return (
         <div>
@@ -72,7 +74,7 @@ const HeaderComponent = () => {
                                 onClick={user?.name ? () => navigate('/userDetail') : handleNavigateLogin}
                                 style={{ cursor: 'pointer', marginRight: '10px' }}
                             >
-                           <UserOutlined style={{ fontSize: '30px' }} />
+                                <UserOutlined style={{ fontSize: '30px' }} />
                             </div>
                             {storageData && (
                                 <div
@@ -84,12 +86,14 @@ const HeaderComponent = () => {
                             )}
                         </div>
 
-                        <div>
-                            <div onClick={handleNavigateCart} style={{ cursor: 'pointer' }}>
+                        <div onClick={handleNavigateCartOrAdmin} style={{ cursor: 'pointer' }}>
+                            {user.isAdmin ? (
+                                <SettingOutlined style={{ fontSize: '30px' }} /> 
+                            ) : (
                                 <Badge count={1} size='small'>
                                     <ShoppingCartOutlined style={{ fontSize: '30px' }} />
                                 </Badge>
-                            </div>
+                            )}
                         </div>
                         {storageData && (
                             <div>

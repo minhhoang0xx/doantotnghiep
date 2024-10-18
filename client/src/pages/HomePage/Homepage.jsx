@@ -61,7 +61,8 @@ const HomePage = () =>{
                   image = {product.image} 
                   name = {product.name}
                   price = {product.price}
-                  rating = {product.rating}/>
+                  rating = {product.rating}
+                  sold = {product.sold}/>
                 )
               })} 
             </div>

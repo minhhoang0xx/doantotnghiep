@@ -11,6 +11,7 @@ const initialState = { // trang thai ban dau
   avatar: '',
   id: null,
   access_token: '',
+  isAdmin : false
 }
 
 export const userSlice = createSlice({ // quan ly
@@ -18,7 +19,7 @@ export const userSlice = createSlice({ // quan ly
   initialState,
   reducers: {
     updateUser: (state, action) =>{
-      const {name, email, phone, address,avatar,_id, access_token} = action.payload;
+      const {name, email, phone, address,avatar,_id, access_token, isAdmin} = action.payload;
       state.name = name;
       state.email = email;
       state.phone = phone;
@@ -26,6 +27,7 @@ export const userSlice = createSlice({ // quan ly
       state.avatar = avatar;
       state.id = _id;
       state.access_token = access_token;
+      state.isAdmin = isAdmin;
     },
     resetUser: (state) =>{
       state.name ='';
@@ -35,6 +37,7 @@ export const userSlice = createSlice({ // quan ly
       state.avatar = '';
       state.id = '';
       state.access_token = '';
+      state.isAdmin = false
     },
   },
 })

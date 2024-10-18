@@ -10,6 +10,7 @@ const productSchema = new mongoose.Schema(
         countInStock: { type: Number, required: true },
         rating: {type: Number},
         description: {type: String},
+        sold:{type: Number}
                 
     },
     {
