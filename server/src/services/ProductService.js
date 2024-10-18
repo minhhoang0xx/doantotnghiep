@@ -67,7 +67,7 @@ const updateProduct = (id,data) => {
     
 }
 
-const deleteProduct= (id) => {
+const deleteProduct= async (id) => {
     return new Promise(async (resolve, reject) => {
         try {
             const checkProduct = await Product.findOne({
@@ -79,7 +79,7 @@ const deleteProduct= (id) => {
                     message: 'the Product is not Defined',
                 })
             }
-            //await Product.findByIdAndDelete(id)
+            await Product.findByIdAndDelete(id)
             resolve ({
                 status: 'OK',
                 message: 'deleted',

@@ -87,7 +87,7 @@ const AddProduct = ({ isModalOpen, setIsModalOpen, refetchProducts, products }) 
                         }
                     ]}
                 >
-                    <InputNumber />
+                    <InputNumber style={{width:'100%'}}/>
                 </Form.Item>
                 <Form.Item
                     label="Stock Count"
@@ -100,7 +100,7 @@ const AddProduct = ({ isModalOpen, setIsModalOpen, refetchProducts, products }) 
                         }
                     ]}
                 >
-                    <InputNumber />
+                    <InputNumber style={{width:'100%'}}/>
                 </Form.Item>
                 <Form.Item
                     label="Description"

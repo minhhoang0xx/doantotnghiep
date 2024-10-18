@@ -1,29 +1,38 @@
+
 import React, { useState } from 'react';
 import { Layout, Menu, Table, Spin, Divider, Typography, Button, Checkbox, message } from 'antd';
-import { UserOutlined, ProductOutlined, ContainerOutlined  } from '@ant-design/icons';
+import { UserOutlined, ProductOutlined, ContainerOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import * as ProductService from "../../services/ProductService";
 import * as UserService from "../../services/UserService";
 // import * as OrderService from "../../services/OrderService"; 
 import AddProduct from '../../components/AdminComponent/AddProduct';
+import DeleteConfirm from '../../components/AdminComponent/DeleteConfirm';
+import UpdateModal from '../../components/AdminComponent/UpdateModal';
 const { Title } = Typography;
 const { Sider, Content } = Layout;
 
 const AdminPage = () => {
-    const [currentView, setCurrentView] = useState('users'); // Trạng thái hiện tại của view
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedRadio, setSelectedRadio] = useState([]);
-    const navigate = useNavigate(); 
+    const [currentView, setCurrentView] = useState('users'); // check view hien tai
+    const [AddModal, setAddModal] = useState(false); // check Add modal co mo hay khong
+    const [selectedRadio, setSelectedRadio] = useState([]); // mang luu ID da chon
+    const [deleteModal, setDeleteModal] = useState(false); // check modal delete co mo hay khong
+    const [updateModal, setUpdateModal] = useState(false); // check modal update co mo hay khong
+    const [currentData, setCurrentData] = useState(null); // data cua doi tuong cap nhat
+    const navigate = useNavigate();
 
     const handleOpenModal = () => {
-        setIsModalOpen(true);
+        setAddModal(true);
     };
 
     const handleSelect = (id) => {
         setSelectedRadio((prev) =>
             prev.includes(id) ? prev.filter((key) => key !== id) : [...prev, id]
         );
+    };
+    const handleDeleteConfirm = () => {
+        setDeleteModal(true);
     };
 
     const handleDelete = async () => {
@@ -33,7 +42,7 @@ const AdminPage = () => {
                 deletePromises = selectedRadio.map(id => ProductService.deleteProduct(id));
             } else if (currentView === 'users') {
                 deletePromises = selectedRadio.map(id => UserService.deleteUser(id)); // Giả sử bạn có hàm deleteUser
-            } 
+            }
             // else if (currentView === 'orders') {
             //     deletePromises = selectedRadio.map(id => OrderService.deleteOrder(id)); // Giả sử bạn có hàm deleteOrder
             // }
@@ -41,18 +50,24 @@ const AdminPage = () => {
             await Promise.all(deletePromises);
             message.success(`${currentView.charAt(0).toUpperCase() + currentView.slice(1)} deleted successfully!`);
             setSelectedRadio([]); // Reset selected keys
-            refetchData(); // Refetch data after deletion
+            setDeleteModal(false);
+            refetchData(); // lam moi du lieu
         } catch (error) {
             message.error('Failed to delete: ' + (error.response?.data?.message || 'Unknown error'));
         }
     };
 
+    const handleUpdate = (record) => {
+        setCurrentData(record); // Lưu đối tượng hiện tại cần update
+        setUpdateModal(true); // Mở modal update
+    };
+
     const refetchData = () => {
         if (currentView === 'products') {
-            refetchProducts();
+            refetchProducts(); // call api lay list product
         } else if (currentView === 'users') {
             refetchUsers();
-        } 
+        }
         // else if (currentView === 'orders') {
         //     refetchOrders();
         // }
@@ -90,7 +105,7 @@ const AdminPage = () => {
     const { data: products, isLoading: loadingProducts, refetch: refetchProducts } = useQuery({
         queryKey: ['products'],
         queryFn: fetchAllProduct,
-        enabled: currentView === 'products', 
+        enabled: currentView === 'products',
         retry: 3,
         retryDelay: 1000,
     });
@@ -116,12 +131,17 @@ const AdminPage = () => {
                 />
             ),
         },
-        { title: 'Name', dataIndex: 'name', key: 'name'},
-        { title: 'Email', dataIndex: 'email', key: 'email'},
-        {title: 'Phone',dataIndex: 'phone',key: 'phone'},
-        {title: 'Address',   dataIndex: 'address',  key: 'address'},
-        {title: 'Role', dataIndex: 'isAdmin',    key: 'isAdmin',
+        { title: 'Name', dataIndex: 'name', key: 'name' },
+        { title: 'Email', dataIndex: 'email', key: 'email' },
+        { title: 'Phone', dataIndex: 'phone', key: 'phone' },
+        { title: 'Address', dataIndex: 'address', key: 'address' },
+        {
+            title: 'Role', dataIndex: 'isAdmin', key: 'isAdmin',
             render: (text) => (text ? 'Admin' : 'User'), // Hiển thị vai trò người dùng
+        },
+        {
+            title: 'Action',render: (text, record) => 
+            (<Button onClick={() => handleUpdate(record)}>Update</Button>),
         },
     ];
 
@@ -136,14 +156,19 @@ const AdminPage = () => {
                 />
             ),
         },
-        {title: 'Name',dataIndex: 'name',key: 'name',},
-        { title: 'Price',dataIndex: 'price',key: 'price',
+        { title: 'Name', dataIndex: 'name', key: 'name', },
+        {
+            title: 'Price', dataIndex: 'price', key: 'price',
             render: (text) => `$${text}`, // Format giá tiền
         },
-        { title: 'Type', dataIndex: 'type', key: 'type',},
-        { title: 'Count In Stock',dataIndex: 'countInStock',key: 'countInStock',},
-        { title: 'Rating', dataIndex: 'rating', key: 'rating',},
-        { title: 'Description', dataIndex: 'description', key: 'description',},
+        { title: 'Type', dataIndex: 'type', key: 'type', },
+        { title: 'Count In Stock', dataIndex: 'countInStock', key: 'countInStock', },
+        { title: 'Rating', dataIndex: 'rating', key: 'rating', },
+        { title: 'Description', dataIndex: 'description', key: 'description', },
+        {
+            title: 'Action',render: (text, record) => 
+            (<Button onClick={() => handleUpdate(record)}>Update</Button>),
+        },
     ];
 
 
@@ -158,24 +183,30 @@ const AdminPage = () => {
                 />
             ),
         },
-        {title: 'Order ID',dataIndex: '_id',key: '_id',},
-        { title: 'User', dataIndex: 'user',key: 'user',
+        { title: 'Order ID', dataIndex: '_id', key: '_id', },
+        {
+            title: 'User', dataIndex: 'user', key: 'user',
             render: (user) => user.name, // Giả sử bạn có trường name trong User
         },
-        { title: 'Total Price',dataIndex: 'totalPrice',key: 'totalPrice'},
+        { title: 'Total Price', dataIndex: 'totalPrice', key: 'totalPrice' },
         {
             title: 'Is Paid', dataIndex: 'isPaid', key: 'isPaid',
             render: (text) => (text ? 'Yes' : 'No'), // Hiển thị tình trạng thanh toán
         },
-        { title: 'Created At',  dataIndex: 'createdAt', key: 'createdAt',
+        {
+            title: 'Created At', dataIndex: 'createdAt', key: 'createdAt',
             render: (text) => new Date(text).toLocaleString(), // Hiển thị thời gian tạo
+        },
+        {
+            title: 'Action',render: (text, record) => 
+            (<Button onClick={() => handleUpdate(record)}>Update</Button>),
         },
     ];
 
     return (
         <Layout style={{ minHeight: '100vh' }}>
             <Sider width='12%' style={{ background: '#fff' }}>
-                <div style={{ padding: '20px', textAlign: 'center', cursor:'pointer' }} onClick={() => navigate('/')}>
+                <div style={{ padding: '20px', textAlign: 'center', cursor: 'pointer' }} onClick={() => navigate('/')}>
                     <Title level={4} style={{ margin: 0, color: '#333' }}>Hoang System Education</Title>
                     <Button type="link"> Back to Home</Button>
                 </div>
@@ -211,12 +242,12 @@ const AdminPage = () => {
                         {currentView === 'users' ? 'User List' : currentView === 'products' ? 'Product List' : 'Order List'}
                     </Divider>
                     {currentView === 'products' && (
-                        <Button type="primary" onClick={handleOpenModal} style={{ marginBottom: '20px' }}>
+                        <Button type="primary" onClick={handleOpenModal}>
                             Add New Product
                         </Button>
                     )}
-                     <Button type="danger" onClick={handleDelete} style={{ marginBottom: '20px' }} disabled={selectedRadio.length === 0}>
-                        Delete Selected
+                    <Button onClick={handleDeleteConfirm} disabled={selectedRadio.length === 0} style={{backgroundColor: selectedRadio.length === 0 ? 'gray' : 'red', color: 'white',fontSize: '16px', border: 'none',borderRadius: '4px',padding: '10px 20px', cursor: selectedRadio.length === 0 ? 'not-allowed' : 'pointer',transition: 'background-color 0.3s ease',}}onMouseEnter={(e) => {if (selectedRadio.length > 0) { e.currentTarget.style.backgroundColor = 'darkred'; }}}onMouseLeave={(e) => {e.currentTarget.style.backgroundColor = selectedRadio.length > 0 ? 'red' : 'gray'; }}>
+                        Delete
                     </Button>
                     {loadingProducts || loadingUsers ? ( ////////////////////////////////////// nho them loading order
                         <Spin size="large" />
@@ -243,11 +274,23 @@ const AdminPage = () => {
                         />
                     )}
                     <AddProduct
-                        isModalOpen={isModalOpen}
-                        setIsModalOpen={setIsModalOpen}
+                        isModalOpen={AddModal}
+                        setIsModalOpen={setAddModal}
                         refetchProducts={refetchProducts}
                         products={products?.data || []}
                     />
+                    <DeleteConfirm
+                        open={deleteModal}
+                        onConfirm={handleDelete}
+                        onCancel={() => setDeleteModal(false)}
+                    />
+                     <UpdateModal
+                    isModalOpen={updateModal}
+                    setIsModalOpen={setUpdateModal}
+                    currentData={currentData}
+                    refetchData={refetchData}
+                    currentView={currentView}
+                />
                 </Content>
             </Layout>
         </Layout>

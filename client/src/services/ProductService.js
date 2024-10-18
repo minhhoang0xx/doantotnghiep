@@ -16,3 +16,9 @@ export const deleteProduct = async (id) => {
     const res = await axios.delete(`${process.env.REACT_APP_API_URL}/product/deleteProduct/${id}`);
     return res.data;
 };
+
+export const updateProduct = async (id, data) => {
+    const res = await axios.put(`${process.env.REACT_APP_API_URL}/product/updateProduct/${id}`, data);
+    return res.data;
+};
+
