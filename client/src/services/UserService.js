@@ -41,3 +41,8 @@ export const updateUser = async (id,data) => {
     const res = await axios.put(`${process.env.REACT_APP_API_URL}/user/updateUser/${id}`, data)
     return res.data
 };
+
+export const deleteUser = async (id) => {
+    const res = await axios.delete(`${process.env.REACT_APP_API_URL}/product/deleteUser/${id}`);
+    return res.data;
+};

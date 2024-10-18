@@ -4,7 +4,7 @@ const ProductService = require('../services/ProductService.js');
 const createProduct = async (req,res)=>{
     try{
         const {name,image,type,price,countInStock,rating,description} = req.body
-        if(!name || !image || !type || !price || !countInStock || !rating ){
+        if(!name || !image || !type || !price || !countInStock){
             return res.status(200).json({
                 status: 'error',
                 message: 'the input is invalid'
@@ -103,7 +103,7 @@ const getAllProduct = async (req,res)=>{
         /////////////////////////
         const {limit,page, sort, filter} = req.query
         //////////////////////////
-        const response = await ProductService.getAllProduct(Number(limit) || 8, Number(page) || 0, sort, filter) // response de khac voi thang res khong bi nham
+        const response = await ProductService.getAllProduct(Number(limit) || 12, Number(page) || 0, sort, filter) // response de khac voi thang res khong bi nham
         return res.status(200).json(response) 
     }catch(e){
         return res.status(404).json({ 

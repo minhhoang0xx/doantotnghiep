@@ -94,7 +94,10 @@ const SignUpForm = () => {
                     <Form.Item
                         label={<span style={{ textAlign:'left' }}>Phone Number</span>}
                         name="phone"
-                        rules={[{ required: true, message: 'Please input your phone number!' }]}
+                        rules={[
+                            { required: true, message: 'Please input your phone number!' },
+                            { pattern: /^[0-9]{10}$/, message: 'Phone number is incorrect!' }
+                        ]}
                     >
                         <Input />
                     </Form.Item>
@@ -110,7 +113,10 @@ const SignUpForm = () => {
                     <Form.Item
                         label="Password"
                         name="password"
-                        rules={[{ required: true, message: 'Please input your password!' }]}
+                        rules={[
+                            { required: true, message: 'Please input your password!' },
+                            { min: 6, message: 'Password must be at least 6 characters!' }
+                        ]}
                     >
                         <Input.Password />
                     </Form.Item>

@@ -1,18 +1,62 @@
 import React, { useState } from 'react';
-import { Layout, Menu, Table, Spin, Divider, Typography, Button } from 'antd';
+import { Layout, Menu, Table, Spin, Divider, Typography, Button, Checkbox, message } from 'antd';
 import { UserOutlined, ProductOutlined, ContainerOutlined  } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import * as ProductService from "../../services/ProductService";
 import * as UserService from "../../services/UserService";
 // import * as OrderService from "../../services/OrderService"; 
+import AddProduct from '../../components/AdminComponent/AddProduct';
 const { Title } = Typography;
 const { Sider, Content } = Layout;
 
 const AdminPage = () => {
     const [currentView, setCurrentView] = useState('users'); // Trạng thái hiện tại của view
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedRadio, setSelectedRadio] = useState([]);
     const navigate = useNavigate(); 
 
+    const handleOpenModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const handleSelect = (id) => {
+        setSelectedRadio((prev) =>
+            prev.includes(id) ? prev.filter((key) => key !== id) : [...prev, id]
+        );
+    };
+
+    const handleDelete = async () => {
+        try {
+            let deletePromises;
+            if (currentView === 'products') {
+                deletePromises = selectedRadio.map(id => ProductService.deleteProduct(id));
+            } else if (currentView === 'users') {
+                deletePromises = selectedRadio.map(id => UserService.deleteUser(id)); // Giả sử bạn có hàm deleteUser
+            } 
+            // else if (currentView === 'orders') {
+            //     deletePromises = selectedRadio.map(id => OrderService.deleteOrder(id)); // Giả sử bạn có hàm deleteOrder
+            // }
+
+            await Promise.all(deletePromises);
+            message.success(`${currentView.charAt(0).toUpperCase() + currentView.slice(1)} deleted successfully!`);
+            setSelectedRadio([]); // Reset selected keys
+            refetchData(); // Refetch data after deletion
+        } catch (error) {
+            message.error('Failed to delete: ' + (error.response?.data?.message || 'Unknown error'));
+        }
+    };
+
+    const refetchData = () => {
+        if (currentView === 'products') {
+            refetchProducts();
+        } else if (currentView === 'users') {
+            refetchUsers();
+        } 
+        // else if (currentView === 'orders') {
+        //     refetchOrders();
+        // }
+    };
 
     // Gọi API lấy dữ liệu sản phẩm
     const fetchAllProduct = async () => {
@@ -34,7 +78,7 @@ const AdminPage = () => {
 
 
     // Sử dụng react-query để quản lý trạng thái lấy dữ liệu cho các loại bảng khác nhau
-    const { data: users, isLoading: loadingUsers } = useQuery({
+    const { data: users, isLoading: loadingUsers, refetch: refetchUsers } = useQuery({
         queryKey: ['users'],
         queryFn: fetchAllUser,
         enabled: currentView === 'users', // Chỉ gọi khi view là users
@@ -43,7 +87,7 @@ const AdminPage = () => {
     });
 
 
-    const { data: products, isLoading: loadingProducts } = useQuery({
+    const { data: products, isLoading: loadingProducts, refetch: refetchProducts } = useQuery({
         queryKey: ['products'],
         queryFn: fetchAllProduct,
         enabled: currentView === 'products', 
@@ -53,7 +97,7 @@ const AdminPage = () => {
 
 
 
-    //   const { data: orders, isLoading: loadingOrders } = useQuery({
+    //   const { data: orders, isLoading: loadingOrders, refetch: refetchOrders } = useQuery({
     //     queryKey: ['orders'],
     //     queryFn: fetchOrderAll,
     //     enabled: currentView === 'orders', // Chỉ gọi khi view là orders
@@ -64,29 +108,19 @@ const AdminPage = () => {
     // Cấu trúc của cột trong bảng người dùng
     const userColumns = [
         {
-            title: 'Name',
-            dataIndex: 'name',
-            key: 'name',
+            title: 'Select',
+            render: (text, record) => (
+                <Checkbox
+                    checked={selectedRadio.includes(record._id)}
+                    onChange={() => handleSelect(record._id)}
+                />
+            ),
         },
-        {
-            title: 'Email',
-            dataIndex: 'email',
-            key: 'email',
-        },
-        {
-            title: 'Phone',
-            dataIndex: 'phone',
-            key: 'phone',
-        },
-        {
-            title: 'Address',
-            dataIndex: 'address',
-            key: 'address',
-        },
-        {
-            title: 'Role',
-            dataIndex: 'isAdmin',
-            key: 'isAdmin',
+        { title: 'Name', dataIndex: 'name', key: 'name'},
+        { title: 'Email', dataIndex: 'email', key: 'email'},
+        {title: 'Phone',dataIndex: 'phone',key: 'phone'},
+        {title: 'Address',   dataIndex: 'address',  key: 'address'},
+        {title: 'Role', dataIndex: 'isAdmin',    key: 'isAdmin',
             render: (text) => (text ? 'Admin' : 'User'), // Hiển thị vai trò người dùng
         },
     ];
@@ -94,67 +128,46 @@ const AdminPage = () => {
     // Cấu trúc của cột trong bảng sản phẩm
     const productColumns = [
         {
-            title: 'Name',
-            dataIndex: 'name',
-            key: 'name',
+            title: 'Select',
+            render: (text, record) => (
+                <Checkbox
+                    checked={selectedRadio.includes(record._id)}
+                    onChange={() => handleSelect(record._id)}
+                />
+            ),
         },
-        {
-            title: 'Price',
-            dataIndex: 'price',
-            key: 'price',
+        {title: 'Name',dataIndex: 'name',key: 'name',},
+        { title: 'Price',dataIndex: 'price',key: 'price',
             render: (text) => `$${text}`, // Format giá tiền
         },
-        {
-            title: 'Type',
-            dataIndex: 'type',
-            key: 'type',
-        },
-        {
-            title: 'Count In Stock',
-            dataIndex: 'countInStock',
-            key: 'countInStock',
-        },
-        {
-            title: 'Rating',
-            dataIndex: 'rating',
-            key: 'rating',
-        },
-        {
-            title: 'Description',
-            dataIndex: 'description',
-            key: 'description',
-        },
+        { title: 'Type', dataIndex: 'type', key: 'type',},
+        { title: 'Count In Stock',dataIndex: 'countInStock',key: 'countInStock',},
+        { title: 'Rating', dataIndex: 'rating', key: 'rating',},
+        { title: 'Description', dataIndex: 'description', key: 'description',},
     ];
 
 
     // Cấu trúc của cột trong bảng đơn hàng
     const orderColumns = [
         {
-            title: 'Order ID',
-            dataIndex: '_id',
-            key: '_id',
+            title: 'Select',
+            render: (text, record) => (
+                <Checkbox
+                    checked={selectedRadio.includes(record._id)}
+                    onChange={() => handleSelect(record._id)}
+                />
+            ),
         },
-        {
-            title: 'User',
-            dataIndex: 'user',
-            key: 'user',
+        {title: 'Order ID',dataIndex: '_id',key: '_id',},
+        { title: 'User', dataIndex: 'user',key: 'user',
             render: (user) => user.name, // Giả sử bạn có trường name trong User
         },
+        { title: 'Total Price',dataIndex: 'totalPrice',key: 'totalPrice'},
         {
-            title: 'Total Price',
-            dataIndex: 'totalPrice',
-            key: 'totalPrice',
-        },
-        {
-            title: 'Is Paid',
-            dataIndex: 'isPaid',
-            key: 'isPaid',
+            title: 'Is Paid', dataIndex: 'isPaid', key: 'isPaid',
             render: (text) => (text ? 'Yes' : 'No'), // Hiển thị tình trạng thanh toán
         },
-        {
-            title: 'Created At',
-            dataIndex: 'createdAt',
-            key: 'createdAt',
+        { title: 'Created At',  dataIndex: 'createdAt', key: 'createdAt',
             render: (text) => new Date(text).toLocaleString(), // Hiển thị thời gian tạo
         },
     ];
@@ -164,9 +177,7 @@ const AdminPage = () => {
             <Sider width='12%' style={{ background: '#fff' }}>
                 <div style={{ padding: '20px', textAlign: 'center', cursor:'pointer' }} onClick={() => navigate('/')}>
                     <Title level={4} style={{ margin: 0, color: '#333' }}>Hoang System Education</Title>
-                    <Button type="link" >
-                        Back to Home
-                    </Button>
+                    <Button type="link"> Back to Home</Button>
                 </div>
                 <Menu
                     mode="inline"
@@ -199,6 +210,14 @@ const AdminPage = () => {
                     <Divider orientation="left">
                         {currentView === 'users' ? 'User List' : currentView === 'products' ? 'Product List' : 'Order List'}
                     </Divider>
+                    {currentView === 'products' && (
+                        <Button type="primary" onClick={handleOpenModal} style={{ marginBottom: '20px' }}>
+                            Add New Product
+                        </Button>
+                    )}
+                     <Button type="danger" onClick={handleDelete} style={{ marginBottom: '20px' }} disabled={selectedRadio.length === 0}>
+                        Delete Selected
+                    </Button>
                     {loadingProducts || loadingUsers ? ( ////////////////////////////////////// nho them loading order
                         <Spin size="large" />
                     ) : currentView === 'users' ? (
@@ -223,6 +242,12 @@ const AdminPage = () => {
                             pagination={{ pageSize: 10 }}
                         />
                     )}
+                    <AddProduct
+                        isModalOpen={isModalOpen}
+                        setIsModalOpen={setIsModalOpen}
+                        refetchProducts={refetchProducts}
+                        products={products?.data || []}
+                    />
                 </Content>
             </Layout>
         </Layout>
