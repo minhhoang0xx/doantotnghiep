@@ -95,14 +95,12 @@ const getAllProduct = (limit, page, sort, filter) => {
     return new Promise(async (resolve, reject) => {
         try {
             const total = await Product.countDocuments(); // Đếm tổng số sản phẩm
-
             if (filter) {
                 const label = filter[0];
                 const allObjectFilter = await Product.find({ [label]: { '$regex': filter[1], '$options': 'i' } })
                     .limit(limit)
                     .skip(page * limit); // $regex để lọc theo từ khóa liên quan nhất
                 // [label] phải để như vậy nếu không sẽ coi label là key trực tiếp
-
                 return resolve({
                     status: 'OK',
                     message: 'Filter list',

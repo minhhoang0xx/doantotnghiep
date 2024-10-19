@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Layout, Menu, Table, Spin, Divider, Typography, Button, Checkbox, message } from 'antd';
+import { Layout, Menu, Table, Spin, Divider, Typography, Button, Checkbox, message, Input } from 'antd';
 import { UserOutlined, ProductOutlined, ContainerOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -20,6 +20,11 @@ const AdminPage = () => {
     const [deleteModal, setDeleteModal] = useState(false); // check modal delete co mo hay khong
     const [updateModal, setUpdateModal] = useState(false); // check modal update co mo hay khong
     const [currentData, setCurrentData] = useState(null); // data cua doi tuong cap nhat
+    const [userSearch, setUserSearch] = useState('');
+    const [productSearch, setProductSearch] = useState('');
+    const [orderSearch, setOrderSearch] = useState('');
+    const [sort, setSort] = useState(null); 
+    const [filter, setFilter] = useState(null); 
     const navigate = useNavigate();
 
     const handleOpenModal = () => {
@@ -31,6 +36,8 @@ const AdminPage = () => {
             prev.includes(id) ? prev.filter((key) => key !== id) : [...prev, id]
         );
     };
+
+    /// delete
     const handleDeleteConfirm = () => {
         setDeleteModal(true);
     };
@@ -56,12 +63,14 @@ const AdminPage = () => {
             message.error('Failed to delete: ' + (error.response?.data?.message || 'Unknown error'));
         }
     };
-
+    // update
     const handleUpdate = (record) => {
         setCurrentData(record); // Lưu đối tượng hiện tại cần update
         setUpdateModal(true); // Mở modal update
     };
 
+
+    // show 
     const refetchData = () => {
         if (currentView === 'products') {
             refetchProducts(); // call api lay list product
@@ -75,21 +84,17 @@ const AdminPage = () => {
 
     // Gọi API lấy dữ liệu sản phẩm
     const fetchAllProduct = async () => {
-        const res = await ProductService.getAllProduct();
+        const res = await ProductService.getAllProduct(sort, filter);
         return res;
     };
-
-    // Gọi API lấy dữ liệu người dùng
     const fetchAllUser = async () => {
         const res = await UserService.getAllUser();
         return res;
     };
-
-    // Gọi API lấy dữ liệu đơn hàng
-    //   const fetchAllOrder = async () => {
-    //     const res = await OrderService.getAllOrders(); // Giả sử bạn có hàm này trong OrderService
-    //     return res;
-    //   };
+    const fetchAllOrder = async () => {
+        // const res = await OrderService.getAllOrders(); // Giả sử bạn có hàm này trong OrderService
+        // return res;
+    };
 
 
     // Sử dụng react-query để quản lý trạng thái lấy dữ liệu cho các loại bảng khác nhau
@@ -114,11 +119,26 @@ const AdminPage = () => {
 
     //   const { data: orders, isLoading: loadingOrders, refetch: refetchOrders } = useQuery({
     //     queryKey: ['orders'],
-    //     queryFn: fetchOrderAll,
-    //     enabled: currentView === 'orders', // Chỉ gọi khi view là orders
+    //     queryFn: fetchAllOrder,
+    //     enabled: currentView === 'orders',
     //     retry: 3,
     //     retryDelay: 1000,
     //   });
+
+    /// Search
+    const filteredUsers = users?.data.filter(user =>
+        user.name.toLowerCase().includes(userSearch.toLowerCase()) ||
+        user.email.toLowerCase().includes(userSearch.toLowerCase())
+    );
+
+    const filteredProducts = products?.data.filter(product =>
+        product.name.toLowerCase().includes(productSearch.toLowerCase())
+    );
+
+    // const filteredOrders = orders?.data.filter(order => 
+    //     order.user.name.toLowerCase().includes(orderSearch.toLowerCase())
+    // );
+
 
     // Cấu trúc của cột trong bảng người dùng
     const userColumns = [
@@ -140,8 +160,8 @@ const AdminPage = () => {
             render: (text) => (text ? 'Admin' : 'User'), // Hiển thị vai trò người dùng
         },
         {
-            title: 'Action',render: (text, record) => 
-            (<Button onClick={() => handleUpdate(record)}>Update</Button>),
+            title: 'Action', render: (text, record) =>
+                (<Button onClick={() => handleUpdate(record)}>Set Admin</Button>),
         },
     ];
 
@@ -156,18 +176,24 @@ const AdminPage = () => {
                 />
             ),
         },
-        { title: 'Name', dataIndex: 'name', key: 'name', },
+        { title: 'Name', dataIndex: 'name', key: 'name', sorter: true },
         {
-            title: 'Price', dataIndex: 'price', key: 'price',
+            title: 'Price', dataIndex: 'price', key: 'price', sorter: true,
             render: (text) => `$${text}`, // Format giá tiền
         },
-        { title: 'Type', dataIndex: 'type', key: 'type', },
-        { title: 'Count In Stock', dataIndex: 'countInStock', key: 'countInStock', },
-        { title: 'Rating', dataIndex: 'rating', key: 'rating', },
+        {
+            title: 'Type', dataIndex: 'type', key: 'type',
+            filters: [
+                { text: 'Electronic', value: 'electronic' },
+                { text: 'Clothing', value: 'clothing' },
+            ],
+        },
+        { title: 'Count In Stock', dataIndex: 'countInStock', key: 'countInStock', sorter: true },
+        { title: 'Rating', dataIndex: 'rating', key: 'rating', sorter: true },
         { title: 'Description', dataIndex: 'description', key: 'description', },
         {
-            title: 'Action',render: (text, record) => 
-            (<Button onClick={() => handleUpdate(record)}>Update</Button>),
+            title: 'Action', render: (text, record) =>
+                (<Button onClick={() => handleUpdate(record)}>Update</Button>),
         },
     ];
 
@@ -198,8 +224,10 @@ const AdminPage = () => {
             render: (text) => new Date(text).toLocaleString(), // Hiển thị thời gian tạo
         },
         {
-            title: 'Action',render: (text, record) => 
-            (<Button onClick={() => handleUpdate(record)}>Update</Button>),
+            title: 'Action', render: (text, record) =>
+            (<Button onClick={() => handleUpdate(record)}>Update</Button>
+            ),
+
         },
     ];
 
@@ -241,12 +269,33 @@ const AdminPage = () => {
                     <Divider orientation="left">
                         {currentView === 'users' ? 'User List' : currentView === 'products' ? 'Product List' : 'Order List'}
                     </Divider>
+                    {currentView === 'users' && (
+                        <Input.Search
+                            placeholder="Search Users by name or email"
+                            onSearch={value => setUserSearch(value)}
+                            style={{ marginBottom: 16 }}
+                        />
+                    )}
+                    {currentView === 'products' && (
+                        <Input.Search
+                            placeholder="Search Products by name"
+                            onSearch={value => setProductSearch(value)}
+                            style={{ marginBottom: 16 }}
+                        />
+                    )}
+                    {currentView === 'orders' && (
+                        <Input.Search
+                            placeholder="Search Orders"
+                            onSearch={value => setOrderSearch(value)}
+                            style={{ marginBottom: 16 }}
+                        />
+                    )}
                     {currentView === 'products' && (
                         <Button type="primary" onClick={handleOpenModal}>
                             Add New Product
                         </Button>
                     )}
-                    <Button onClick={handleDeleteConfirm} disabled={selectedRadio.length === 0} style={{backgroundColor: selectedRadio.length === 0 ? 'gray' : 'red', color: 'white',fontSize: '16px', border: 'none',borderRadius: '4px',padding: '10px 20px', cursor: selectedRadio.length === 0 ? 'not-allowed' : 'pointer',transition: 'background-color 0.3s ease',}}onMouseEnter={(e) => {if (selectedRadio.length > 0) { e.currentTarget.style.backgroundColor = 'darkred'; }}}onMouseLeave={(e) => {e.currentTarget.style.backgroundColor = selectedRadio.length > 0 ? 'red' : 'gray'; }}>
+                    <Button onClick={handleDeleteConfirm} disabled={selectedRadio.length === 0} style={{ backgroundColor: selectedRadio.length === 0 ? 'gray' : 'red', color: 'white', fontSize: '16px', border: 'none', borderRadius: '4px', padding: '10px 20px', cursor: selectedRadio.length === 0 ? 'not-allowed' : 'pointer', transition: 'background-color 0.3s ease', }} onMouseEnter={(e) => { if (selectedRadio.length > 0) { e.currentTarget.style.backgroundColor = 'darkred'; } }} onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = selectedRadio.length > 0 ? 'red' : 'gray'; }}>
                         Delete
                     </Button>
                     {loadingProducts || loadingUsers ? ( ////////////////////////////////////// nho them loading order
@@ -254,21 +303,21 @@ const AdminPage = () => {
                     ) : currentView === 'users' ? (
                         <Table
                             columns={userColumns}
-                            dataSource={users?.data}
+                            dataSource={filteredUsers}
                             rowKey={(record) => record._id}
                             pagination={{ pageSize: 10 }}
                         />
                     ) : currentView === 'products' ? (
                         <Table
                             columns={productColumns}
-                            dataSource={products?.data} // Hiển thị dữ liệu từ API sản phẩm
+                            dataSource={filteredProducts} // Hiển thị dữ liệu từ API sản phẩm
                             rowKey={(record) => record._id} // Đặt key là _id của mỗi sản phẩm
                             pagination={{ pageSize: 10 }} // Phân trang, 10 sản phẩm mỗi trang
                         />
                     ) : (
                         <Table
                             columns={orderColumns}
-                            //   dataSource={orders?.data} // Hiển thị dữ liệu từ API đơn hàng
+                            //   dataSource={filteredOrders} // Hiển thị dữ liệu từ API đơn hàng
                             rowKey={(record) => record._id}
                             pagination={{ pageSize: 10 }}
                         />
@@ -284,13 +333,13 @@ const AdminPage = () => {
                         onConfirm={handleDelete}
                         onCancel={() => setDeleteModal(false)}
                     />
-                     <UpdateModal
-                    isModalOpen={updateModal}
-                    setIsModalOpen={setUpdateModal}
-                    currentData={currentData}
-                    refetchData={refetchData}
-                    currentView={currentView}
-                />
+                    <UpdateModal
+                        isModalOpen={updateModal}
+                        setIsModalOpen={setUpdateModal}
+                        currentData={currentData}
+                        refetchData={refetchData}
+                        currentView={currentView}
+                    />
                 </Content>
             </Layout>
         </Layout>
