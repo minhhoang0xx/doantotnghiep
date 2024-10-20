@@ -60,7 +60,7 @@ export const routes =[
         page: SignUpPage
     },
     {
-        path: '/product/detail',
+        path: '/product/detailProduct/:id',
         page: ProductDetailPage,
         isShowHeader: true,
     

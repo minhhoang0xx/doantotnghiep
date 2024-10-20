@@ -2,16 +2,22 @@ import React from "react";
 import { ShoppingCartOutlined } from '@ant-design/icons';
 import { Card } from 'antd';
 import Meta from "antd/es/card/Meta";
+import { useNavigate } from "react-router-dom";
 
 
 const CardComponent = (props) => {
-    const { countInStock, image, name, price, rating, sold } = props;
+    const { _id,countInStock, image, name, price, rating, sold } = props;
+    const navigate = useNavigate()
+
+    const handleClick = () => {
+        navigate(`/product/detailProduct/${_id}`);  
+    };
     return (
         <Card
         hoverable // hover 
             style={{ width: '18.7%', borderRadius: '8px',  overflow: 'hidden', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)'}}
             cover={ 
-                <div style={{ height: '200px', overflow: 'hidden',  }}>
+                <div style={{ height: '200px', overflow: 'hidden' }}  onClick={handleClick} >
                     <img alt="Product Card" src={image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
             }

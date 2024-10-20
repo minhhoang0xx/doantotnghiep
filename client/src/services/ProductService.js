@@ -29,3 +29,8 @@ export const updateProduct = async (id, data) => {
     return res.data;
 };
 
+export const detailProduct = async (id) => {
+    const res = await axiosJWT.get(`${process.env.REACT_APP_API_URL}/product/detailProduct/${id}`)
+    return res.data
+};
+
