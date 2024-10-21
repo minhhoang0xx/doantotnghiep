@@ -170,6 +170,15 @@ const detailProduct = (id) => {
     })
     
 }
+const searchProduct = async (keyword) => {
+    try {
+        const products = await Product.find({ name: { $regex: keyword, $options: 'i' } });
+        return products;
+    } catch (error) {
+        throw new Error('Error searching products: ' + error.message);
+    }
+};
+
 
 
 module.exports = {
@@ -178,5 +187,6 @@ module.exports = {
     deleteProduct,
     getAllProduct,
     detailProduct,
+    searchProduct
 
 }

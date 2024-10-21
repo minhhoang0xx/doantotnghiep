@@ -56,6 +56,7 @@ const HomePage = () =>{
                 return (
                   <CardComponent 
                   key={product._id} 
+                  _id={product._id}
                   countInStock={product.countInStock} 
                   description={product.description} 
                   image = {product.image} 

@@ -10,5 +10,6 @@ router.delete('/deleteProduct/:id', ProductController.deleteProduct)// :id la di
 router.get('/getAllProduct', ProductController.getAllProduct)
 router.get('/detailProduct/:id', ProductController.detailProduct)
 router.post('/refreshToken', ProductController.refreshToken)
+router.get('/searchProduct', ProductController.searchProduct);
 
 module.exports = router

@@ -34,3 +34,8 @@ export const detailProduct = async (id) => {
     return res.data
 };
 
+export const searchProduct = async (keyword) => {
+    const res = await axios.get(`${process.env.REACT_APP_API_URL}/product/searchProduct`, { params: { keyword } });
+    return res.data;
+};
+

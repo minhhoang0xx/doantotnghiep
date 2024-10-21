@@ -132,6 +132,17 @@ const refreshToken = async (req,res)=>{
         })
     }
 }
+
+const searchProduct = async (req, res) => {
+    const { keyword } = req.query;
+    try {
+        const products = await ProductService.searchProduct(keyword);
+        res.status(200).json(products);
+    } catch (error) {
+        console.error('Error searching products:', error);
+        res.status(500).json({ message: 'Error searching products', error });
+    }
+};
 module.exports = {
     createProduct,
     logOut,
@@ -139,5 +150,6 @@ module.exports = {
     deleteProduct,
     getAllProduct,
     detailProduct,
-    refreshToken
+    refreshToken,
+    searchProduct
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Badge, Col, Input, message } from 'antd'
 import { useNavigate } from "react-router-dom";
 import { WrapperAccount, WrapperHeader, WrapperText } from './style';
@@ -6,13 +6,28 @@ import { UserOutlined, ShoppingCartOutlined, LogoutOutlined, SettingOutlined } f
 // import { useCookies } from 'react-cookie';
 import { useDispatch, useSelector } from 'react-redux';
 import * as UserService from '../../services/UserService';
-import { resetUser } from '../../redux/slices/userSlice'
+import * as ProductService from '../../services/ProductService';
+import { resetUser } from '../../redux/slices/userSlice';
+import {  fetchSearchResults, clearSearchResults   } from '../../redux/slices/productSlice';
+
 
 
 const HeaderComponent = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const user = useSelector((state) => state.user)
+    const searchResults = useSelector((state) => state.product.searchResults);  // Lấy kết quả tìm kiếm
+    const [search, setSearch] = useState('');
+
+    const onSearch = (e) => {
+        const keyword = e.target.value;
+        setSearch(keyword);
+        if (keyword.trim()) {
+            dispatch(fetchSearchResults(keyword));// api tu redux
+        } else {
+            dispatch(clearSearchResults());
+        }
+      }
     const handleNavigateHome = () => {
         navigate('/')
     }
@@ -28,6 +43,11 @@ const HeaderComponent = () => {
     const handleNavigateContact = () => {
         navigate('/contact')
     }
+    const handleNavigateSearch = (id) => {
+        navigate(`/product/detailProduct/${id}`);
+        setSearch('');
+        dispatch(clearSearchResults());
+    };
     const handleLogout = async () => {
         await UserService.logOut()
         dispatch(resetUser)
@@ -64,8 +84,19 @@ const HeaderComponent = () => {
                     <div onClick={handleNavigateContact} style={{ cursor: 'pointer' }} ><WrapperText>Contact</WrapperText></div>
                 </Col>
                 <Col span={8} style={{ display: 'flex', justifyContent: 'center' }}>
-                    <Input.Search placeholder="input search text" allowClear style={{ width: '90%' }} />
+                    <Input.Search placeholder="input search text" allowClear style={{ width: '90%' }} onChange={onSearch}/>
                 </Col>
+                {searchResults.length > 0 && (
+                    <div style={{ position: 'absolute', top: '50px', width: '90%', zIndex: 1000, background: 'white', boxShadow: '0px 4px 6px rgba(0,0,0,0.1)' }}>
+                        {searchResults.map((product) => (
+                            <div key={product._id} onClick={() => handleNavigateSearch(product._id)}
+                                style={{ padding: '10px', borderBottom: '1px solid #f0f0f0', cursor: 'pointer' }}
+                            >
+                                {product.name}
+                            </div>
+                        ))}
+                    </div>
+                )}
                 <Col span={5}>
 
                     <WrapperAccount>
