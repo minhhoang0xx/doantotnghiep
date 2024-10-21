@@ -1,17 +1,44 @@
 import React from "react";
 import { ShoppingCartOutlined } from '@ant-design/icons';
-import { Card } from 'antd';
+import { Card, message } from 'antd';
 import Meta from "antd/es/card/Meta";
-import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from 'react-redux';
+import { useLocation, useNavigate } from "react-router-dom";
+import { addOrderProduct } from '../../redux/slices/orderSlice'; // Import action
 
 
 const CardComponent = (props) => {
     const { _id,countInStock, image, name, price, rating, sold } = props;
     const navigate = useNavigate()
-
+    const dispatch = useDispatch();
+    const user = useSelector((state) => state.user)
+    const location = useLocation();
     const handleClick = () => {
         navigate(`/product/detailProduct/${_id}`);  
     };
+
+    const handleAddToCart = () => {
+        if (!user?.id) {
+            navigate('/sign-in', {state: location?.pathname})
+        } else {
+        if (countInStock > 0) { // Kiểm tra xem sản phẩm còn hàng không
+            dispatch(addOrderProduct({
+                orderItem: {
+                    product: _id,
+                    name,
+                    image,
+                    price,
+                    amount: 1, // Số lượng mặc định là 1
+                    countInstock: countInStock,
+                },
+            }));
+            message.success(`${name} added to cart!`); // Hiển thị thông báo thành công
+        } else {
+            message.error('This product is out of stock.'); // Thông báo nếu không còn hàng
+        }
+    }
+    };
+
     return (
         <Card
         hoverable // hover 
@@ -23,7 +50,7 @@ const CardComponent = (props) => {
             }
             actions={[
 
-                <ShoppingCartOutlined key="addToCart" alt='Add To Cart' style={{ color: '#52c41a', fontSize: '24px' }}/>,
+                <ShoppingCartOutlined key="addToCart" alt='Add To Cart' style={{ color: '#52c41a', fontSize: '24px' }} onClick={handleAddToCart}/>,
             ]}
         >
             <Meta

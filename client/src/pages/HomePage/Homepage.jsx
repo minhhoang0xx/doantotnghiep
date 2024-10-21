@@ -1,6 +1,6 @@
 import React from "react";
 import { Carousel } from 'antd';
-import CardComponent from "../../components/CardComponet/CartComponent";
+import CardComponent from "../../components/CardComponet/CardComponent";
 import { useQuery } from '@tanstack/react-query';
 import * as ProductService from "../../services/ProductService";
 const contentStyle = {

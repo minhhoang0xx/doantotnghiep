@@ -1,20 +1,27 @@
-const express = require('express');
-const mongoose = require('mongoose');
+const express = require("express");
+const dotenv = require('dotenv');
+const mongoose = require("mongoose");
 const routes = require('./routes');
-const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
 const cors = require('cors');
-require('dotenv').config();
+const cookieParser = require('cookie-parser');
 
-const app = express()
-const port = process.env.PORT || 3001
+dotenv.config();
+mongoose.set('strictQuery', false);
+const app = express();
+const port = process.env.PORT || 3001;
 
-app.use(cors())
-app.use(bodyParser.json())// tai sao no phai de truoc route
-app.use(cookieParser())
+// Cấu hình CORS
+app.use(cors());
+
+// Cấu hình middleware của express
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(cookieParser());
+
+// Định tuyến
 routes(app);
 
-
+// Kết nối MongoDB
 mongoose.connect('mongodb+srv://lmh:hoanghoang@cluster0.t56sx.mongodb.net/')
 .then(() =>{
     console.log('connect database OK!')
@@ -23,8 +30,9 @@ mongoose.connect('mongodb+srv://lmh:hoanghoang@cluster0.t56sx.mongodb.net/')
     console.log(err)
 })
 
-
-
+// Khởi động server
 app.listen(port, () => {
-    console.log('listening on port:' + port)
-})
+    console.log('Server is running on port:', port);
+});
+
+

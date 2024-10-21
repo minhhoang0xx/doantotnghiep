@@ -18,6 +18,7 @@ const HeaderComponent = () => {
     const user = useSelector((state) => state.user)
     const searchResults = useSelector((state) => state.product.searchResults);  // Lấy kết quả tìm kiếm
     const [search, setSearch] = useState('');
+    const order = useSelector((state) => state.order);
 
     const onSearch = (e) => {
         const keyword = e.target.value;
@@ -121,7 +122,7 @@ const HeaderComponent = () => {
                             {user.isAdmin ? (
                                 <SettingOutlined style={{ fontSize: '30px' }} /> 
                             ) : (
-                                <Badge count={1} size='small'>
+                                <Badge count={order?.orderItems?.length} size='small'>
                                     <ShoppingCartOutlined style={{ fontSize: '30px' }} />
                                 </Badge>
                             )}

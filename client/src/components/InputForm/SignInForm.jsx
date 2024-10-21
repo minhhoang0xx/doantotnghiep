@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import { Button, Checkbox, Form, Input, message } from 'antd';
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import * as UserService from '../../services/UserService';
 import { jwtDecode } from "jwt-decode";
 import { useDispatch } from 'react-redux'
@@ -10,7 +10,7 @@ import { updateUser } from "../../redux/slices/userSlice";
 const SignInForm = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-
+    const location = useLocation();
     const dispatch = useDispatch();
     const navigate = useNavigate()
     const handleOnChangeEmail = (e) => {
@@ -54,10 +54,14 @@ const SignInForm = () => {
                 if (decoded?.id) {
                     handleGetDetailUser(decoded?.id, res?.access_token)
                 }
-                if (decoded?.isAdmin) {
-                    navigate('/admin'); 
+                if (location.state) {
+                    navigate(location.state);
                 } else {
-                    navigate('/'); 
+                    if (decoded?.isAdmin) {
+                        navigate('/admin');
+                    } else {
+                        navigate('/');
+                    }
                 }
             } else {
                 message.error(res.message || 'Login failed!');

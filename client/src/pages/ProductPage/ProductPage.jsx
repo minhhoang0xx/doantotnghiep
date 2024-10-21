@@ -1,5 +1,5 @@
 import React from "react";
-import CardComponent from "../../components/CardComponet/CartComponent";
+import CardComponent from "../../components/CardComponet/CardComponent";
 import { Pagination } from "antd";
 import { useQuery } from '@tanstack/react-query';
 import * as ProductService from "../../services/ProductService";

@@ -1,5 +1,5 @@
 import AboutPage from "../pages/About/About";
-import CartPage from "../pages/CartPage/Cart";
+import CartPage from "../pages/OrderPage/OrderPage";
 import ContactPage from "../pages/Contact/Contact";
 import HomePage from "../pages/HomePage/Homepage";
 import NotFoundPage from "../pages/NotFound/NotFoundPage";
@@ -41,7 +41,7 @@ export const routes =[
     },
     {
         path: '/cart',
-        page: CartPage,
+        page: OrderPage,
         isShowHeader: true,
     },
     {
