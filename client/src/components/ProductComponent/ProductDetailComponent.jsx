@@ -76,7 +76,7 @@ const ProductDetailComponent = () => {
                 <WrapperQuantity>
                     <div>Quantity</div>
                     <div>
-                        <InputNumber min={1} max={10} defaultValue={1} onChange={onChange} changeOnWheel />
+                        <InputNumber min={1} max={10}  value={quantity} onChange={onChange} changeOnWheel />
                         <br />
                         <span style={{ fontSize: '15px' }}>Stock: {product?.countInStock}</span>
                     </div>

@@ -1,6 +1,5 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import * as OrderService from '../../services/OrderService'; // Đảm bảo bạn đã có dịch vụ này
-
+import { createSlice } from '@reduxjs/toolkit';
+import * as OrderService from '../../services/OrderService'; 
 const initialState = {
   orderItems: [],
   orderItemsSlected: [],
