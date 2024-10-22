@@ -11,35 +11,39 @@ export const cartSlice = createSlice({
   initialState,
   reducers: {
     addCartItem: (state, action) => {
-      const { cartItem } = action.payload;
+      const cartItem = action.payload; 
       const itemInCart = state.cartItems.find(item => item.product === cartItem.product);
       if (itemInCart) {
         itemInCart.amount += cartItem.amount;
       } else {
-        state.cartItems.push(cartItem);
+        state.cartItems.push({ ...cartItem, amount: 1 }); // Khởi tạo amount thành 1 nếu sản phẩm mới
       }
-      state.totalPrice += cartItem.price * cartItem.amount;
+      state.totalPrice += cartItem.price * cartItem.amount; // Tính toán tổng giá trị
     },
     removeCartItem: (state, action) => {
       const { productId } = action.payload;
+      const itemToRemove = state.cartItems.find(item => item.product === productId);
+      if (itemToRemove) {
+        state.totalPrice -= itemToRemove.price * itemToRemove.amount; // Cập nhật tổng giá trị
+      }
       state.cartItems = state.cartItems.filter(item => item.product !== productId);
     },
     updateCartItem: (state, action) => {
       const { productId, newAmount } = action.payload;
       const itemInCart = state.cartItems.find(item => item.product === productId);
       if (itemInCart) {
-        state.totalPrice -= itemInCart.price * itemInCart.amount;
+        state.totalPrice -= itemInCart.price * itemInCart.amount; // Trừ giá trị cũ
         itemInCart.amount = newAmount;
-        state.totalPrice += itemInCart.price * newAmount;
+        state.totalPrice += itemInCart.price * newAmount; // Cộng giá trị mới
       }
     },
     clearCart: (state) => {
       state.cartItems = [];
       state.totalPrice = 0;
-    }
+    },
   },
 });
 
-export const { addCartItem, removeCartItem, updateCartItem, clearCart} = cartSlice.actions;
+export const { addCartItem, removeCartItem, updateCartItem, clearCart } = cartSlice.actions;
 
 export default cartSlice.reducer;

@@ -8,7 +8,7 @@ export const createCart = async (userId, data) => {
 };
 export const getCart = async (userId, data) => {
     const res = await axios.get(`${process.env.REACT_APP_API_URL}/cart/getCart/${userId}`, data);
-    return res.data; // Trả về dữ liệu từ phản hồi
+    return res.data; 
 };
 export const updateCart = (userId, productId, newAmount) => {
     return axios.put(`${process.env.REACT_APP_API_URL}/cart/${userId}`, { productId, newAmount });

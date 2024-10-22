@@ -17,19 +17,41 @@ const OrderPage = () => {
   
   const user = localStorage.getItem('access_token');
   const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         const res = await CartService.getCart(jwtTranslate(user)?.id);
-        setQuantities(res.data.cartItems.reduce((acc, item) => ({ ...acc, [item.product]: item.amount }), {}));
-        setLoading(false); // Stop loading once data is fetched
+        if (res.data.cartItems) {
+          res.data.cartItems.forEach(item => {
+            dispatch(addCartItem(item));
+          });
+          setQuantities(res.data.cartItems.reduce((acc, item) => ({ ...acc, [item.product]: item.amount }), {}));
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchData();
-  }, [user]);
+  }, [user, dispatch]);
   
+  // Lưu cart vào localStorage khi cartItems thay đổi
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(cartItems));
+  }, [cartItems]);
+
+  // Tải cart từ localStorage khi trang được tải lại
+  useEffect(() => {
+    const storedCart = JSON.parse(localStorage.getItem('cart'));
+    if (storedCart) {
+      storedCart.forEach(item => {
+        dispatch(addCartItem(item));
+      });
+    }
+  }, [dispatch]);
   if (loading) {
     return <div>Loading...</div>; // Display a loading indicator
   }
@@ -38,7 +60,6 @@ const OrderPage = () => {
     dispatch(updateCartItem({ productId, newAmount: value }));
     setQuantities((prev) => ({ ...prev, [productId]: value }));
   };
-
   const handleRemoveCartItem = (productId) => {
     dispatch(removeCartItem({ productId }));
     message.success('Removed item from cart successfully');
@@ -73,28 +94,19 @@ const OrderPage = () => {
 
               {cartItems.map((item, index) => (
                 <Row key={index} gutter={16} style={{ padding: '10px 0', borderBottom: '1px solid #eee', alignItems: 'center' }}>
-                  <Col span={2}>
-                    <Checkbox />
-                  </Col>
+                  <Col span={2}><Checkbox /></Col>
                   <Col span={8} style={{ display: 'flex', alignItems: 'center' }}>
                     <img src={item.image} alt={item.name} style={{ width: '77px', height: '79px', objectFit: 'cover', marginRight: '10px', borderRadius: '8px' }} />
                     <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#333' }}>{item.name}</div>
                   </Col>
-                  <Col span={4}>
-                    ${item.price}
-                  </Col>
+                  <Col span={4}>${item.price}</Col>
                   <Col span={4} style={{ display: 'flex', alignItems: 'center' }}>
-                    <InputNumber min={1} value={quantities[item.product]} onChange={(value) => handleQuantityChange(item.product, value)} />
+                    <InputNumber min={1} value={quantities[item.product] || 1} onChange={(value) => handleQuantityChange(item.product, value)} />
                   </Col>
-                  <Col span={4}>
-                    ${item.price * item.amount}
-                  </Col>
-                  <Col span={2}>
-                    <DeleteOutlined style={{ cursor: 'pointer' }} onClick={() => handleRemoveCartItem(item.product)} />
-                  </Col>
+                  <Col span={4}>${(item.price * (quantities[item.product] || 1)).toFixed(2)}</Col>
+                  <Col span={2}><DeleteOutlined style={{ cursor: 'pointer' }} onClick={() => handleRemoveCartItem(item.product)} /></Col>
                 </Row>
               ))}
-
             </Col>
 
             <Col span={8}>
@@ -105,12 +117,12 @@ const OrderPage = () => {
                   <Button type="link">Change</Button>
                 </div>
                 <div style={{ marginBottom: '20px', fontSize: '14px' }}>
-                  <div>Subtotal: ${cartItems.reduce((total, item) => total + item.price * item.amount, 0)}</div>
+                  <div>Subtotal: ${cartItems.reduce((total, item) => total + item.price * (quantities[item.product] || 1), 0).toFixed(2)}</div>
                   <div>Discount: $0.00</div>
                   <div>Shipping Fee: $0.00</div>
                 </div>
                 <div style={{ fontWeight: 'bold', color: 'rgb(254, 56, 52)', fontSize: '18px' }}>
-                  Total: ${cartItems.reduce((total, item) => total + item.price * item.amount, 0)}
+                  Total: ${cartItems.reduce((total, item) => total + item.price * (quantities[item.product] || 1), 0).toFixed(2)}
                 </div>
                 <Button type="primary" size="large" style={{ width: '100%', marginTop: '20px', fontSize: '16px' }}>
                   Checkout
@@ -123,6 +135,5 @@ const OrderPage = () => {
     </div>
   );
 };
-
 
 export default OrderPage;

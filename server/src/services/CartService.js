@@ -32,29 +32,29 @@ const createCart = (userId, data) => {
                     cartItems: [{ product: productId, name, image, price, amount }],
                 });
             }
-
-            console.log('Saving cart:', userCart); // Log cart trước khi lưu
+            console.log('Saving cart:', userCart); 
             await userCart.save();
-            console.log('Cart saved successfully'); // Log sau khi lưu
+            console.log('Cart saved successfully'); 
             resolve(userCart);
         } catch (e) {
-            console.error('Error creating cart:', e); // Log lỗi
+            console.error('Error creating cart:', e); 
             reject(e);
         }
     });
 };
 const getCart = (userId) => {
     return new Promise(async (resolve, reject) => {
-
         try {
             const findCart = await Cart.findOne({ user: userId });
+            console.log('Found cart:', findCart); 
             resolve({
                 status: 'OK',
                 message: 'success',
                 data: findCart
-            })
+            });
         } catch (e) {
-            reject(e); // Trả về lỗi nếu có vấn đề xảy ra
+            console.error("Error fetching cart:", e); 
+            reject(e); 
         }
     });
 };
