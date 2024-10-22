@@ -206,7 +206,6 @@ const getAllOrder = () => {
 
 module.exports = {
     createOrder,
-    getAllOrderDetail,
     getDetailOrder,
     cancelOrder,
     getAllOrder

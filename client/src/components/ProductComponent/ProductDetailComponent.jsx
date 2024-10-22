@@ -6,16 +6,16 @@ import ButtonComponent from "../Button/ButtonComponent";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import * as ProductService from "../../services/ProductService";
 import { useDispatch, useSelector } from 'react-redux';
-import { addOrderProduct } from '../../redux/slices/orderSlice';
-
+import { addCartItem } from '../../redux/slices/cartSlice';
+import * as CartService from "../../services/CartService"; // Import CartService
 
 const ProductDetailComponent = () => {
     const { id } = useParams(); // Lấy id sản phẩm từ URL
     const [product, setProduct] = useState(null);
     const [quantity, setQuantity] = useState(1); // Trạng thái số lượng sản phẩm
     const navigate = useNavigate();
-    const user = useSelector((state) => state.user)
     const dispatch = useDispatch();
+    const user = useSelector((state) => state.user)
     const location = useLocation();
 
     useEffect(() => {
@@ -33,24 +33,29 @@ const ProductDetailComponent = () => {
     const onChange = (value) => {
         setQuantity(value); // Cập nhật số lượng khi người dùng thay đổi
     };
-    const handleAddToCart = () => {
+    const handleAddToCart = async () => {
         if (!user?.id) {
-            navigate('/sign-in', {state: location?.pathname})
+            navigate('/sign-in', { state: location?.pathname });
         } else {
-            if (product.countInStock >= quantity) { // Kiểm tra số lượng hàng còn
-                dispatch(addOrderProduct({
-                    orderItem: {
-                        product: product?._id,
-                        name: product?.name,
-                        image: product?.image,
-                        price: product?.price,
-                        amount: quantity, // Số lượng người dùng chọn
-                        countInstock: product?.countInStock,
-                    },
-                }));
-                message.success(`${product?.name} added to cart!`); // Hiển thị thông báo thành công
+            if (product.countInStock >= quantity) {
+                const data = {
+                    productId: product?._id,
+                    name: product?.name,
+                    image: product?.image,
+                    price: product?.price,
+                    amount: quantity,
+                };
+                try {
+                    const response = await CartService.createCart(user?.id, data);
+                    console.log('Response from server:', response); // Log phản hồi từ server
+                    dispatch(addCartItem({ cartItem: data }));
+                    message.success(`${product?.name} added to cart!`);
+                } catch (error) {
+                    message.error('Error adding product to cart.');
+                    console.error('Error details:', error); // Log chi tiết lỗi
+                }
             } else {
-                message.error('Not enough stock available.'); // Thông báo nếu không đủ hàng
+                message.error('Not enough stock available.');
             }
         }
     };
