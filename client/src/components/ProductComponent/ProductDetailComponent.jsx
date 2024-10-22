@@ -47,12 +47,10 @@ const ProductDetailComponent = () => {
                 };
                 try {
                     const response = await CartService.createCart(user?.id, data);
-                    console.log('Response from server:', response); // Log phản hồi từ server
                     dispatch(addCartItem({ cartItem: data }));
                     message.success(`${product?.name} added to cart!`);
                 } catch (error) {
                     message.error('Error adding product to cart.');
-                    console.error('Error details:', error); // Log chi tiết lỗi
                 }
             } else {
                 message.error('Not enough stock available.');

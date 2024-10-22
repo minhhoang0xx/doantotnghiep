@@ -16,7 +16,11 @@ export const cartSlice = createSlice({
       if (itemInCart) {
         itemInCart.amount += cartItem.amount;
       } else {
-        state.cartItems.push({ ...cartItem, amount: 1 }); // Khởi tạo amount thành 1 nếu sản phẩm mới
+        if (cartItem.product && cartItem.name && cartItem.price && cartItem.image) {
+          state.cartItems.push({ ...cartItem, amount: 1 }); // Khởi tạo amount thành 1 nếu sản phẩm mới
+        } else {
+          console.warn('Attempted to add empty cart item:', cartItem); // Log cảnh báo nếu sản phẩm trống
+        }
       }
       state.totalPrice += cartItem.price * cartItem.amount; // Tính toán tổng giá trị
     },

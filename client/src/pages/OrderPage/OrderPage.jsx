@@ -25,7 +25,11 @@ const OrderPage = () => {
         const res = await CartService.getCart(jwtTranslate(user)?.id);
         if (res.data.cartItems) {
           res.data.cartItems.forEach(item => {
-            dispatch(addCartItem(item));
+            if (item.product && item.name && item.price && item.image) {
+              dispatch(addCartItem(item));
+            } else {
+              console.warn('Incomplete cart item:', item); // Log cảnh báo nếu có sản phẩm không đầy đủ
+            }
           });
           setQuantities(res.data.cartItems.reduce((acc, item) => ({ ...acc, [item.product]: item.amount }), {}));
         }
@@ -48,10 +52,16 @@ const OrderPage = () => {
     const storedCart = JSON.parse(localStorage.getItem('cart'));
     if (storedCart) {
       storedCart.forEach(item => {
-        dispatch(addCartItem(item));
+        // Kiểm tra xem item có đầy đủ thông tin không trước khi thêm vào
+        if (item.product && item.name && item.price && item.image) {
+          dispatch(addCartItem(item));
+        } else {
+          console.warn('Stored item is incomplete:', item); // Log nếu sản phẩm không đầy đủ
+        }
       });
     }
   }, [dispatch]);
+  
   if (loading) {
     return <div>Loading...</div>; // Display a loading indicator
   }
