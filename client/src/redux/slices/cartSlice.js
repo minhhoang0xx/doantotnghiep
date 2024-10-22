@@ -24,23 +24,23 @@ export const cartSlice = createSlice({
       }
       state.totalPrice += cartItem.price * cartItem.amount; // Tính toán tổng giá trị
     },
-    removeCartItem: (state, action) => {
-      const { productId } = action.payload;
-      const itemToRemove = state.cartItems.find(item => item.product === productId);
-      if (itemToRemove) {
-        state.totalPrice -= itemToRemove.price * itemToRemove.amount; // Cập nhật tổng giá trị
-      }
-      state.cartItems = state.cartItems.filter(item => item.product !== productId);
-    },
     updateCartItem: (state, action) => {
       const { productId, newAmount } = action.payload;
       const itemInCart = state.cartItems.find(item => item.product === productId);
       if (itemInCart) {
-        state.totalPrice -= itemInCart.price * itemInCart.amount; // Trừ giá trị cũ
-        itemInCart.amount = newAmount;
-        state.totalPrice += itemInCart.price * newAmount; // Cộng giá trị mới
+          state.totalPrice -= itemInCart.price * itemInCart.amount; // Trừ giá trị cũ
+          itemInCart.amount = newAmount; // Cập nhật số lượng mới
+          state.totalPrice += itemInCart.price * newAmount; // Cộng giá trị mới
       }
-    },
+  },
+  removeCartItem: (state, action) => {
+      const { productId } = action.payload;
+      const itemToRemove = state.cartItems.find(item => item.product === productId);
+      if (itemToRemove) {
+          state.totalPrice -= itemToRemove.price * itemToRemove.amount; // Cập nhật tổng giá trị
+      }
+      state.cartItems = state.cartItems.filter(item => item.product !== productId); // Xóa sản phẩm khỏi giỏ hàng
+  },
     clearCart: (state) => {
       state.cartItems = [];
       state.totalPrice = 0;

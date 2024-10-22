@@ -10,10 +10,15 @@ export const getCart = async (userId, data) => {
     const res = await axios.get(`${process.env.REACT_APP_API_URL}/cart/getCart/${userId}`, data);
     return res.data; 
 };
-export const updateCart = (userId, productId, newAmount) => {
-    return axios.put(`${process.env.REACT_APP_API_URL}/cart/${userId}`, { productId, newAmount });
-  };
-  
-  export const removeCartItem = (userId, productId) => {
-    return axios.delete(`${process.env.REACT_APP_API_URL}/cart/${userId}/${productId}`);
-  };
+export const updateCart = async (userId, productId, newAmount) => {
+  const res = await axios.put(`${process.env.REACT_APP_API_URL}/cart/updateCart/${userId}`, { productId, newAmount });
+  return res.data;
+};
+
+export const removeCart = async (userId, productId) => {
+  const res = await axios.delete(`${process.env.REACT_APP_API_URL}/cart/removeCart/${userId}/${productId}`);
+  return res.data;
+};
+export const deleteCart = async (userId) => { // xoa khi khong con item nào trong cart
+  await axios.delete(`${process.env.REACT_APP_API_URL}/cart/deleteCart/${userId}`);
+};

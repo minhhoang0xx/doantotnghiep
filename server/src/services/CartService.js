@@ -59,7 +59,79 @@ const getCart = (userId) => {
     });
 };
 
+const updateCartItem = (userId, productId, newAmount) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const userCart = await Cart.findOne({ user: userId });
+            if (!userCart) {
+                return reject(new Error('Cart not found'));
+            }
+
+            const itemIndex = userCart.cartItems.findIndex(item => item.product.toString() === productId);
+            if (itemIndex === -1) {
+                return reject(new Error('Product not found in cart'));
+            }
+
+            // Cập nhật số lượng
+            const oldAmount = userCart.cartItems[itemIndex].amount;
+            userCart.cartItems[itemIndex].amount = newAmount;
+
+            // Cập nhật tổng giá trị
+            userCart.totalPrice += userCart.cartItems[itemIndex].price * (newAmount - oldAmount);
+
+            await userCart.save();
+            resolve(userCart);
+        } catch (e) {
+            console.error('Error updating cart item:', e);
+            reject(e);
+        }
+    });
+};
+
+const removeCartItem = (userId, productId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const userCart = await Cart.findOne({ user: userId });
+            if (!userCart) {
+                return reject(new Error('Cart not found'));
+            }
+
+            const itemIndex = userCart.cartItems.findIndex(item => item.product.toString() === productId);
+            if (itemIndex === -1) {
+                return reject(new Error('Product not found in cart'));
+            }
+
+            // Cập nhật tổng giá trị
+            userCart.totalPrice -= userCart.cartItems[itemIndex].price * userCart.cartItems[itemIndex].amount;
+
+            // Xóa sản phẩm khỏi giỏ hàng
+            userCart.cartItems.splice(itemIndex, 1);
+
+            await userCart.save();
+            resolve(userCart);
+        } catch (e) {
+            console.error('Error removing cart item:', e);
+            reject(e);
+        }
+    });
+};
+const deleteCart = (userId) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            // Xóa giỏ hàng của người dùng
+            await Cart.deleteOne({ user: userId });
+            resolve({ message: 'Cart deleted successfully' });
+        } catch (e) {
+            console.error('Error deleting cart:', e);
+            reject(new Error('Failed to delete cart'));
+        }
+    });
+};
+
 module.exports = {
     createCart,
-    getCart
+    getCart,
+    updateCartItem,
+    removeCartItem,
+    deleteCart
 };

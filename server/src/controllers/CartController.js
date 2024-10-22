@@ -27,7 +27,50 @@ const getCart = async (req, res) => {
 
 
 
+const updateCart = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const { productId, newAmount } = req.body; // Nhận productId và newAmount từ body
+        const response = await CartService.updateCartItem(userId, productId, newAmount);
+        return res.status(200).json(response);
+    } catch (e) {
+        console.error('Error in updateCart:', e); // Log lỗi
+        return res.status(400).json({
+            message: e.message || 'An error occurred while updating the cart item.'
+        });
+    }
+};
+
+const removeCart = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const productId = req.params.productId; // Nhận productId từ params
+        const response = await CartService.removeCartItem(userId, productId);
+        return res.status(200).json(response);
+    } catch (e) {
+        console.error('Error in removeCart:', e); // Log lỗi
+        return res.status(400).json({
+            message: e.message || 'An error occurred while removing the cart item.'
+        });
+    }
+};
+const deleteCart = async (req, res) => { // khi không còn item nào trong cart
+    try {
+        const userId = req.params.userId; // Lấy userId từ params
+        const response = await CartService.deleteCart(userId); 
+        return res.status(200).json(response); 
+    } catch (e) {
+        console.error('Error in deleteCart:', e);
+        return res.status(400).json({
+            message: e.message || 'An error occurred while deleting the cart.',
+        });
+    }
+};
+
 module.exports = {
     createCart,
-    getCart
-}
+    getCart,
+    updateCart,
+    removeCart,
+    deleteCart
+};

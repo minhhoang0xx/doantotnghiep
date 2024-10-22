@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { ShoppingCartOutlined } from '@ant-design/icons';
 import { Card, message } from 'antd';
 import Meta from "antd/es/card/Meta";
@@ -13,6 +13,7 @@ const CardComponent = (props) => {
     const dispatch = useDispatch();
     const user = useSelector((state) => state.user)
     const location = useLocation();
+    const [amount, setAmount] = useState(1);
     const handleClick = () => {
         navigate(`/product/detailProduct/${_id}`);
     };
@@ -22,12 +23,11 @@ const CardComponent = (props) => {
             navigate('/sign-in', { state: location?.pathname });
         } else {
             if (countInStock > 0) { // Kiểm tra xem sản phẩm còn hàng không
-                const data = { productId: _id, name, image, price, amount: '1' };
+                const data = { productId: _id, name, image, price, amount};
                 try {
                     const res = await CartService.createCart(user?.id, data);
-                    console.log('API Response:', res); // Log toàn bộ phản hồi từ API
     
-                    if (res && res._id) { // Kiểm tra xem phản hồi có chứa _id
+                    if (res && res._id) { 
                         // Sau khi thêm vào cơ sở dữ liệu thành công, cập nhật Redux store
                         dispatch(addCartItem({ cartItem: data }));
                         message.success(`${name} added to cart!`);
@@ -36,7 +36,6 @@ const CardComponent = (props) => {
                         message.error('Failed to add product to cart.'); // Thông báo lỗi
                     }
                 } catch (error) {
-                    console.error('Error adding product to cart:', error); // Log lỗi
                     message.error('Error adding product to cart.'); // Thông báo lỗi
                 }
             } else {
