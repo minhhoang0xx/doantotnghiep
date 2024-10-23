@@ -1,5 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit';
-import * as OrderService from '../../services/OrderService'; 
 
 const initialState = {
   orderItems: [],

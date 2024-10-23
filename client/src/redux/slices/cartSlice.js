@@ -1,5 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit';
-import * as CartService from '../../services/CartService'; 
 
 const initialState = {
   cartItems: [],
@@ -19,10 +18,10 @@ export const cartSlice = createSlice({
         if (cartItem.product && cartItem.name && cartItem.price && cartItem.image) {
           state.cartItems.push({ ...cartItem, amount: 1 }); // Khởi tạo amount thành 1 nếu sản phẩm mới
         } else {
-          console.warn('Attempted to add empty cart item:', cartItem); // Log cảnh báo nếu sản phẩm trống
+          console.warn('Attempted to add empty cart item:', cartItem); 
         }
       }
-      state.totalPrice += cartItem.price * cartItem.amount; // Tính toán tổng giá trị
+      state.totalPrice += cartItem.price * cartItem.amount; // Total
     },
     updateCartItem: (state, action) => {
       const { productId, newAmount } = action.payload;

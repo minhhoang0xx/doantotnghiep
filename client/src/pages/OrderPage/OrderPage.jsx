@@ -11,101 +11,100 @@ const { Title } = Typography;
 const { Step } = Steps;
 
 const OrderPage = () => {
-  const dispatch = useDispatch(); // Khởi tạo dispatch từ Redux
-  const navigate = useNavigate(); // Khởi tạo navigate từ react-router-dom
-  const cartItems = useSelector((state) => state.cart.cartItems || []); // Lấy danh sách sản phẩm trong giỏ hàng từ Redux
-  const [quantities, setQuantities] = useState({}); // Trạng thái cho số lượng sản phẩm
-  const user = localStorage.getItem('access_token'); // Lấy token người dùng từ localStorage
-  const [loading, setLoading] = useState(true); // Trạng thái loading
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const cartItems = useSelector((state) => state.cart.cartItems || []); // Lấy list product trong cart từ Redux
+  const [quantities, setQuantities] = useState({}); 
+  const user = localStorage.getItem('access_token'); 
+  const [loading, setLoading] = useState(true); 
 
-  // Fetch dữ liệu giỏ hàng khi component được mount
+  // LAY GIO HANG TU API, LUU VAO REDUX, UPDATE SO LUONG
+  // chay moi khi co su thay doi tk user
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true); // Bắt đầu loading
+      setLoading(true); 
       try {
-        const res = await CartService.getCart(jwtTranslate(user)?.id); // Lấy giỏ hàng từ API
-        if (res.data.cartItems) {
-          res.data.cartItems.forEach(item => {
+        const res = await CartService.getCart(jwtTranslate(user)?.id); // call cart tu api
+        if (res.data.cartItems) { // iem tra xem sp co trong cart khong
+          res.data.cartItems.forEach(item => { // duyet qua tung sp
             if (item.product && item.name && item.price && item.image) {
-              dispatch(addCartItem(item)); // Thêm sản phẩm vào giỏ hàng Redux
+              dispatch(addCartItem(item)); // them sp vao redux
             } else {
-              console.warn('Incomplete cart item:', item); // Log nếu sản phẩm không đầy đủ
+              console.warn('Incomplete cart item:', item); 
             }
           });
-          // Cập nhật trạng thái số lượng cho mỗi sản phẩm
+          /// set Quantitise cho moi sp
           setQuantities(res.data.cartItems.reduce((acc, item) => ({ ...acc, [item.product]: item.amount }), {}));
+           // Hàm reduce biến mảng `cartItems` thành một đối tượng `quantities` với key là `product` và value là `amount`
         }
       } catch (error) {
-        console.error("Error fetching data:", error); // Log lỗi nếu có
+        console.error("Error fetching data:", error); 
       } finally {
-        setLoading(false); // Kết thúc loading
+        setLoading(false); 
       }
     };
-    fetchData(); // Gọi hàm fetchData
+    fetchData(); 
   }, [user, dispatch]);
 
-  // Tải giỏ hàng từ localStorage khi trang được tải lại
+  // LAY GIO HANG TU LOCALSTORAGE KHI RELOAD
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem('cart')); // Lấy giỏ hàng từ localStorage
     if (storedCart) {
       storedCart.forEach(item => {
-        // Kiểm tra từng sản phẩm có đầy đủ thông tin không
+        // Kiểm tra từng sản phẩm có đầy đủ thông tin không 
+        // neu co thi sp duoc them vao redux
         if (item.product && item.name && item.price && item.image) {
           dispatch(addCartItem(item)); // Thêm sản phẩm vào giỏ hàng Redux
         } else {
-          console.warn('Stored item is incomplete:', item); // Log nếu sản phẩm không đầy đủ
+          console.warn('Stored item is incomplete:', item); 
         }
       });
     }
   }, [dispatch]);
 
-  // Lưu giỏ hàng vào localStorage khi cartItems thay đổi
+  // Lưu giỏ hàng tu redux vào localStorage mỗi khi thay đổi
+  // khi CRUD thi se duoc luu vao Local
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cartItems)); // Lưu giỏ hàng vào localStorage
+    localStorage.setItem('cart', JSON.stringify(cartItems)); 
   }, [cartItems]);
 
-  // Hiển thị loading nếu đang trong trạng thái loading
   if (loading) {
     return <div>Loading...</div>;
   }
 
-  // Hàm xử lý khi thay đổi số lượng sản phẩm
   const handleQuantityChange = async (productId, value) => {
-    if (value < 1) return; // Ngăn không cho số lượng nhỏ hơn 1
+    if (value < 1) return; 
     try {
-      await CartService.updateCart(jwtTranslate(user)?.id, productId, value); // Gọi API để cập nhật số lượng sản phẩm
-      dispatch(updateCartItem({ productId, newAmount: value })); // Cập nhật số lượng sản phẩm trong Redux
-      setQuantities((prev) => ({ ...prev, [productId]: value })); // Cập nhật trạng thái số lượng
+      await CartService.updateCart(jwtTranslate(user)?.id, productId, value); //Api update
+      dispatch(updateCartItem({ productId, newAmount: value })); // update  Redux
+      setQuantities((prev) => ({ ...prev, [productId]: value })); // update trạng thái
     } catch (error) {
-      message.error('Failed to update cart item'); // Hiển thị thông báo lỗi
+      message.error('Failed to update cart item'); 
     }
   };
 
-  // Hàm xử lý khi xóa sản phẩm khỏi giỏ hàng
   const handleRemoveCartItem = async (productId) => {
     try {
-      await CartService.removeCart(jwtTranslate(user)?.id, productId); // Gọi API để xóa sản phẩm khỏi giỏ hàng
-      dispatch(removeCartItem({ productId })); // Xóa sản phẩm khỏi giỏ hàng trong Redux
+      await CartService.removeCart(jwtTranslate(user)?.id, productId); // Gọi API 
+      dispatch(removeCartItem({ productId })); // xoa trong Redux
       message.success('Removed item from cart successfully');
-      if (cartItems.length === 1) { // Nếu chỉ còn lại một sản phẩm và sản phẩm đó được xóa
-        await CartService.deleteCart(jwtTranslate(user)?.id); } // Hiển thị thông báo thành công
+      if (cartItems.length === 1) { // neu sp =1 thi xoa luon cart
+        await CartService.deleteCart(jwtTranslate(user)?.id); }
     } catch (error) {
-      console.error("Error removing cart item:", error); // Log lỗi nếu có
       message.error('Failed to remove cart item'); // Hiển thị thông báo lỗi
     }
   };
 
-
   // Hàm xử lý khi nhấn nút Checkout
   const handleCheckout = () => {
-    message.success('Proceeding to checkout...'); // Hiển thị thông báo khi chuyển sang thanh toán
-    navigate('/checkout'); // Chuyển đến trang thanh toán
+    message.success('Proceeding to checkout...'); 
+    navigate('/checkout'); 
   };
 
   return (
     <div style={{ padding: '30px', backgroundColor: '#f0f2f5', minHeight: '100vh' }}>
       <Title level={2} style={{ textAlign: 'center', marginBottom: '40px', fontSize: '28px' }}>Your Cart</Title>
-      {cartItems.length === 0 ? ( // Kiểm tra xem giỏ hàng có sản phẩm không
+      {cartItems.length === 0 ? ( 
         <p style={{ textAlign: 'center', color: '#888', fontSize: '18px' }}>Your cart is empty.</p>
       ) : (
         <div style={{ background: '#fff', borderRadius: '10px', padding: '20px', maxWidth: '85%', margin: '0 auto', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)' }}>
@@ -113,7 +112,7 @@ const OrderPage = () => {
             <Col span={16}>
               <div style={{ marginBottom: '20px' }}>
                 <h4 style={{ fontSize: '22px' }}>Cart Status</h4>
-                <Steps current={0}> {/* Hiển thị trạng thái thanh toán */}
+                <Steps current={0}> 
                   <Step title="Order" />
                   <Step title="Payment" />
                   <Step title="Shipping" />
@@ -129,7 +128,7 @@ const OrderPage = () => {
                 <Col span={2}><DeleteOutlined style={{ cursor: 'pointer' }} /></Col>
               </Row>
 
-              {cartItems.map((item) => ( // Lặp qua từng sản phẩm trong giỏ hàng
+              {cartItems.map((item) => ( 
                 <Row key={item.product} gutter={16} style={{ padding: '10px 0', borderBottom: '1px solid #eee', alignItems: 'center' }}>
                   <Col span={2}><Checkbox /></Col>
                   <Col span={8} style={{ display: 'flex', alignItems: 'center' }}>
@@ -154,7 +153,6 @@ const OrderPage = () => {
                   <Button type="link">Change</Button>
                 </div>
                 <div style={{ marginBottom: '20px', fontSize: '14px' }}>
-                  {/* Hiển thị thông tin về giá trị giỏ hàng */}
                   <div>Subtotal: ${cartItems.reduce((total, item) => total + item.price * (quantities[item.product] || 1), 0).toFixed(2)}</div>
                   <div>Discount: $0.00</div>
                   <div>Shipping Fee: $0.00</div>

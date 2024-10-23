@@ -11,22 +11,22 @@ const createCart = (userId, data) => {
             const product = await Product.findById(productId);
 
             if (!product) {
-                return reject(new Error('Product not found')); // Kiểm tra sản phẩm có tồn tại không
+                return reject(new Error('Product not found'));
             }
 
-            if (userCart) {
-                // Nếu cart đã tồn tại, kiểm tra xem sản phẩm đã có trong cart chưa
+            if (userCart) { // co cart roi
+               // check xem san pham da co chua
                 const itemIndex = userCart.cartItems.findIndex((item) => item.product.toString() === productId);
 
                 if (itemIndex > -1) {
-                    // Nếu sản phẩm đã có trong cart, cập nhật số lượng
+                    // neu co roi thi + amount
                     userCart.cartItems[itemIndex].amount += amount;
                 } else {
-                    // Nếu chưa có, thêm sản phẩm mới vào cart
+                    // neu chua co thi tao. moi'
                     userCart.cartItems.push({ product: productId, name, image, price, amount });
                 }
             } else {
-                // Nếu cart chưa tồn tại, tạo cart mới
+                // tao cart moi neu truoc do chua co
                 userCart = new Cart({
                     user: userId,
                     cartItems: [{ product: productId, name, image, price, amount }],
@@ -66,17 +66,17 @@ const updateCartItem = (userId, productId, newAmount) => {
             if (!userCart) {
                 return reject(new Error('Cart not found'));
             }
-
+            // tim kiem vị trí của sản phẩm trong giỏ hàng
             const itemIndex = userCart.cartItems.findIndex(item => item.product.toString() === productId);
             if (itemIndex === -1) {
                 return reject(new Error('Product not found in cart'));
             }
 
-            // Cập nhật số lượng
+            //update amount
             const oldAmount = userCart.cartItems[itemIndex].amount;
             userCart.cartItems[itemIndex].amount = newAmount;
 
-            // Cập nhật tổng giá trị
+            // update total
             userCart.totalPrice += userCart.cartItems[itemIndex].price * (newAmount - oldAmount);
 
             await userCart.save();
@@ -100,11 +100,9 @@ const removeCartItem = (userId, productId) => {
             if (itemIndex === -1) {
                 return reject(new Error('Product not found in cart'));
             }
-
-            // Cập nhật tổng giá trị
+            // tinh lai total
             userCart.totalPrice -= userCart.cartItems[itemIndex].price * userCart.cartItems[itemIndex].amount;
-
-            // Xóa sản phẩm khỏi giỏ hàng
+           // delete
             userCart.cartItems.splice(itemIndex, 1);
 
             await userCart.save();
