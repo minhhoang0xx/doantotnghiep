@@ -16,7 +16,7 @@ export const cartSlice = createSlice({
         itemInCart.amount += cartItem.amount;
       } else {
         if (cartItem.product && cartItem.name && cartItem.price && cartItem.image) {
-          state.cartItems.push({ ...cartItem, amount: 1 }); // Khởi tạo amount thành 1 nếu sản phẩm mới
+          state.cartItems.push({ ...cartItem, amount: cartItem.amount });
         } else {
           console.warn('Attempted to add empty cart item:', cartItem); 
         }

@@ -8,10 +8,11 @@ const { Title } = Typography;
 
 const CheckoutPage = () => {
     const dispatch = useDispatch();
-    const cartItems = useSelector((state) => state.cart.cartItems || []);
     const user = localStorage.getItem('access_token');
     const selectedCartItems = JSON.parse(localStorage.getItem('selectedCartItems')) || [];
-
+    selectedCartItems.forEach(item => {
+        console.log(item); // Check if amount is present and correct
+    });
     const calculateTotal = () => {
         return selectedCartItems.reduce((total, item) => total + item.price * item.amount, 0).toFixed(2);
     };
@@ -49,14 +50,16 @@ const CheckoutPage = () => {
             message.warning('Your cart is empty.'); 
             return;
         }
-
+        console.log("Selected Cart Items:", selectedCartItems);
         const orderData = {
             orderItems: selectedCartItems.map(item => ({
                 product: item.product,
                 name: item.name,
                 price: item.price,
-                amount: item.amount
+                amount: item.amount,
+                
             })),
+
             shippingAddress: {
                 address: shippingAddress.address,
                 city: shippingAddress.city,
@@ -66,8 +69,9 @@ const CheckoutPage = () => {
             paymentMethod,
             user: jwtTranslate(user)?.id,
             totalPrice: calculateTotal(),
+    
         };
-
+        console.log("Order Data:", orderData);
         try {
             await dispatch(createOrderAction(orderData)).unwrap();
             message.success('Order created successfully!');
@@ -83,7 +87,7 @@ const CheckoutPage = () => {
 
     return (
         <div style={{ padding: '50px', background: '#f0f2f5' }}>
-            <Title level={2} style={{ textAlign: 'center' }}>Checkout</Title>
+            <Title level={2} style={{ textAlign: 'center' }}>CHECK OUT</Title>
             <Card style={{ maxWidth: '600px', margin: '0 auto' }}>
                 <Title level={4}>Order Summary</Title>
                 {selectedCartItems.length === 0 ? (

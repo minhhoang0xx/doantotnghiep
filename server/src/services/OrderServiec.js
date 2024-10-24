@@ -1,4 +1,4 @@
-const Order = require("../models/OrderProduct")
+const Order = require("../models/OrderModel");
 const Product = require("../models/ProductModel")
 const EmailService = require("../services/EmailService")
 
@@ -33,45 +33,47 @@ const createOrder = (newOrder) => {
                 }
             })
             const results = await Promise.all(promises)
-            const newData = results && results.filter((item) => item.id)
-            if(newData.length) {
-                const arrId = []
-                newData.forEach((item) => {
-                    arrId.push(item.id)
-                })
-                resolve({
+            const outOfStockItems = results.filter(item => item.status === 'ERR');
+
+            // Nếu có sản phẩm không đủ hàng, trả về thông báo lỗi
+            if (outOfStockItems.length) {
+                const arrId = outOfStockItems.map(item => item.id);
+                return resolve({
                     status: 'ERR',
-                    message: `San pham voi id: ${arrId.join(',')} khong du hang`
-                })
-            } else {
-                const createdOrder = await Order.create({
-                    orderItems,
-                    shippingAddress: {
-                        fullName,
-                        address,
-                        city, phone
-                    },
-                    paymentMethod,
-                    itemsPrice,
-                    shippingPrice,
-                    totalPrice,
-                    user: user,
-                    isPaid, paidAt
-                })
-                if (createdOrder) {
-                    await EmailService.sendEmailCreateOrder(email,orderItems)
-                    resolve({
-                        status: 'OK',
-                        message: 'success'
-                    })
-                }
+                    message: `Insufficient stock for products with ids: ${arrId.join(', ')}`
+                });
+            }
+
+            // Tạo đơn hàng nếu tất cả sản phẩm có đủ hàng
+            const createdOrder = await Order.create({
+                orderItems,
+                shippingAddress: {
+                    fullName,
+                    address,
+                    city,
+                    phone
+                },
+                paymentMethod,
+                itemsPrice,
+                shippingPrice,
+                totalPrice,
+                user,
+                isPaid,
+                paidAt
+            });
+
+            if (createdOrder) {
+                await EmailService.sendEmailCreateOrder(email, orderItems);
+                resolve({
+                    status: 'OK',
+                    message: 'Order created successfully'
+                });
             }
         } catch (e) {
-        //   console.log('e', e)
-            reject(e)
+            reject(e);
         }
-    })
-}
+    });
+};
 
 
 const getAllOrderDetail = (id) => {

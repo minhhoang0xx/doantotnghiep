@@ -87,7 +87,7 @@ export const routes =[
     {
         path: '/checkOut',
         page: CheckoutPage,
-        isShowHeader: false,
+        isShowHeader: true,
     
     },
 ]
