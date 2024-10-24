@@ -159,7 +159,7 @@ const SignInForm = () => {
                         </p>
                     </Form.Item>
 
-                    <Form.Item wrapperCol={{ offset: 4, span: 20 }}>
+                    <Form.Item wrapperCol={{ offset:4, span: 20 }}>
                         <Button type="primary" htmlType="submit" style={{ width: '50%' }} >
                             Submit
                         </Button>

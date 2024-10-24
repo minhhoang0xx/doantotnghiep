@@ -58,7 +58,7 @@ const ProductDetailComponent = () => {
         }
     };
     return (
-        <Row style={{ padding: '16px', background: 'white', borderRadius: '10px' }}>
+        <Row style={{ padding: '16px', background: 'white', borderRadius: '10px' ,boxShadow: '0px 2px 2px 2px rgba(0, 0, 0, 0.1)' }}>
             <Col span={10} style={{ paddingRight: '16px' }} >
                 <WrapperImage src={product?.image} alt={product?.name} preview={true} />
             </Col>

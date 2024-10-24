@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import * as ProductService from "../../services/ProductService";
 import * as UserService from "../../services/UserService";
-// import * as OrderService from "../../services/OrderService"; 
+import * as OrderService from "../../services/OrderService"; 
 import AddProduct from '../../components/AdminComponent/AddProduct';
 import DeleteConfirm from '../../components/AdminComponent/DeleteConfirm';
 import UpdateModal from '../../components/AdminComponent/UpdateModal';
@@ -50,9 +50,9 @@ const AdminPage = () => {
             } else if (currentView === 'users') {
                 deletePromises = selectedRadio.map(id => UserService.deleteUser(id)); // Giả sử bạn có hàm deleteUser
             }
-            // else if (currentView === 'orders') {
-            //     deletePromises = selectedRadio.map(id => OrderService.deleteOrder(id)); // Giả sử bạn có hàm deleteOrder
-            // }
+            else if (currentView === 'orders') {
+                deletePromises = selectedRadio.map(id => OrderService.deleteOrder(id)); // Giả sử bạn có hàm deleteOrder
+            }
 
             await Promise.all(deletePromises);
             message.success(`${currentView.charAt(0).toUpperCase() + currentView.slice(1)} deleted successfully!`);
@@ -77,9 +77,9 @@ const AdminPage = () => {
         } else if (currentView === 'users') {
             refetchUsers();
         }
-        // else if (currentView === 'orders') {
-        //     refetchOrders();
-        // }
+        else if (currentView === 'orders') {
+            refetchOrders();
+        }
     };
 
     // Gọi API lấy dữ liệu sản phẩm
@@ -92,8 +92,8 @@ const AdminPage = () => {
         return res;
     };
     const fetchAllOrder = async () => {
-        // const res = await OrderService.getAllOrders(); // Giả sử bạn có hàm này trong OrderService
-        // return res;
+        const res = await OrderService.getAllOrder();
+        return res;
     };
 
 
@@ -117,13 +117,13 @@ const AdminPage = () => {
 
 
 
-    //   const { data: orders, isLoading: loadingOrders, refetch: refetchOrders } = useQuery({
-    //     queryKey: ['orders'],
-    //     queryFn: fetchAllOrder,
-    //     enabled: currentView === 'orders',
-    //     retry: 3,
-    //     retryDelay: 1000,
-    //   });
+      const { data: orders, isLoading: loadingOrders, refetch: refetchOrders } = useQuery({
+        queryKey: ['orders'],
+        queryFn: fetchAllOrder,
+        enabled: currentView === 'orders',
+        retry: 3,
+        retryDelay: 1000,
+      });
 
     /// Search
     const filteredUsers = users?.data.filter(user =>
@@ -135,9 +135,9 @@ const AdminPage = () => {
         product.name.toLowerCase().includes(productSearch.toLowerCase())
     );
 
-    // const filteredOrders = orders?.data.filter(order => 
-    //     order.user.name.toLowerCase().includes(orderSearch.toLowerCase())
-    // );
+    const filteredOrders = orders?.data.filter(order => 
+        order.user.name.toLowerCase().includes(orderSearch.toLowerCase())
+    );
 
 
     // Cấu trúc của cột trong bảng người dùng
@@ -212,7 +212,7 @@ const AdminPage = () => {
         { title: 'Order ID', dataIndex: '_id', key: '_id', },
         {
             title: 'User', dataIndex: 'user', key: 'user',
-            render: (user) => user.name, // Giả sử bạn có trường name trong User
+            render: (user) => user.name,
         },
         { title: 'Total Price', dataIndex: 'totalPrice', key: 'totalPrice' },
         {
@@ -232,6 +232,7 @@ const AdminPage = () => {
     ];
 
     return (
+        
         <Layout style={{ minHeight: '100vh' }}>
             <Sider width='12%' style={{ background: '#fff' }}>
                 <div style={{ padding: '20px', textAlign: 'center', cursor: 'pointer' }} onClick={() => navigate('/')}>
@@ -298,7 +299,7 @@ const AdminPage = () => {
                     <Button onClick={handleDeleteConfirm} disabled={selectedRadio.length === 0} style={{ backgroundColor: selectedRadio.length === 0 ? 'gray' : 'red', color: 'white', fontSize: '16px', border: 'none', borderRadius: '4px', padding: '10px 20px', cursor: selectedRadio.length === 0 ? 'not-allowed' : 'pointer', transition: 'background-color 0.3s ease', }} onMouseEnter={(e) => { if (selectedRadio.length > 0) { e.currentTarget.style.backgroundColor = 'darkred'; } }} onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = selectedRadio.length > 0 ? 'red' : 'gray'; }}>
                         Delete
                     </Button>
-                    {loadingProducts || loadingUsers ? ( ////////////////////////////////////// nho them loading order
+                    {loadingProducts || loadingUsers || loadingOrders ? ( 
                         <Spin size="large" />
                     ) : currentView === 'users' ? (
                         <Table

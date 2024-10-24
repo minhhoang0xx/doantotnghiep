@@ -73,19 +73,6 @@ const createOrder = (newOrder) => {
     })
 }
 
-// const deleteManyProduct = (ids) => {
-//     return new Promise(async (resolve, reject) => {
-//         try {
-//             await Product.deleteMany({ _id: ids })
-//             resolve({
-//                 status: 'OK',
-//                 message: 'Delete product success',
-//             })
-//         } catch (e) {
-//             reject(e)
-//         }
-//     })
-// }
 
 const getAllOrderDetail = (id) => {
     return new Promise(async (resolve, reject) => {
@@ -137,7 +124,7 @@ const getDetailOrder = (id) => {
     })
 }
 
-const cancelOrder = (id, data) => {
+const deleteOrder = (id, data) => {
     return new Promise(async (resolve, reject) => {
         try {
             let order = []
@@ -207,6 +194,6 @@ const getAllOrder = () => {
 module.exports = {
     createOrder,
     getDetailOrder,
-    cancelOrder,
+    deleteOrder,
     getAllOrder
 }

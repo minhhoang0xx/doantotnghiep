@@ -5,10 +5,11 @@ const { Title, Paragraph } = Typography;
 
 const About = () => {
   return (
+    <div style={{ padding: '50px 0 0 0 ',background:'#f5f5f5' }}>
     <div style={{ padding: '50px', background:'#f5f5f5' }}>
       <Row justify="center">
         <Col span={16}>
-          <Card>
+          <Card style={{boxShadow: '0 1px 2px 4px rgba(0, 0, 0, 0.01)' }}>
             <Title level={1} style={{ textAlign: 'center' }}>
               About Hoang System Education
             </Title>
@@ -56,6 +57,7 @@ const About = () => {
           </Card>
         </Col>
       </Row>
+    </div>
     </div>
   );
 };

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, Checkbox, Row, Col, InputNumber, Typography, Steps, message } from 'antd';
+import { Button, Checkbox, Row, Col, InputNumber, Typography, Steps, message, Modal } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { addCartItem, removeCartItem, updateCartItem } from '../../redux/slices/cartSlice';
+import { addCartItem, removeCartItem, updateCartItem , clearCart} from '../../redux/slices/cartSlice';
 import * as CartService from "../../services/CartService";
 import { jwtTranslate } from "../../ultils";
 
@@ -17,6 +17,10 @@ const OrderPage = () => {
   const [quantities, setQuantities] = useState({}); 
   const user = localStorage.getItem('access_token'); 
   const [loading, setLoading] = useState(true); 
+  const [selectAll, setSelectAll] = useState(false); 
+  const [selectedItems, setSelectedItems] = useState(new Set()); 
+
+  // Fetch cart items from API
 
   // LAY GIO HANG TU API, LUU VAO REDUX, UPDATE SO LUONG
   // chay moi khi co su thay doi tk user
@@ -72,6 +76,41 @@ const OrderPage = () => {
     return <div>Loading...</div>;
   }
 
+  const handleSelectAllChange = (e) => {
+    setSelectAll(e.target.checked);
+    if (e.target.checked) {
+      const allSelected = new Set(cartItems.map(item => item.product));
+      setSelectedItems(allSelected);
+    } else {
+      setSelectedItems(new Set());
+    }
+  };
+  const handleItemSelect = (productId) => {
+    const newSelectedItems = new Set(selectedItems);
+    if (newSelectedItems.has(productId)) {
+      newSelectedItems.delete(productId);
+    } else {
+      newSelectedItems.add(productId);
+    }
+    setSelectedItems(newSelectedItems);
+    setSelectAll(newSelectedItems.size === cartItems.length); 
+  };
+
+  const handleDeleteAll = () => {
+    Modal.confirm({
+      title: 'Are you sure you want to delete all items?',
+      onOk: async () => {
+        try {
+          await CartService.deleteCart(jwtTranslate(user)?.id);
+          dispatch(clearCart()); // Cập nhật Redux
+          message.success('All items removed from cart successfully');
+        } catch (error) {
+          message.error('Failed to remove all items from cart');
+        }
+      },
+    });
+  };
+  
   const handleQuantityChange = async (productId, value) => {
     if (value < 1) return; 
     try {
@@ -97,11 +136,22 @@ const OrderPage = () => {
 
   // Hàm xử lý khi nhấn nút Checkout
   const handleCheckout = () => {
-    message.success('Proceeding to checkout...'); 
-    navigate('/checkout'); 
+    if (selectedItems.size === 0) {
+        message.warning('Please select at least one item to proceed to checkout.');
+        return;
+    }
+    // Tạo một danh sách các sản phẩm đã chọn
+    const selectedCartItems = cartItems.filter(item => selectedItems.has(item.product));
+    localStorage.setItem('selectedCartItems', JSON.stringify(selectedCartItems));
+    navigate('/checkOut');
+};
+
+  const calculateTotal = () => {
+    return cartItems.reduce((total, item) => total + item.price * (quantities[item.product]), 0).toFixed(2);
   };
 
   return (
+    <div style={{ padding: '50px 0 0 0 ',background:'#f0f2f5' }}>
     <div style={{ padding: '30px', backgroundColor: '#f0f2f5', minHeight: '100vh' }}>
       <Title level={2} style={{ textAlign: 'center', marginBottom: '40px', fontSize: '28px' }}>Your Cart</Title>
       {cartItems.length === 0 ? ( 
@@ -120,17 +170,17 @@ const OrderPage = () => {
               </div>
 
               <Row gutter={16} style={{ fontWeight: 'bold', fontSize: '16px', padding: '10px 0', borderBottom: '1px solid #ddd' }}>
-                <Col span={2}><Checkbox /></Col>
+                <Col span={2}><Checkbox checked={selectAll} onChange={handleSelectAllChange} /></Col>
                 <Col span={8}>Product</Col>
                 <Col span={4}>Price</Col>
                 <Col span={4}>Quantity</Col>
                 <Col span={4}>Total</Col>
-                <Col span={2}><DeleteOutlined style={{ cursor: 'pointer' }} /></Col>
+                <Col span={2}><DeleteOutlined style={{ cursor: 'pointer' }} onClick={handleDeleteAll}/></Col>
               </Row>
 
               {cartItems.map((item) => ( 
                 <Row key={item.product} gutter={16} style={{ padding: '10px 0', borderBottom: '1px solid #eee', alignItems: 'center' }}>
-                  <Col span={2}><Checkbox /></Col>
+                  <Col span={2}><Checkbox checked={selectedItems.has(item.product)} onChange={() => handleItemSelect(item.product)} /></Col>
                   <Col span={8} style={{ display: 'flex', alignItems: 'center' }}>
                     <img src={item.image} alt={item.name} style={{ width: '77px', height: '79px', objectFit: 'cover', marginRight: '10px', borderRadius: '8px' }} />
                     <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#333' }}>{item.name}</div>
@@ -153,12 +203,12 @@ const OrderPage = () => {
                   <Button type="link">Change</Button>
                 </div>
                 <div style={{ marginBottom: '20px', fontSize: '14px' }}>
-                  <div>Subtotal: ${cartItems.reduce((total, item) => total + item.price * (quantities[item.product] || 1), 0).toFixed(2)}</div>
+                <div>Subtotal: ${calculateTotal()}</div>
                   <div>Discount: $0.00</div>
                   <div>Shipping Fee: $0.00</div>
                 </div>
                 <div style={{ fontWeight: 'bold', color: 'rgb(254, 56, 52)', fontSize: '18px' }}>
-                  Total: ${cartItems.reduce((total, item) => total + item.price * (quantities[item.product] || 1), 0).toFixed(2)}
+                Total: ${calculateTotal()}
                 </div>
                 <Button type="primary" size="large" style={{ width: '100%', marginTop: '20px', fontSize: '16px' }} onClick={handleCheckout}>
                   Checkout
@@ -168,6 +218,7 @@ const OrderPage = () => {
           </Row>
         </div>
       )}
+    </div>
     </div>
   );
 };

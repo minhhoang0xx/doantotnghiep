@@ -1,5 +1,4 @@
 import AboutPage from "../pages/About/About";
-import CartPage from "../pages/OrderPage/OrderPage";
 import ContactPage from "../pages/Contact/Contact";
 import HomePage from "../pages/HomePage/Homepage";
 import NotFoundPage from "../pages/NotFound/NotFoundPage";
@@ -10,6 +9,7 @@ import SignInPage from "../pages/SignIn/SignInPage";
 import SignUpPage from "../pages/SignIn/SignUpPage";
 import UserDetailPage from "../pages/UserPage/UserDetailPage";
 import AdminPage from "../pages/AdminPage/AdminPage";
+import CheckoutPage from "../pages/CheckOutPage/CheckOutPage";
 
 
 
@@ -82,6 +82,12 @@ export const routes =[
         page: AdminPage,
         isShowHeader: false,
         isPrivate: true
+    
+    },
+    {
+        path: '/checkOut',
+        page: CheckoutPage,
+        isShowHeader: false,
     
     },
 ]

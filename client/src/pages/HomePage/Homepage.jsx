@@ -4,12 +4,11 @@ import CardComponent from "../../components/CardComponet/CardComponent";
 import { useQuery } from '@tanstack/react-query';
 import * as ProductService from "../../services/ProductService";
 const contentStyle = {
-    margin: '20px 0',
-    height: '500px',
-    color: '#fff',
+    height: '100vh',
+    color: '#f5f5f5',
     lineHeight: '500px',
     textAlign: 'center',
-    background: '#364d79',
+    background: '#f5f5f5',
     objectFit: 'cover',
     width: '100%',
   };
@@ -18,7 +17,6 @@ const HomePage = () =>{
 
   const fetchProductAll = async() =>{
     const res =await ProductService.getAllProduct()
-    console.log('res',res)
     return res
   }
   const{ data: products} = useQuery({queryKey: ['products'],queryFn: fetchProductAll, retry:3, retryDelay: 1000});
@@ -26,6 +24,7 @@ const HomePage = () =>{
 
 
     return (
+      <div style ={{background: '#f5f5f5' }} >
         <>
         <Carousel arrows infinite={false}>
       <div>
@@ -41,7 +40,7 @@ const HomePage = () =>{
         <img src="assets/slide2.jpg" alt="Slide4" style={contentStyle}/>
       </div>
     </Carousel>
-    <div >
+    <div style ={{background: '#f5f5f5' }} >
         <h1 
         className="title"
         style={{ 
@@ -69,7 +68,7 @@ const HomePage = () =>{
             </div>
     </div>
         </>
-        
+        </div>
         
         
         )

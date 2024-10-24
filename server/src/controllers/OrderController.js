@@ -54,7 +54,7 @@ const getDetailOrder = async (req, res) => {
     }
 }
 
-const cancelOrder = async (req, res) => {
+const deleteOrder = async (req, res) => {
     try {
         const data= req.body.orderItems
         const orderId= req.body.orderId
@@ -88,6 +88,6 @@ module.exports = {
     createOrder,
     getAllOrderDetail,
     getDetailOrder,
-    cancelOrder,
+    deleteOrder,
     getAllOrder
 }

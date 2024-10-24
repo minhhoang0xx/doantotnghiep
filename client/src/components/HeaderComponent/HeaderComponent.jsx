@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Badge, Col, Input, message } from 'antd'
 import { useNavigate } from "react-router-dom";
 import { WrapperAccount, WrapperHeader, WrapperText } from './style';
@@ -18,8 +18,9 @@ const HeaderComponent = () => {
     const user = useSelector((state) => state.user)
     const searchResults = useSelector((state) => state.product.searchResults);  // Lấy kết quả tìm kiếm
     const [search, setSearch] = useState('');
-    const order = useSelector((state) => state.order);
-
+    const cart = useSelector((state) => state.cart);
+    const [isVisible, setIsVisible] = useState(true);
+    const [lastScrollY, setLastScrollY] = useState(0);
     const onSearch = (e) => {
         const keyword = e.target.value;
         setSearch(keyword);
@@ -65,13 +66,37 @@ const HeaderComponent = () => {
             navigate('/cart');
         }
     };
+    const handleScroll = () => {
+        if (typeof window !== "undefined") {
+            const scrollY = window.scrollY;
+            if (scrollY > lastScrollY) {
+                setIsVisible(false); // Cuộn xuống thì ẩn header
+            } else {
+                setIsVisible(true); // Cuộn lên thì hiện header
+            }
+            setLastScrollY(scrollY);
+        }
+    };
 
+    useEffect(() => {
+        window.addEventListener('scroll', handleScroll);
+        
+        // Đảm bảo hiển thị header ban đầu
+        const handleLoad = () => setIsVisible(true);
+        
+        window.addEventListener('load', handleLoad);
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener('load', handleLoad);
+        };
+    }, [lastScrollY]);
 
     const storageData = localStorage.getItem('access_token');
 
     return (
         <div>
-            <WrapperHeader>
+            <WrapperHeader style={{ top: isVisible ? '0' : '-70px', transition: 'top 0.6s'}}>
                 <Col span={5}>
                     <div onClick={handleNavigateHome} style={{ cursor: 'pointer' }}> <WrapperText>Hoang System Education</WrapperText></div>
                 </Col>
@@ -122,7 +147,7 @@ const HeaderComponent = () => {
                             {user.isAdmin ? (
                                 <SettingOutlined style={{ fontSize: '30px' }} /> 
                             ) : (
-                                <Badge count={order?.orderItems?.length} size='small'>
+                                <Badge count={cart?.cartItems?.length} size='small'>
                                     <ShoppingCartOutlined style={{ fontSize: '30px' }} />
                                 </Badge>
                             )}

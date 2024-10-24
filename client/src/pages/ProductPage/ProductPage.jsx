@@ -20,6 +20,7 @@ const ProductPage = () => {
 
         return (
                 <>
+                    <div style={{ padding: '50px 0 0 0 ',background:'#f5f5f5' }}>
                         <div style={{ margin: '20px 0 20px 20px', display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
                                 {products?.data?.map((product) => ( 
                                         <CardComponent
@@ -36,6 +37,7 @@ const ProductPage = () => {
 
                         </div>
                         <Pagination defaultCurrent={1} total={50} onChange={onChange} style={{ textAlign: 'center', margin: '20px 0' }} />
+                        </div>
                 </>
 
 

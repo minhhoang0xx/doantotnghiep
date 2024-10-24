@@ -1,18 +1,6 @@
 const mongoose = require('mongoose') 
 const orderSchema = new mongoose. Schema({
-    orderItems: [
-        {
-            name: {type: String, required: true },
-            amount: {type: Number, required: true },
-            image: {type: String, required: true },
-            price: { type: Number, required: true },
-            product: { //join bang Product vao bang order (tim hieu populate trong mongoDB)
-                type: mongoose.Schema. Types.ObjectId, 
-                ref: 'Product',
-                required: true,
-            },
-        },
-    ],
+  
     shippingAddress: {
         fullName: {type: String, required: true },
         address: {type: String, required: true },
