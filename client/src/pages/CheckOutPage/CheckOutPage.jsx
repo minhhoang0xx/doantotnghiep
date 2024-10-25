@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, Typography, Card, Form, Input, message } from 'antd';
-import { createOrder as createOrderAction } from '../../redux/slices/orderSlice';
+import { Button, Typography, Card, Form, Input, message, Image, Radio } from 'antd';
+import { createOrder } from '../../redux/slices/orderSlice';
 import { jwtTranslate } from '../../ultils';
-
+import * as OrderService from "../../services/OrderService"; // Import CartService
+import { useNavigate } from 'react-router-dom';
+import { removeSelectedItems } from '../../redux/slices/cartSlice';
+import * as CartService from "../../services/CartService";
 const { Title } = Typography;
+
 
 const CheckoutPage = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(false);
     const user = localStorage.getItem('access_token');
     const selectedCartItems = JSON.parse(localStorage.getItem('selectedCartItems')) || [];
     selectedCartItems.forEach(item => {
@@ -18,10 +24,10 @@ const CheckoutPage = () => {
     };
     // State để lưu thông tin địa chỉ giao hàng và phương thức thanh toán
     const [shippingAddress, setShippingAddress] = useState({
+        fullname: '',
         address: '',
         city: '',
-        postalCode: '',
-        country: '',
+        phone: '',
     });
 
     const [paymentMethod, setPaymentMethod] = useState('');
@@ -40,49 +46,62 @@ const CheckoutPage = () => {
         setShippingAddress(newAddress);
         localStorage.setItem('shippingAddress', JSON.stringify(newAddress)); // Lưu địa chỉ vào localStorage
     };
-    const handlePaymentChange = (value) => {
-        setPaymentMethod(value);
-        localStorage.setItem('paymentMethod', value); // Lưu phương thức thanh toán vào localStorage
+    const handlePaymentChange = (e) => {
+        setPaymentMethod(e.target.value);
+        localStorage.setItem('paymentMethod', e.target.value); // Lưu phương thức thanh toán vào localStorage
     };
 
     const handleCheckout = async () => {
+        if (isLoading) return; // Ngăn chặn nhấn nhiều lần
+    setIsLoading(true);
         if (selectedCartItems.length === 0) {
-            message.warning('Your cart is empty.'); 
+            message.warning('Your cart is empty.');
+            return;
+        }
+        const userId = jwtTranslate(user)?.id;
+        if (!userId) {
+            message.error('User ID is not available. Please log in.');
             return;
         }
         console.log("Selected Cart Items:", selectedCartItems);
         const orderData = {
             orderItems: selectedCartItems.map(item => ({
+                image: item.image,
                 product: item.product,
                 name: item.name,
                 price: item.price,
                 amount: item.amount,
-                
             })),
-
-            shippingAddress: {
-                address: shippingAddress.address,
-                city: shippingAddress.city,
-                postalCode: shippingAddress.postalCode,
-                country: shippingAddress.country,
-            },
+            shippingAddress,
             paymentMethod,
-            user: jwtTranslate(user)?.id,
+            user: userId,
+            itemsPrice: calculateTotal(),
+            shippingPrice: 0,
             totalPrice: calculateTotal(),
-    
+            isPaid: false,
+            paidAt: null,
+            // email: 'hoanglmgch210529@fpt.edu.vn'
         };
         console.log("Order Data:", orderData);
         try {
-            await dispatch(createOrderAction(orderData)).unwrap();
-            message.success('Order created successfully!');
-            // Reset giỏ hàng và thông tin địa chỉ sau khi đặt hàng thành công
-            localStorage.removeItem('shippingAddress');
-            localStorage.removeItem('paymentMethod');
-            localStorage.removeItem('selectedCartItems'); // Xóa sản phẩm đã chọn
-            // Điều hướng tới trang khác nếu cần
+            const response = await OrderService.createOrder(userId, orderData);
+            if (response.status === 'ERR') {
+                message.error(`Out of stock!!!`);
+            } else {
+                await Promise.all(selectedCartItems.map(item => 
+                    CartService.removeCart(userId, item.product)
+                ));
+                dispatch(removeSelectedItems(selectedCartItems));// xoa san pham trong cart
+                message.success('Order created successfully');
+                localStorage.removeItem('shippingAddress');
+                localStorage.removeItem('paymentMethod');
+                localStorage.removeItem('selectedCartItems');
+                navigate('/my-orders');
+            }
         } catch (error) {
             message.error('Failed to create order: ' + error);
         }
+        setIsLoading(false);
     };
 
     return (
@@ -95,20 +114,43 @@ const CheckoutPage = () => {
                 ) : (
                     <div>
                         {selectedCartItems.map(item => (
-                            <div key={item.product} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0' }}>
-                                <span>{item.name} (x{item.amount})</span>
-                                <span>${(item.price * item.amount).toFixed(2)}</span>
-                            </div>
+                            <Card
+                                key={item.product}
+                                style={{
+                                    alignItems: 'center',
+                                    marginBottom: '15px',
+                                    border: '1px solid #f0f0f0',
+                                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                                    borderRadius: '10px',
+                                }}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                                    <Image width={70} height={70} src={item.image} alt={item.name} style={{ borderRadius: '8px' }} />
+                                    <div>
+                                        <p style={{ margin: 0, fontSize: '16px', fontWeight: '600' }}>{item.name}</p>
+                                        <p style={{ color: 'rgba(0, 0, 0, 0.6)', fontSize: '14px', margin: '5px 0 0' }}>Quantity: {item.amount}</p>
+                                    </div>
+                                </div>
+                                <div style={{ fontSize: '16px', fontWeight: '500', textAlign: 'right', minWidth: '80px' }}>
+                                    ${(item.price * item.amount).toFixed(2)}
+                                </div>
+                            </Card>
                         ))}
-                        <div style={{ fontWeight: 'bold', marginTop: '10px' }}>
+                        <div style={{ textAlign: 'left', marginTop: '20px', fontSize: '18px', fontWeight: 'bold', color: 'darkorange' }}>
                             Total: ${calculateTotal()}
                         </div>
                     </div>
                 )}
-                
+
                 {/* Form nhập địa chỉ giao hàng */}
                 <Form layout="vertical" style={{ marginTop: '20px' }}>
                     <Title level={4}>Shipping Address</Title>
+                    <Form.Item label="Full Name">
+                        <Input
+                            value={shippingAddress.fullname}
+                            onChange={(e) => handleAddressChange('fullname', e.target.value)}
+                        />
+                    </Form.Item>
                     <Form.Item label="Address">
                         <Input
                             value={shippingAddress.address}
@@ -121,31 +163,27 @@ const CheckoutPage = () => {
                             onChange={(e) => handleAddressChange('city', e.target.value)}
                         />
                     </Form.Item>
-                    <Form.Item label="Postal Code">
+                    <Form.Item label="Phone Number">
                         <Input
-                            value={shippingAddress.postalCode}
-                            onChange={(e) => handleAddressChange('postalCode', e.target.value)}
-                        />
-                    </Form.Item>
-                    <Form.Item label="Country">
-                        <Input
-                            value={shippingAddress.country}
-                            onChange={(e) => handleAddressChange('country', e.target.value)}
+                            value={shippingAddress.phone}
+                            onChange={(e) => handleAddressChange('phone', e.target.value)}
                         />
                     </Form.Item>
 
-                    {/* Form nhập phương thức thanh toán */}
                     <Title level={4}>Payment Method</Title>
-                    <Form.Item label="Payment Method">
-                        <Input
-                            value={paymentMethod}
-                            onChange={(e) => handlePaymentChange(e.target.value)}
-                        />
+                    <Form.Item label="Choose Payment Method">
+                        <Radio.Group onChange={handlePaymentChange} value={paymentMethod} style={{ display: 'block' }}>
+                            <Radio style={{ display: 'block', marginBottom: '10px' }} value="creditCard">Credit Card</Radio>
+                            <Radio style={{ display: 'block', marginBottom: '10px' }} value="paypal">PayPal</Radio>
+                            <Radio style={{ display: 'block', marginBottom: '10px' }} value="cashOnDelivery">Cash on Delivery</Radio>
+                        </Radio.Group>
                     </Form.Item>
+                    <div>
+                        <Button type="primary" onClick={handleCheckout} style={{ width: '100%' }}>
+                            Place Order
+                        </Button>
+                    </div>
 
-                    <Button type="primary" onClick={handleCheckout} style={{ width: '100%' }}>
-                        Place Order
-                    </Button>
                 </Form>
             </Card>
         </div>

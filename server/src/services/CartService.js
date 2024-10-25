@@ -46,7 +46,6 @@ const getCart = (userId) => {
     return new Promise(async (resolve, reject) => {
         try {
             const findCart = await Cart.findOne({ user: userId });
-            console.log('Found cart:', findCart); 
             resolve({
                 status: 'OK',
                 message: 'success',

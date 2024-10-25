@@ -4,7 +4,7 @@ export const axiosJWT = axios.create(); // Tạo axios instance nếu cần
 
 export const createOrder = async (userId, orderData) => {
     const res = await axios.post(`${process.env.REACT_APP_API_URL}/order/createOrder/${userId}`, orderData);
-    return res.data; // Trả về dữ liệu từ phản hồi
+    return res.data; 
 };
 
 export const updateOrderStatus = (orderId, status) => {

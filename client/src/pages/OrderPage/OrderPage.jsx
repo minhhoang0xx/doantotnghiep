@@ -138,15 +138,15 @@ const OrderPage = () => {
     }
     // Tạo một danh sách các sản phẩm đã chọn
     const selectedCartItems = cartItems.filter(item => selectedItems.has(item.product));
-    // localStorage.setItem('selectedCartItems', JSON.stringify(selectedCartItems));
+    /////// // gán gia tri amount tranh loi logic
     const selectedQuantities = {};
     selectedItems.forEach(productId => {
-      selectedQuantities[productId] = quantities[productId]; // Lấy số lượng từ state quantities
+      selectedQuantities[productId] = quantities[productId]; 
     });
     const updatedSelectedCartItems = selectedCartItems.map(item => {
       return {
         ...item,
-        amount: selectedQuantities[item.product] || item.amount // Gán giá trị amount mới hoặc giữ nguyên nếu không có
+        amount: selectedQuantities[item.product] || item.amount 
       };
     });
     localStorage.setItem('selectedCartItems', JSON.stringify(updatedSelectedCartItems));

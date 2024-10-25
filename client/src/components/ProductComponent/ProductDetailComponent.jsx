@@ -7,7 +7,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import * as ProductService from "../../services/ProductService";
 import { useDispatch, useSelector } from 'react-redux';
 import { addCartItem } from '../../redux/slices/cartSlice';
-import * as CartService from "../../services/CartService"; // Import CartService
+import * as CartService from "../../services/CartService"; 
 
 const ProductDetailComponent = () => {
     const { id } = useParams(); // Lấy id sản phẩm từ URL
