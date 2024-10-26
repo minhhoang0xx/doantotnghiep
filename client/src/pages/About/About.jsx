@@ -3,7 +3,7 @@ import { Typography, Card, Row, Col } from 'antd';
 
 const { Title, Paragraph } = Typography;
 
-const About = () => {
+const AboutPage = () => {
   return (
     <div style={{ padding: '50px 0 0 0 ',background:'#f5f5f5' }}>
     <div style={{ padding: '50px', background:'#f5f5f5' }}>
@@ -62,4 +62,4 @@ const About = () => {
   );
 };
 
-export default About;
+export default AboutPage;

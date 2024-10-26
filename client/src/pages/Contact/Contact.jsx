@@ -4,7 +4,7 @@ import { Typography, Card, Row, Col, Form, Input, Button } from 'antd';
 const { Title, Paragraph } = Typography;
 const { TextArea } = Input;
 
-const Contact = () => {
+const ContactPage = () => {
   const onFinish = (values) => {
     console.log('Received values:', values);
     // Thêm logic xử lý liên hệ như gửi email hoặc lưu vào database
@@ -81,4 +81,4 @@ const Contact = () => {
   );
 };
 
-export default Contact;
+export default ContactPage;

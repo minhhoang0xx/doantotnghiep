@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Typography, Card, Form, Input, message, Image, Radio } from 'antd';
-import { createOrder } from '../../redux/slices/orderSlice';
 import { jwtTranslate } from '../../ultils';
-import * as OrderService from "../../services/OrderService"; // Import CartService
+import * as OrderService from "../../services/OrderService"; 
 import { useNavigate } from 'react-router-dom';
 import { removeSelectedItems } from '../../redux/slices/cartSlice';
 import * as CartService from "../../services/CartService";
@@ -88,15 +87,15 @@ const CheckoutPage = () => {
             if (response.status === 'ERR') {
                 message.error(`Out of stock!!!`);
             } else {
-                await Promise.all(selectedCartItems.map(item => 
-                    CartService.removeCart(userId, item.product)
-                ));
+                for (const item of selectedCartItems) {
+                        await CartService.removeCart(userId, item.product); 
+                }
                 dispatch(removeSelectedItems(selectedCartItems));// xoa san pham trong cart
                 message.success('Order created successfully');
                 localStorage.removeItem('shippingAddress');
                 localStorage.removeItem('paymentMethod');
                 localStorage.removeItem('selectedCartItems');
-                navigate('/my-orders');
+                navigate('/myOrder');
             }
         } catch (error) {
             message.error('Failed to create order: ' + error);

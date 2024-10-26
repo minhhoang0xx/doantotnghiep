@@ -20,8 +20,8 @@ const OrderPage = () => {
   const [selectAll, setSelectAll] = useState(false);
   const [selectedItems, setSelectedItems] = useState(new Set());
 
-  // Fetch cart items from API
 
+  // Fetch cart items from API
   // LAY GIO HANG TU API, LUU VAO REDUX, UPDATE SO LUONG
   // chay moi khi co su thay doi tk user
   useEffect(() => {
@@ -141,12 +141,12 @@ const OrderPage = () => {
     /////// // gán gia tri amount tranh loi logic
     const selectedQuantities = {};
     selectedItems.forEach(productId => {
-      selectedQuantities[productId] = quantities[productId]; 
+      selectedQuantities[productId] = quantities[productId];
     });
     const updatedSelectedCartItems = selectedCartItems.map(item => {
       return {
         ...item,
-        amount: selectedQuantities[item.product] || item.amount 
+        amount: selectedQuantities[item.product] || item.amount
       };
     });
     localStorage.setItem('selectedCartItems', JSON.stringify(updatedSelectedCartItems));
@@ -159,6 +159,8 @@ const OrderPage = () => {
 
   return (
     <div style={{ padding: '50px 0 0 0 ', background: '#f0f2f5' }}>
+      <Button type="primary"style={{position: 'absolute',top: 60, right: 10,fontSize: '16px',backgroundColor: '#4CAF50',border: 'none',padding: '10px 20px',borderRadius: '5px',}}
+        onClick={() => navigate('/myOrder')}>My Orders </Button>
       <div style={{ padding: '30px', backgroundColor: '#f0f2f5', minHeight: '100vh' }}>
         <Title level={2} style={{ textAlign: 'center', marginBottom: '40px', fontSize: '28px' }}>Your Cart</Title>
         {cartItems.length === 0 ? (

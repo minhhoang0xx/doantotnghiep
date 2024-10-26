@@ -51,7 +51,7 @@ const AdminPage = () => {
                 deletePromises = selectedRadio.map(id => UserService.deleteUser(id)); // Giả sử bạn có hàm deleteUser
             }
             else if (currentView === 'orders') {
-                deletePromises = selectedRadio.map(id => OrderService.deleteOrder(id)); // Giả sử bạn có hàm deleteOrder
+                deletePromises = selectedRadio.map(id => OrderService.cancelOrder(id)); // Giả sử bạn có hàm deleteOrder
             }
 
             await Promise.all(deletePromises);
