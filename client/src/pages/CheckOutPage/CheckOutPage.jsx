@@ -19,13 +19,12 @@ const CheckoutPage = () => {
         console.log(item); // Check if amount is present and correct
     });
     const calculateTotal = () => {
-        return selectedCartItems.reduce((total, item) => total + item.price * item.amount, 0).toFixed(2);
+        return selectedCartItems.reduce((total, item) => total + item.price * item.amount, 0);
     };
     // State để lưu thông tin địa chỉ giao hàng và phương thức thanh toán
     const [shippingAddress, setShippingAddress] = useState({
         fullname: '',
         address: '',
-        city: '',
         phone: '',
     });
 
@@ -131,7 +130,7 @@ const CheckoutPage = () => {
                                     </div>
                                 </div>
                                 <div style={{ fontSize: '16px', fontWeight: '500', textAlign: 'right', minWidth: '80px' }}>
-                                    ${(item.price * item.amount).toFixed(2)}
+                                    ${(item.price * item.amount)}
                                 </div>
                             </Card>
                         ))}
@@ -154,12 +153,6 @@ const CheckoutPage = () => {
                         <Input
                             value={shippingAddress.address}
                             onChange={(e) => handleAddressChange('address', e.target.value)}
-                        />
-                    </Form.Item>
-                    <Form.Item label="City">
-                        <Input
-                            value={shippingAddress.city}
-                            onChange={(e) => handleAddressChange('city', e.target.value)}
                         />
                     </Form.Item>
                     <Form.Item label="Phone Number">

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Table, message, Button, Image ,Typography } from 'antd';
+import { useNavigate } from 'react-router-dom';
 import { CloseCircleOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchOrders, cancelOrder } from '../../redux/slices/orderSlice';
@@ -8,12 +9,15 @@ import { jwtTranslate } from "../../ultils";
 import dayjs from 'dayjs';
 const { Title } = Typography;
 const MyOrderPage = () => {
+    const navigate = useNavigate();
     const dispatch = useDispatch();
     const { orders, isLoading, error } = useSelector((state) => state.order);
     const user = localStorage.getItem('access_token'); 
     const userId = jwtTranslate(user)?.id;
     const [loading, setLoading] = useState(true);
-
+    const handleClick = (orderId) => {
+        navigate(`/order/detailOrder/${orderId}`);
+    };
     useEffect(() => {
         const fetchData = async () => {
             if (!userId) {
@@ -59,8 +63,8 @@ const MyOrderPage = () => {
             title: 'Product',
             dataIndex: 'orderItems',
             key: 'orderItems',
-            render: (orderItems) => (
-                <div style={{ display: 'flex', gap: '10px' }}>
+            render: (orderItems, record) => (
+                <div style={{ display: 'flex', gap: '10px', cursor: 'pointer' }}  onClick={() => handleClick(record._id)}>
                     {orderItems.slice(0, 3).map((item) => (
                         <Image
                             key={item._id}
@@ -92,7 +96,7 @@ const MyOrderPage = () => {
             title: 'Price',
             dataIndex: 'totalPrice',
             key: 'totalPrice',
-            render: (price) => `$${price.toFixed(2)}`,
+            render: (price) => `$${price}`,
         },
         {
             title: 'Action',
@@ -109,7 +113,7 @@ const MyOrderPage = () => {
     ];
 
     return (
-        <div style={{ padding: '100px 0 0 0', background: '#f0f2f5' }}>
+        <div style={{ padding: '100px 0 0 0', background: '#f0f2f5' , minHeight: '100vh' }}>
             <div style={{ maxWidth: '80%', margin: '0 auto' }}>
             <Title level={2} style={{ textAlign: 'center', marginBottom: '40px', fontSize: '28px' }}>My Order</Title>
                 {error && <p style={{ color: 'red' }}>{error}</p>}

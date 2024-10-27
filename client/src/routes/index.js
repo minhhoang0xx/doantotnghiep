@@ -11,7 +11,7 @@ import UserDetailPage from "../pages/UserPage/UserDetailPage";
 import AdminPage from "../pages/AdminPage/AdminPage";
 import CheckoutPage from "../pages/CheckOutPage/CheckOutPage";
 import MyOrderPage from "../pages/MyOrder/MyOrder";
-
+import DetailOrder from "../pages/MyOrder/DetailOrder";
 
 
 export const routes =[
@@ -94,6 +94,12 @@ export const routes =[
     {
         path: '/myOrder',
         page: MyOrderPage,
+        isShowHeader: true,
+    
+    },
+    {
+        path: '/order/detailOrder/:orderId',
+        page: DetailOrder,
         isShowHeader: true,
     
     },

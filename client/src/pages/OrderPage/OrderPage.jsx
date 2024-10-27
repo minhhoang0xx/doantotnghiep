@@ -154,7 +154,7 @@ const OrderPage = () => {
   };
 
   const calculateTotal = () => {
-    return cartItems.reduce((total, item) => total + item.price * (quantities[item.product]), 0).toFixed(2);
+    return cartItems.reduce((total, item) => total + item.price * (quantities[item.product]), 0);
   };
 
   return (
@@ -194,11 +194,11 @@ const OrderPage = () => {
                       <img src={item.image} alt={item.name} style={{ width: '77px', height: '79px', objectFit: 'cover', marginRight: '10px', borderRadius: '8px' }} />
                       <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#333' }}>{item.name}</div>
                     </Col>
-                    <Col span={4}>${item.price.toFixed(2)}</Col>
+                    <Col span={4}>${item.price}</Col>
                     <Col span={4} style={{ display: 'flex', alignItems: 'center' }}>
                       <InputNumber min={1} value={quantities[item.product] || 1} onChange={(value) => handleQuantityChange(item.product, value)} />
                     </Col>
-                    <Col span={4}>${(item.price * (quantities[item.product] || 1)).toFixed(2)}</Col>
+                    <Col span={4}>${(item.price * (quantities[item.product] || 1))}</Col>
                     <Col span={2}><DeleteOutlined style={{ cursor: 'pointer' }} onClick={() => handleRemoveCartItem(item.product)} /></Col>
                   </Row>
                 ))}

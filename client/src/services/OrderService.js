@@ -7,8 +7,6 @@ export const createOrder = async (userId, orderData) => {
   return res.data;
 };
 
-
-
 export const cancelOrder = async (orderId, orderItems) => {
   const res = await axios.delete(`${process.env.REACT_APP_API_URL}/order/deleteOrder/${orderId}`, { data: { orderItems } });
   return res.data
@@ -25,6 +23,10 @@ export const getAllOrder = async () => {
   return res.data
 };
 
+export const getDetailOrder = async (orderId) => {
+  const res = await axios.get(`${process.env.REACT_APP_API_URL}/order/detailOrder/${orderId}`);
+  return res.data;
+};
 // export const updateOrderStatus = async (orderId, status) => {
 //   const res = await axios.put(`${process.env.REACT_APP_API_URL}/order/${orderId}`, { status });
 //   return res.data

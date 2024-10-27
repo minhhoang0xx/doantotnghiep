@@ -169,7 +169,7 @@ const deleteOrder = (orderId, data) => {
 const getAllOrder = () => {
     return new Promise(async (resolve, reject) => {
         try {
-            const allOrder = await Order.find().sort({ createdAt: -1, updatedAt: -1 })
+            const allOrder = await Order.find().populate('user', 'name');
             resolve({
                 status: 'OK',
                 message: 'Success',
