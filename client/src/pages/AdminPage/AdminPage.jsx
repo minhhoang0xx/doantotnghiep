@@ -48,15 +48,15 @@ const AdminPage = () => {
             if (currentView === 'products') {
                 deletePromises = selectedRadio.map(id => ProductService.deleteProduct(id));
             } else if (currentView === 'users') {
-                deletePromises = selectedRadio.map(id => UserService.deleteUser(id)); // Giả sử bạn có hàm deleteUser
+                deletePromises = selectedRadio.map(id => UserService.deleteUser(id)); 
             }
             else if (currentView === 'orders') {
-                deletePromises = selectedRadio.map(id => OrderService.cancelOrder(id)); // Giả sử bạn có hàm deleteOrder
+                deletePromises = selectedRadio.map(id => OrderService.cancelOrder(id)); 
             }
 
             await Promise.all(deletePromises);
             message.success(`${currentView.charAt(0).toUpperCase() + currentView.slice(1)} deleted successfully!`);
-            setSelectedRadio([]); // Reset selected keys
+            setSelectedRadio([]); // Đặt lại các khóa đã chọn
             setDeleteModal(false);
             refetchData(); // lam moi du lieu
         } catch (error) {
@@ -93,7 +93,10 @@ const AdminPage = () => {
     };
     const fetchAllOrder = async () => {
         const res = await OrderService.getAllOrder();
+        console.log('res',res)
         return res;
+   
+       
     };
 
 
@@ -135,9 +138,12 @@ const AdminPage = () => {
         product.name.toLowerCase().includes(productSearch.toLowerCase())
     );
 
-    const filteredOrders = orders?.data.filter(order => 
-        order.user.name.toLowerCase().includes(orderSearch.toLowerCase())
-    );
+    const filteredOrders = orders?.data.filter(order => {
+        console.log('order', order); // Kiểm tra cấu trúc của order
+        const itemName = order.user.name || ''; 
+    const searchTerm = orderSearch ? orderSearch.toLowerCase() : ''; // Kiểm tra searchInput
+    return itemName.toLowerCase().includes(searchTerm);
+});
 
 
     // Cấu trúc của cột trong bảng người dùng
@@ -210,10 +216,9 @@ const AdminPage = () => {
                 />
             ),
         },
-        { title: 'Order ID', dataIndex: '_id', key: '_id', },
         {
             title: 'User', dataIndex: 'user', key: 'user',
-            render: (user) => user.name,
+            render: (text, record) => record.user?.name || 'Unknown',
         },
         { title: 'Total Price', dataIndex: 'totalPrice', key: 'totalPrice' },
         {
@@ -319,7 +324,7 @@ const AdminPage = () => {
                     ) : (
                         <Table
                             columns={orderColumns}
-                            //   dataSource={filteredOrders} // Hiển thị dữ liệu từ API đơn hàng
+                               dataSource={filteredOrders} // Hiển thị dữ liệu từ API đơn hàng
                             rowKey={(record) => record._id}
                             pagination={{ pageSize: 10 }}
                         />
