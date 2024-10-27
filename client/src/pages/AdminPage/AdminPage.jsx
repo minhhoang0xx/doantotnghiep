@@ -189,6 +189,7 @@ const AdminPage = () => {
             ],
         },
         { title: 'Count In Stock', dataIndex: 'countInStock', key: 'countInStock', sorter: true },
+        { title: 'Sold', dataIndex: 'sold', key: 'sold', sorter: true },
         { title: 'Rating', dataIndex: 'rating', key: 'rating', sorter: true },
         { title: 'Description', dataIndex: 'description', key: 'description', },
         {

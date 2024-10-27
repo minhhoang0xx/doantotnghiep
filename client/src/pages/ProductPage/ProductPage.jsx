@@ -32,6 +32,7 @@ const ProductPage = () => {
                                                 name={product.name}
                                                 price={product.price}
                                                 rating={product.rating}
+                                                sold={product.sold}
                                         />
                                 ))}
 

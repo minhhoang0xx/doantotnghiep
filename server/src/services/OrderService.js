@@ -14,7 +14,7 @@ const createOrder = (userId, newOrder) => {
                     {
                         $inc: {
                             countInStock: -order.amount,
-                            selled: +order.amount
+                            sold: +order.amount
                         }
                     },
                     { new: true }
@@ -37,7 +37,7 @@ const createOrder = (userId, newOrder) => {
             console.log(shippingAddress)
             const createdOrder = await Order.create({
                 orderItems,
-                shippingAddress ,
+                shippingAddress,
                 paymentMethod,
                 itemsPrice,
                 shippingPrice,
@@ -61,12 +61,12 @@ const createOrder = (userId, newOrder) => {
 };
 
 
-const getAllOrderDetail = (id) => {
+const getUserOrder = (userID) => {
     return new Promise(async (resolve, reject) => {
         try {
             const order = await Order.find({
-                user: id
-            }).sort({createdAt: -1, updatedAt: -1})
+                user: userID
+            }).sort({ createdAt: -1, updatedAt: -1 })
             if (order === null) {
                 resolve({
                     status: 'ERR',
@@ -86,11 +86,11 @@ const getAllOrderDetail = (id) => {
     })
 }
 
-const getDetailOrder = (id) => {
+const getDetailOrder = (orderId) => {
     return new Promise(async (resolve, reject) => {
         try {
             const order = await Order.findById({
-                _id: id
+                _id: orderId
             })
             if (order === null) {
                 resolve({
@@ -111,62 +111,65 @@ const getDetailOrder = (id) => {
     })
 }
 
-const deleteOrder = (id, data) => {
+const deleteOrder = (orderId, data) => {
     return new Promise(async (resolve, reject) => {
         try {
-            let order = []
-            const promises = data.map(async (order) => {
-                const productData = await Product.findOneAndUpdate(
-                    {
-                    _id: order.product,
-                    selled: {$gte: order.amount}
-                    },
-                    {$inc: {
-                        countInStock: +order.amount,
-                        selled: -order.amount
-                    }},
-                    {new: true}
-                )
-                if(productData) {
-                    order = await Order.findByIdAndDelete(id)
-                    if (order === null) {
-                        resolve({
-                            status: 'ERR',
-                            message: 'The order is not defined'
-                        })
+            if (!Array.isArray(data)) {
+                throw new Error("Invalid data format: data should be an array.");
+            }
+
+            const promises = data.map(async (item) => {
+                try {
+                    const productData = await Product.findOneAndUpdate(
+                        {
+                            _id: item.product,
+                            sold: { $gte: item.amount }
+                        },
+                        {
+                            $inc: {
+                                countInStock: +item.amount,
+                                sold: -item.amount
+                            }
+                        },
+                        { new: true }
+                    );
+
+                    if (!productData) {
+                        throw new Error(`Product with ID ${item.product} does not exist or insufficient stock.`);
                     }
-                } else {
-                    return{
-                        status: 'OK',
-                        message: 'ERR',
-                        id: order.product
-                    }
+                } catch (error) {
+                    console.error(`Error updating product ${item.product}:`, error.message);
+                    throw error;
                 }
-            })
-            const results = await Promise.all(promises)
-            const newData = results && results[0] && results[0].id
-            
-            if(newData) {
+            });
+
+            await Promise.all(promises);
+
+            const deletedOrder = await Order.findByIdAndDelete(orderId);
+
+            if (!deletedOrder) {
                 resolve({
                     status: 'ERR',
-                    message: `San pham voi id: ${newData} khong ton tai`
-                })
+                    message: 'The order does not exist.',
+                });
+            } else {
+                resolve({
+                    status: 'OK',
+                    message: 'Order deleted successfully',
+                    data: deletedOrder,
+                });
             }
-            resolve({
-                status: 'OK',
-                message: 'success',
-                data: order
-            })
         } catch (e) {
-            reject(e)
+            console.error('Error in deleteOrder:', e.message);
+            reject(e);
         }
-    })
-}
+    });
+};
 
 const getAllOrder = () => {
     return new Promise(async (resolve, reject) => {
         try {
-            const allOrder = await Order.find().sort({createdAt: -1, updatedAt: -1})
+            const allOrder = await Order.find().sort({ createdAt: -1, updatedAt: -1 })
             resolve({
                 status: 'OK',
                 message: 'Success',
@@ -181,6 +184,7 @@ const getAllOrder = () => {
 module.exports = {
     createOrder,
     getDetailOrder,
+    getUserOrder,
     deleteOrder,
     getAllOrder
 }
