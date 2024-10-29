@@ -43,6 +43,6 @@ export const updateUser = async (id,data) => {
 };
 
 export const deleteUser = async (id) => {
-    const res = await axios.delete(`${process.env.REACT_APP_API_URL}/product/deleteUser/${id}`);
+    const res = await axios.delete(`${process.env.REACT_APP_API_URL}/user/deleteUser/${id}`);
     return res.data;
 };

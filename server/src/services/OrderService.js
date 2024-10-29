@@ -46,7 +46,7 @@ const createOrder = (userId, newOrder) => {
                 isPaid: false,
                 paidAt: Date.now(),
                 isDelivered: false,
-                deliveredAt: Date.now()
+                deliveredAt: null 
             });
 
             if (createdOrder) {
@@ -181,10 +181,65 @@ const getAllOrder = () => {
     })
 }
 
+const doneOrder = (id) => {
+    return new Promise(async (resolve, reject) => {
+        console.log('123123123')
+        try {
+            const doneOrder = await Order.findByIdAndDelete(id);
+            if (!doneOrder) {
+                resolve({
+                    status: 'ERR',
+                    message: 'The order does not exist.',
+                });
+            } else {
+                resolve({
+                    status: 'OK',
+                    message: 'Order deleted successfully',
+                    data: doneOrder,
+                });
+            }
+        } catch (e) {
+            console.error('Error in deleteOrder:', e.message);
+            reject(e);
+        }
+    });
+};
+
+const updateOrderStatus = (id,data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const checkOrder = await Order.findOne({
+                _id : id, // truy van cua mongoDB phair laf _id
+            })
+            console.log(checkOrder)
+            if(checkOrder === null){
+                resolve({
+                    status: 'error',
+                    message: 'the User is not Defined',
+                })
+            }
+            if (data.isDelivered === true) {
+                data.deliveredAt = Date.now();
+            }
+            const updateOrderStatus = await Order.findByIdAndUpdate(id, data, {new: true})
+            resolve ({
+                status: 'OK',
+                message: 'succes',
+                data: updateOrderStatus
+            })
+        }catch(err){
+            reject(err);
+        }
+    })
+    
+}
 module.exports = {
     createOrder,
     getDetailOrder,
     getUserOrder,
     deleteOrder,
-    getAllOrder
+    getAllOrder,
+    doneOrder,
+    updateOrderStatus
+
 }

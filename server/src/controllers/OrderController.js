@@ -85,11 +85,50 @@ const getAllOrder = async (req, res) => {
         })
     }
 }
-
+const doneOrder = async (req, res) => {
+    try {
+        const id = req.params.id
+        if (!id) {
+            return res.status(200).json({
+                status: 'ERR',
+                message: 'The orderId is required'
+            })
+        }
+        const response = await OrderService.doneOrder(id)
+        return res.status(200).json(response)
+    } catch (e) {
+        return res.status(404).json({
+            message: e,
+            status: 'ERRoooii',
+        })
+    }
+}
+const updateOrderStatus = async (req,res)=>{
+    try{
+        const id = req.params.id
+        const data = req.body
+        if(!id){
+            return res.status(200).json({
+                status: 'ERR',
+                message: 'The Order ID is required'
+            })
+        }
+        const response = await OrderService.updateOrderStatus(id,data) // response de khac voi thang res khong bi nham
+        return res.status(200).json(response) 
+    }catch(e){
+        return res.status(404).json({ 
+            status: 'error0',
+            message: e.message,
+            error: e
+        })
+    }
+}
 module.exports = {
     createOrder,
     getUserOrder,
     getDetailOrder,
     deleteOrder,
-    getAllOrder
+    getAllOrder,
+    doneOrder,
+    updateOrderStatus
 }

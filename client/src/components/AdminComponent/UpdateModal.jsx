@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { Modal, Form, Input, InputNumber, message, Button, Checkbox } from 'antd';
-import * as ProductService from '../../services/ProductService'; 
-import * as UserService from '../../services/UserService'; 
-// import * as OrderService from '../../services/OrderService';
+import * as ProductService from '../../services/ProductService';
+import * as UserService from '../../services/UserService';
+import * as OrderService from '../../services/OrderService';
 
 const UpdateModal = ({ isModalOpen, setIsModalOpen, currentData, refetchData, currentView }) => {
     const [form] = Form.useForm();
@@ -20,10 +20,10 @@ const UpdateModal = ({ isModalOpen, setIsModalOpen, currentData, refetchData, cu
                 response = await ProductService.updateProduct(currentData._id, data);
             } else if (currentView === 'users') {
                 response = await UserService.updateUser(currentData._id, data); // Tương tự cho user
-            } 
-            // else if (currentView === 'orders') {
-            //    response = await OrderService.updateOrder(currentData._id, data);
-            // }
+            }
+            else if (currentView === 'orders') {
+                response = await OrderService.updateOrderStatus(currentData._id, data);
+            }
 
             message.success('Updated successfully!');
             setIsModalOpen(false);
@@ -107,13 +107,22 @@ const UpdateModal = ({ isModalOpen, setIsModalOpen, currentData, refetchData, cu
 
                 {/* Trường hợp currentView === 'orders' */}
                 {currentView === 'orders' && (
-                    <Form.Item
-                        label="Is Paid"
-                        name="isPaid"
-                        valuePropName="checked"
-                    >
-                        <Checkbox>Paid</Checkbox>
-                    </Form.Item>
+                    <>
+                        <Form.Item
+                            label="Is Paid"
+                            name="isPaid"
+                            valuePropName="checked"
+                        >
+                            <Checkbox>Pay</Checkbox>
+                        </Form.Item>
+                        <Form.Item
+                            label="Is Delivered"
+                            name="isDelivered"
+                            valuePropName="checked"
+                        >
+                            <Checkbox>Delivery</Checkbox>
+                        </Form.Item>
+                    </>
                 )}
 
                 <Form.Item>

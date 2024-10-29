@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Descriptions, Image, Spin, Typography, message } from 'antd';
+import { CheckCircleTwoTone, CloseCircleTwoTone } from '@ant-design/icons';
 import * as OrderService from "../../services/OrderService";
 import dayjs from 'dayjs';
 
@@ -38,7 +39,7 @@ const DetailOrder = () => {
             const res = await OrderService.cancelOrder(orderId, orderDetails.orderItems);
             if (res?.status === 'OK') {
                 message.success('Order canceled successfully');
-                navigate('/myOrder'); 
+                navigate('/myOrder');
             } else {
                 message.error('Failed to cancel order');
             }
@@ -63,10 +64,37 @@ const DetailOrder = () => {
                 <Title level={2} style={{ textAlign: 'center', marginBottom: '40px', fontSize: '28px' }}>Order Details</Title>
                 <Descriptions bordered column={1}>
                     <Descriptions.Item label="Created At">
-                        {dayjs(orderDetails.createdAt).format('HH:mm/DD/MM/YYYY')}
+                        {new Date(orderDetails.paidAt).toLocaleString('en-GB', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                        })}
                     </Descriptions.Item>
-                    <Descriptions.Item label="Status">
-                        {orderDetails.isPaid ? "Paid" : "Not Paid"}
+
+                    <Descriptions.Item label="Pay">
+                        {orderDetails.isPaid ? <CheckCircleTwoTone twoToneColor="#52c41a" /> : <CloseCircleTwoTone twoToneColor="#ff4d4f" />}  {orderDetails?.paymentMethod}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Delivery">
+                        <>
+                            {orderDetails.isDelivered ? (
+                                <>
+                                    <CheckCircleTwoTone twoToneColor="#52c41a"  />
+                                    <Descriptions.Item label="Delivery At">
+                                        {new Date(orderDetails.deliveredAt).toLocaleString('en-GB', {
+                                            day: '2-digit',
+                                            month: '2-digit',
+                                            year: 'numeric',
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                        })}
+                                    </Descriptions.Item>
+                                </>
+                            ) : (
+                                <CloseCircleTwoTone twoToneColor="#ff4d4f" />
+                            )}
+                        </>
                     </Descriptions.Item>
                     <Descriptions.Item label="FullName">
                         {orderDetails.shippingAddress?.fullname}

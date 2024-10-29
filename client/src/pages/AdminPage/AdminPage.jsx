@@ -1,15 +1,16 @@
 
 import React, { useState } from 'react';
 import { Layout, Menu, Table, Spin, Divider, Typography, Button, Checkbox, message, Input } from 'antd';
-import { UserOutlined, ProductOutlined, ContainerOutlined } from '@ant-design/icons';
+import { UserOutlined, ProductOutlined, ContainerOutlined,EditOutlined, EyeOutlined, CheckCircleTwoTone, CloseCircleTwoTone } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import * as ProductService from "../../services/ProductService";
 import * as UserService from "../../services/UserService";
-import * as OrderService from "../../services/OrderService"; 
+import * as OrderService from "../../services/OrderService";
 import AddProduct from '../../components/AdminComponent/AddProduct';
 import DeleteConfirm from '../../components/AdminComponent/DeleteConfirm';
 import UpdateModal from '../../components/AdminComponent/UpdateModal';
+import DetailOrderModal from '../../components/AdminComponent/DetailOrderModal';
 const { Title } = Typography;
 const { Sider, Content } = Layout;
 
@@ -20,13 +21,30 @@ const AdminPage = () => {
     const [deleteModal, setDeleteModal] = useState(false); // check modal delete co mo hay khong
     const [updateModal, setUpdateModal] = useState(false); // check modal update co mo hay khong
     const [currentData, setCurrentData] = useState(null); // data cua doi tuong cap nhat
+    const [orderDetailModal, setOrderDetailModal] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [currentOrderDetails, setCurrentOrderDetails] = useState(null);
     const [userSearch, setUserSearch] = useState('');
     const [productSearch, setProductSearch] = useState('');
     const [orderSearch, setOrderSearch] = useState('');
-    const [sort, setSort] = useState(null); 
-    const [filter, setFilter] = useState(null); 
+    const [sort, setSort] = useState(null);
+    const [filter, setFilter] = useState(null);
     const navigate = useNavigate();
 
+    const handleOrderDetail = async (orderId) => {
+        setLoading(true);
+        try {
+            const res = await OrderService.getDetailOrder(orderId);
+            if (res?.status === 'OK') {
+                setCurrentOrderDetails(res.data);
+                setOrderDetailModal(true);
+            }
+        } catch (error) {
+            message.error('Error fetching order details: ' + error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
     const handleOpenModal = () => {
         setAddModal(true);
     };
@@ -48,10 +66,11 @@ const AdminPage = () => {
             if (currentView === 'products') {
                 deletePromises = selectedRadio.map(id => ProductService.deleteProduct(id));
             } else if (currentView === 'users') {
-                deletePromises = selectedRadio.map(id => UserService.deleteUser(id)); 
+                deletePromises = selectedRadio.map(id => UserService.deleteUser(id));
             }
             else if (currentView === 'orders') {
-                deletePromises = selectedRadio.map(id => OrderService.cancelOrder(id)); 
+                deletePromises = selectedRadio.map(id => OrderService.doneOrder(id));
+                console.log('123', deletePromises)
             }
 
             await Promise.all(deletePromises);
@@ -60,7 +79,7 @@ const AdminPage = () => {
             setDeleteModal(false);
             refetchData(); // lam moi du lieu
         } catch (error) {
-            message.error('Failed to delete: ' + (error.response?.data?.message || 'Unknown error'));
+            message.error('Failed to delete');
         }
     };
     // update
@@ -93,10 +112,10 @@ const AdminPage = () => {
     };
     const fetchAllOrder = async () => {
         const res = await OrderService.getAllOrder();
-        console.log('res',res)
+        console.log('res', res)
         return res;
-   
-       
+
+
     };
 
 
@@ -120,13 +139,13 @@ const AdminPage = () => {
 
 
 
-      const { data: orders, isLoading: loadingOrders, refetch: refetchOrders } = useQuery({
+    const { data: orders, isLoading: loadingOrders, refetch: refetchOrders } = useQuery({
         queryKey: ['orders'],
         queryFn: fetchAllOrder,
         enabled: currentView === 'orders',
         retry: 3,
         retryDelay: 1000,
-      });
+    });
 
     /// Search
     const filteredUsers = users?.data.filter(user =>
@@ -140,10 +159,10 @@ const AdminPage = () => {
 
     const filteredOrders = orders?.data.filter(order => {
         console.log('order', order); // Kiểm tra cấu trúc của order
-        const itemName = order.user.name || ''; 
-    const searchTerm = orderSearch ? orderSearch.toLowerCase() : ''; // Kiểm tra searchInput
-    return itemName.toLowerCase().includes(searchTerm);
-});
+        const itemName = order.user.name || '';
+        const searchTerm = orderSearch ? orderSearch.toLowerCase() : ''; // Kiểm tra searchInput
+        return itemName.toLowerCase().includes(searchTerm);
+    });
 
 
     // Cấu trúc của cột trong bảng người dùng
@@ -156,6 +175,12 @@ const AdminPage = () => {
                     onChange={() => handleSelect(record._id)}
                 />
             ),
+        },
+        {
+            title: 'Avatar',
+            dataIndex: 'avatar',
+            key: 'avatar',
+            render: (text) => <img src={text} alt="User" style={{ width: '50px', height: '50px', objectFit: 'cover' }} />,
         },
         { title: 'Name', dataIndex: 'name', key: 'name' },
         { title: 'Email', dataIndex: 'email', key: 'email' },
@@ -182,6 +207,12 @@ const AdminPage = () => {
                 />
             ),
         },
+        {
+            title: 'Image',
+            dataIndex: 'image',
+            key: 'image',
+            render: (text) => <img src={text} alt="Product" style={{ width: '50px', height: '50px', objectFit: 'cover' }} />,
+        },
         { title: 'Name', dataIndex: 'name', key: 'name', sorter: true },
         {
             title: 'Price', dataIndex: 'price', key: 'price', sorter: true,
@@ -194,13 +225,13 @@ const AdminPage = () => {
                 { text: 'Clothing', value: 'clothing' },
             ],
         },
-        { title: 'Count In Stock', dataIndex: 'countInStock', key: 'countInStock', sorter: true },
+        { title: 'Stock', dataIndex: 'countInStock', key: 'countInStock', sorter: true },
         { title: 'Sold', dataIndex: 'sold', key: 'sold', sorter: true },
         { title: 'Rating', dataIndex: 'rating', key: 'rating', sorter: true },
-        { title: 'Description', dataIndex: 'description', key: 'description', },
+        // { title: 'Description', dataIndex: 'description', key: 'description', },
         {
             title: 'Action', render: (text, record) =>
-                (<Button onClick={() => handleUpdate(record)}>Update</Button>),
+                (<Button icon={<EditOutlined />}  onClick={() => handleUpdate(record)}/>),
         },
     ];
 
@@ -223,22 +254,34 @@ const AdminPage = () => {
         { title: 'Total Price', dataIndex: 'totalPrice', key: 'totalPrice' },
         {
             title: 'Is Paid', dataIndex: 'isPaid', key: 'isPaid',
-            render: (text) => (text ? 'Yes' : 'No'), // Hiển thị tình trạng thanh toán
+            render: (text) => (text ? <CheckCircleTwoTone twoToneColor="#52c41a"/> : <CloseCircleTwoTone twoToneColor="#ff4d4f" />), // Hiển thị tình trạng thanh toán
         },
         {
-            title: 'Created At', dataIndex: 'createdAt', key: 'createdAt',
-            render: (text) => new Date(text).toLocaleString(), // Hiển thị thời gian tạo
+            title: 'Is Delivery', dataIndex: 'isDelivered', key: 'isDelivered',
+            render: (text) => (text ? <CheckCircleTwoTone twoToneColor="#52c41a"/> : <CloseCircleTwoTone twoToneColor="#ff4d4f" />), // Hiển thị tình trạng thanh toán
         },
         {
-            title: 'Action', render: (text, record) =>
-            (<Button onClick={() => handleUpdate(record)}>Update</Button>
+            title: 'Created At',dataIndex: 'paidAt',key: 'paidAt',
+            render: (text) => new Date(text).toLocaleString('en-GB', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+            }),
+        },
+        {
+            title: 'Action', render: (text, record) => (
+                <>
+                    <Button icon={<EditOutlined />} onClick={() => handleUpdate(record)} style={{ marginRight: '8px' }} />
+                    <Button  icon={<EyeOutlined />} onClick={() => handleOrderDetail(record._id)}/>
+                </>
             ),
-
         },
     ];
 
     return (
-        
+
         <Layout style={{ minHeight: '100vh' }}>
             <Sider width='12%' style={{ background: '#fff' }}>
                 <div style={{ padding: '20px', textAlign: 'center', cursor: 'pointer' }} onClick={() => navigate('/')}>
@@ -303,9 +346,9 @@ const AdminPage = () => {
                         </Button>
                     )}
                     <Button onClick={handleDeleteConfirm} disabled={selectedRadio.length === 0} style={{ backgroundColor: selectedRadio.length === 0 ? 'gray' : 'red', color: 'white', fontSize: '16px', border: 'none', borderRadius: '4px', padding: '10px 20px', cursor: selectedRadio.length === 0 ? 'not-allowed' : 'pointer', transition: 'background-color 0.3s ease', }} onMouseEnter={(e) => { if (selectedRadio.length > 0) { e.currentTarget.style.backgroundColor = 'darkred'; } }} onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = selectedRadio.length > 0 ? 'red' : 'gray'; }}>
-                        Delete
+                    {currentView === 'orders' ? 'Order completed, removed?' : 'Delete'}
                     </Button>
-                    {loadingProducts || loadingUsers || loadingOrders ? ( 
+                    {loadingProducts || loadingUsers || loadingOrders ? (
                         <Spin size="large" />
                     ) : currentView === 'users' ? (
                         <Table
@@ -324,7 +367,7 @@ const AdminPage = () => {
                     ) : (
                         <Table
                             columns={orderColumns}
-                               dataSource={filteredOrders} // Hiển thị dữ liệu từ API đơn hàng
+                            dataSource={filteredOrders} // Hiển thị dữ liệu từ API đơn hàng
                             rowKey={(record) => record._id}
                             pagination={{ pageSize: 10 }}
                         />
@@ -346,6 +389,12 @@ const AdminPage = () => {
                         currentData={currentData}
                         refetchData={refetchData}
                         currentView={currentView}
+                    />
+                    <DetailOrderModal
+                        visible={orderDetailModal}
+                        onClose={() => setOrderDetailModal(false)}
+                        orderDetails={currentOrderDetails}
+                        loading={loading}
                     />
                 </Content>
             </Layout>
