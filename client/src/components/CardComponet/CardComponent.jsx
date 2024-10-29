@@ -21,6 +21,8 @@ const CardComponent = (props) => {
     const handleAddToCart = async () => {
         if (!user?.id) {
             navigate('/sign-in', { state: location?.pathname });
+        } else if (user?.isAdmin) { 
+            message.error('Admin cannot add products to the cart.');
         } else {
             if (countInStock > 0) { // Kiểm tra xem sản phẩm còn hàng không
                 const data = { productId: _id, name, image, price, amount};
@@ -56,7 +58,7 @@ const CardComponent = (props) => {
             actions={[
 
                 <ShoppingCartOutlined key="addToCart" alt='Add To Cart' style={{ color: '#52c41a', fontSize: '24px' }} onClick={handleAddToCart} />,
-            ]}
+            ]} 
         >
             <Meta
                 title={<span style={{ fontWeight: 'bold', fontSize: '20px' }}>{name}</span>}

@@ -106,7 +106,7 @@ const MyOrderPage = () => {
                     type="text"
                     icon={<CloseCircleOutlined style={{ color: 'red', fontSize: '18px' }} />}
                     onClick={() => handleCancelOrder(record._id, record.orderItems)}
-                    disabled={record.isPaid}
+                    disabled={record.isPaid || record.isDelivered} 
                 />
             ),
         },

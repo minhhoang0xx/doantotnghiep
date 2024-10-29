@@ -36,6 +36,8 @@ const ProductDetailComponent = () => {
     const handleAddToCart = async () => {
         if (!user?.id) {
             navigate('/sign-in', { state: location?.pathname });
+        } else if (user?.isAdmin) { 
+            message.error('Admin cannot add products to the cart.');
         } else {
             if (product.countInStock >= quantity) {
                 const data = {

@@ -150,7 +150,7 @@ const DetailOrder = () => {
                         danger
                         onClick={handleCancelOrder}
                         loading={cancelLoading}
-                        disabled={orderDetails.isPaid}
+                        disabled={orderDetails.isPaid || orderDetails.isDelivered}
                     >
                         Cancel Order
                     </Button>

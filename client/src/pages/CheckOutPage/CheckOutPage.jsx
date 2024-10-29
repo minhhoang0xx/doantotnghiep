@@ -74,7 +74,7 @@ const CheckoutPage = () => {
             paymentMethod,
             user: userId,
             itemsPrice: calculateTotal(),
-            shippingPrice: 0,
+            shippingPrice: 30,
             totalPrice: calculateTotal(),
             isPaid: false,
             paidAt: null,
