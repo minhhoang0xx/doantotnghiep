@@ -35,6 +35,8 @@ const createOrder = (userId, newOrder) => {
                 });
             }
             console.log(shippingAddress)
+            const isPaid = paymentMethod === 'creditCard' || paymentMethod === 'paypal';
+           
             const createdOrder = await Order.create({
                 orderItems,
                 shippingAddress,
@@ -43,7 +45,7 @@ const createOrder = (userId, newOrder) => {
                 shippingPrice,
                 totalPrice,
                 user: userId,
-                isPaid: false,
+                isPaid,
                 paidAt: Date.now(),
                 isDelivered: false,
                 deliveredAt: null 

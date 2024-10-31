@@ -389,6 +389,7 @@ const AdminPage = () => {
                         currentData={currentData}
                         refetchData={refetchData}
                         currentView={currentView}
+                        paymentMethod={currentData?.paymentMethod}
                     />
                     <DetailOrderModal
                         visible={orderDetailModal}

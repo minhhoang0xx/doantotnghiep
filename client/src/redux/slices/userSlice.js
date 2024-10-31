@@ -35,7 +35,7 @@ export const userSlice = createSlice({ // quan ly
       state.phone = '';
       state.address = '';
       state.avatar = '';
-      state.id = '';
+      state.id = null;
       state.access_token = '';
       state.isAdmin = false
     },
@@ -43,6 +43,6 @@ export const userSlice = createSlice({ // quan ly
 })
 
 // Action creators are generated for each case reducer function
-export const { updateUser, resetUser } = userSlice.actions
+export const { updateUser, resetUser} = userSlice.actions
 
 export default userSlice.reducer

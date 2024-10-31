@@ -7,7 +7,7 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import * as ProductService from "../../services/ProductService";
 import { useDispatch, useSelector } from 'react-redux';
 import { addCartItem } from '../../redux/slices/cartSlice';
-import * as CartService from "../../services/CartService"; 
+import * as CartService from "../../services/CartService";
 
 const ProductDetailComponent = () => {
     const { id } = useParams(); // Lấy id sản phẩm từ URL
@@ -34,28 +34,46 @@ const ProductDetailComponent = () => {
         setQuantity(value); // Cập nhật số lượng khi người dùng thay đổi
     };
     const handleAddToCart = async () => {
-        if (!user?.id) {
-            navigate('/sign-in', { state: location?.pathname });
-        } else if (user?.isAdmin) { 
+        if (user?.isAdmin) {
             message.error('Admin cannot add products to the cart.');
+            return;
+        }
+        if (product.countInStock < quantity) {
+            message.error('Not enough stock available.');
+            return;
+        }
+        const data = {
+            product: product?._id,
+            name: product?.name,
+            image: product?.image,
+            price: product?.price,
+            amount: quantity,
+        };
+    
+        if (!user?.id) {
+            // Xử lý giỏ hàng trong localStorage nếu chưa đăng nhập
+            const existingCart = JSON.parse(localStorage.getItem('cart')) || [];
+            const checkcount = existingCart.findIndex(item => item.productId === product?._id);
+            if (checkcount > -1) {
+                // Cập nhật số lượng nếu sản phẩm đã tồn tại trong giỏ hàng
+                existingCart[checkcount].amount += quantity;
+            } else {
+                existingCart.push(data);
+            }
+    
+            localStorage.setItem('cart', JSON.stringify(existingCart));
+            message.success(`${product?.name} added to session cart!`);
         } else {
-            if (product.countInStock >= quantity) {
-                const data = {
-                    productId: product?._id,
-                    name: product?.name,
-                    image: product?.image,
-                    price: product?.price,
-                    amount: quantity,
-                };
-                try {
-                    const response = await CartService.createCart(user?.id, data);
+            // Gọi API để lưu giỏ hàng cho người dùng đã đăng nhập
+            try {
+                const response = await CartService.createCart(user?.id, data);
+
                     dispatch(addCartItem({ cartItem: data }));
                     message.success(`${product?.name} added to cart!`);
-                } catch (error) {
-                    message.error('Error adding product to cart.');
-                }
-            } else {
-                message.error('Not enough stock available.');
+
+
+            } catch (error) {
+                message.error('Error adding product to cart.');
             }
         }
     };

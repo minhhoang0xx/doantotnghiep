@@ -14,63 +14,65 @@ const OrderPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const cartItems = useSelector((state) => state.cart.cartItems || []); // Lấy list product trong cart từ Redux
+  console.log('Current cart items:', cartItems);
   const [quantities, setQuantities] = useState({});
   const user = localStorage.getItem('access_token');
   const [loading, setLoading] = useState(true);
   const [selectAll, setSelectAll] = useState(false);
   const [selectedItems, setSelectedItems] = useState(new Set());
 
-
-  // Fetch cart items from API
   // LAY GIO HANG TU API, LUU VAO REDUX, UPDATE SO LUONG
   // chay moi khi co su thay doi tk user
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const res = await CartService.getCart(jwtTranslate(user)?.id); // call cart tu api
-        if (res.data.cartItems) { // iem tra xem sp co trong cart khong
-          res.data.cartItems.forEach(item => { // duyet qua tung sp
+// useEffect để load cart từ API hoặc localStorage
+useEffect(() => {
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      // Khi có người dùng đăng nhập, lấy giỏ hàng từ API
+      if (user) {
+        const res = await CartService.getCart(jwtTranslate(user)?.id);
+        console.log('user',res.data.cartItems)
+        if (res.data.cartItems) {
+          res.data.cartItems.forEach(item => {
+            console.log('item', item)
             if (item.product && item.name && item.price && item.image) {
-              dispatch(addCartItem(item)); // them sp vao redux
-            } else {
-              console.warn('Incomplete cart item:', item);
+              dispatch(addCartItem(item));
             }
           });
-          /// set Quantitise cho moi sp
-          setQuantities(res.data.cartItems.reduce((acc, item) => ({ ...acc, [item.product]: item.amount }), {}));
-          // Hàm reduce biến mảng `cartItems` thành một đối tượng `quantities` với key là `product` và value là `amount`
+          setQuantities(
+            res.data.cartItems.reduce((acc, item) => ({ ...acc, [item.product]: item.amount }), {})
+          );
         }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setLoading(false);
+      } else {
+        // Khi chưa đăng nhập, lấy giỏ hàng từ localStorage
+        const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+        console.log('stored', storedCart)
+        if (storedCart.length > 0) {
+          storedCart.forEach(item => {
+            if ( item.product && item.name && item.price && item.image) {
+              console.log('item', item)
+              dispatch(addCartItem(item));
+            }
+          });
+          setQuantities(
+            storedCart.reduce((acc, item) => ({ ...acc, [item.product]: item.amount }),{})
+          );
+        }  else {
+          console.log('No items in local storage');
+        }
       }
-    };
-    fetchData();
-  }, [user, dispatch]);
-
-  // LAY GIO HANG TU LOCALSTORAGE KHI RELOAD
-  useEffect(() => {
-    const storedCart = JSON.parse(localStorage.getItem('cart')); // Lấy giỏ hàng từ localStorage
-    if (storedCart) {
-      storedCart.forEach(item => {
-        // Kiểm tra từng sản phẩm có đầy đủ thông tin không 
-        // neu co thi sp duoc them vao redux
-        if (item.product && item.name && item.price && item.image) {
-          dispatch(addCartItem(item)); // Thêm sản phẩm vào giỏ hàng Redux
-        } else {
-          console.warn('Stored item is incomplete:', item);
-        }
-      });
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setLoading(false);
     }
-  }, [dispatch]);
+  };
+  fetchData();
+}, [user, dispatch]);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+ 
   localStorage.removeItem('selectedCartItems');
-  localStorage.removeItem('cart')
+  // localStorage.removeItem('cart')
   const handleSelectAllChange = (e) => {
     setSelectAll(e.target.checked);
     if (e.target.checked) {
@@ -152,7 +154,9 @@ const OrderPage = () => {
     localStorage.setItem('selectedCartItems', JSON.stringify(updatedSelectedCartItems));
     navigate('/checkOut');
   };
-
+  if (loading) {
+    return <div>Loading...</div>;
+  }
   const calculateTotal = () => {
     return cartItems.reduce((total, item) => total + item.price * (quantities[item.product]), 0);
   };
@@ -214,7 +218,7 @@ const OrderPage = () => {
                   <div style={{ marginBottom: '20px', fontSize: '14px' }}>
                     <div>Subtotal: ${calculateTotal()}</div>
                     <div>Discount: $0.00</div>
-                    <div>Shipping Fee: $0.00</div>
+                    <div>Shipping Fee: $30.00</div>
                   </div>
                   <div style={{ fontWeight: 'bold', color: 'rgb(254, 56, 52)', fontSize: '18px' }}>
                     Total: ${calculateTotal()}

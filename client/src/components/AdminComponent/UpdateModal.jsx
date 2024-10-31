@@ -4,7 +4,7 @@ import * as ProductService from '../../services/ProductService';
 import * as UserService from '../../services/UserService';
 import * as OrderService from '../../services/OrderService';
 
-const UpdateModal = ({ isModalOpen, setIsModalOpen, currentData, refetchData, currentView }) => {
+const UpdateModal = ({ isModalOpen, setIsModalOpen, currentData, refetchData, currentView, paymentMethod }) => {
     const [form] = Form.useForm();
 
     useEffect(() => {
@@ -112,8 +112,10 @@ const UpdateModal = ({ isModalOpen, setIsModalOpen, currentData, refetchData, cu
                             label="Is Paid"
                             name="isPaid"
                             valuePropName="checked"
+                            
+                            
                         >
-                            <Checkbox>Pay</Checkbox>
+                            <Checkbox disabled={paymentMethod === 'creditCard' || paymentMethod === 'paypal'}>Pay</Checkbox>
                         </Form.Item>
                         <Form.Item
                             label="Is Delivered"
