@@ -13,21 +13,17 @@ const MyOrderPage = () => {
     const dispatch = useDispatch();
     const { orders, isLoading, error } = useSelector((state) => state.order);
     const user = localStorage.getItem('access_token'); 
-    const userId = jwtTranslate(user)?.id;
+    const userId = jwtTranslate(user)?.id || '670cd572724ca7db55337cb4';
     const [loading, setLoading] = useState(true);
     const handleClick = (orderId) => {
         navigate(`/order/detailOrder/${orderId}`);
     };
     useEffect(() => {
         const fetchData = async () => {
-            if (!userId) {
-                message.error('User ID is not available. Please log in.');
-                setLoading(false);
-                return;
-            }
             setLoading(true);
             try {
-                const res = await OrderService.UserOrder(userId)
+                const userID = userId
+                const res = await OrderService.UserOrder(userID)
                 console.log(res)
                 if (res?.status === 'OK') {
                     dispatch(fetchOrders(res.data));

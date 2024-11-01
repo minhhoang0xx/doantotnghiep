@@ -14,6 +14,7 @@ const UserDetailPage = () => {
     const [address, setAddress] = useState('');
     const [avatar, setAvatar] = useState('');
 
+
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem('user'));
         console.log('Stored User from localStorage:', storedUser); 
@@ -22,6 +23,7 @@ const UserDetailPage = () => {
         if (currentUser) {
             setName(currentUser?.name || '');
             setEmail(currentUser?.email || '');
+
             setPhone(currentUser?.phone || '');
             setAddress(currentUser?.address || '');
             setAvatar(currentUser?.avatar || '');
@@ -110,6 +112,7 @@ const handleUpdate = async () => {
                             id="userForm"
                             layout="vertical"
                         >
+                      
                             <Form.Item label="Name">
                                 <Input placeholder="Enter your name" value={name} onChange={handleChangeName} />
                             </Form.Item>

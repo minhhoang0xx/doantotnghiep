@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect  } from 'react';
 import { Layout, Menu, Table, Spin, Divider, Typography, Button, Checkbox, message, Input } from 'antd';
 import { UserOutlined, ProductOutlined, ContainerOutlined,EditOutlined, EyeOutlined, CheckCircleTwoTone, CloseCircleTwoTone } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
@@ -15,7 +15,7 @@ const { Title } = Typography;
 const { Sider, Content } = Layout;
 
 const AdminPage = () => {
-    const [currentView, setCurrentView] = useState('users'); // check view hien tai
+    const [currentView, setCurrentView] = useState(() => {return localStorage.getItem('currentView') || 'users'}); // check view hien tai
     const [AddModal, setAddModal] = useState(false); // check Add modal co mo hay khong
     const [selectedRadio, setSelectedRadio] = useState([]); // mang luu ID da chon
     const [deleteModal, setDeleteModal] = useState(false); // check modal delete co mo hay khong
@@ -45,6 +45,10 @@ const AdminPage = () => {
             setLoading(false);
         }
     };
+    useEffect(() => {
+        localStorage.setItem('currentView', currentView);
+    }, [currentView]);
+
     const handleOpenModal = () => {
         setAddModal(true);
     };
@@ -107,11 +111,11 @@ const AdminPage = () => {
         return res;
     };
     const fetchAllUser = async () => {
-        const res = await UserService.getAllUser();
+        const res = await UserService.getAllUser(sort, filter);
         return res;
     };
     const fetchAllOrder = async () => {
-        const res = await OrderService.getAllOrder();
+        const res = await OrderService.getAllOrder(sort, filter);
         console.log('res', res)
         return res;
 
@@ -221,9 +225,10 @@ const AdminPage = () => {
         {
             title: 'Type', dataIndex: 'type', key: 'type',
             filters: [
-                { text: 'Electronic', value: 'electronic' },
-                { text: 'Clothing', value: 'clothing' },
+                { text: '1', value: '1' },
             ],
+            filteredValue: filter ? [filter] : null,
+            onFilter: (value, record) => record.type.includes(value),
         },
         { title: 'Stock', dataIndex: 'countInStock', key: 'countInStock', sorter: true },
         { title: 'Sold', dataIndex: 'sold', key: 'sold', sorter: true },
@@ -263,11 +268,7 @@ const AdminPage = () => {
         {
             title: 'Created At',dataIndex: 'paidAt',key: 'paidAt',
             render: (text) => new Date(text).toLocaleString('en-GB', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
+                day: '2-digit', month: '2-digit', year: 'numeric',hour: '2-digit',minute: '2-digit',
             }),
         },
         {
@@ -290,7 +291,7 @@ const AdminPage = () => {
                 </div>
                 <Menu
                     mode="inline"
-                    defaultSelectedKeys={['1']} //1 la user
+                    selectedKeys={[currentView === 'users' ? '1' : currentView === 'products' ? '2' : '3']}
                     items={[
                         {
                             key: '1',

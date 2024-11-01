@@ -18,6 +18,7 @@ const CheckoutPage = () => {
     const [sdkReady, SetSdkReady] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const user = localStorage.getItem('access_token');
+    localStorage.getItem('cart');
     const selectedCartItems = JSON.parse(localStorage.getItem('selectedCartItems')) || [];
     selectedCartItems.forEach(item => {
         console.log(item); // Check if amount is present and correct
@@ -49,7 +50,7 @@ const CheckoutPage = () => {
     };
     const handlePaymentChange = (e) => {
         const selectedMethod = e.target.value;
-        if (selectedMethod  === 'paypal' && !(user)) {
+        if (selectedMethod === 'paypal' && !(user)) {
             // Hiển thị Modal yêu cầu đăng nhập
             Modal.confirm({
                 content: "You need to login to make online payments.",
@@ -61,8 +62,8 @@ const CheckoutPage = () => {
                 },
             });
         } else {
-        setPaymentMethod(selectedMethod);
-        localStorage.setItem('paymentMethod', selectedMethod); // Lưu phương thức thanh toán vào localStorage
+            setPaymentMethod(selectedMethod);
+            localStorage.setItem('paymentMethod', selectedMethod); // Lưu phương thức thanh toán vào localStorage
         }
     };
     const addPaypalScript = async () => {
@@ -71,20 +72,20 @@ const CheckoutPage = () => {
         script.type = 'text/javascript' // add type cua text = javascript
         script.src = `https://sandbox.paypal.com/sdk/js?client-id=${data}`
         script.async = true;
-        script.onload = () =>{
+        script.onload = () => {
             SetSdkReady(true)
         }
         document.body.appendChild(script)
-        console.log('data',data)
+        console.log('data', data)
     }
 
     useEffect(() => {
-        if(!window.paypal) {
+        if (!window.paypal) {
             addPaypalScript()
-        } else{
+        } else {
             SetSdkReady(true)
         }
-      
+
     }, [])
 
     const onSuccessPayPal = async (details, data) => {
@@ -98,13 +99,7 @@ const CheckoutPage = () => {
             message.warning('Your cart is empty.');
             return;
         }
-        const userId = jwtTranslate(user)?.id || 'guest';
-        // if (!userId) {
-        //     message.warning('Please login to create order.');
-        //     navigate('/sign-in', { state: location?.pathname });
-        //     return;
-        // }
-
+        const userId = user ? jwtTranslate(user)?.id : '670cd572724ca7db55337cb4';
         console.log("Selected Cart Items:", selectedCartItems);
         const orderData = {
             orderItems: selectedCartItems.map(item => ({
@@ -127,18 +122,26 @@ const CheckoutPage = () => {
         console.log("Order Data:", orderData);
         try {
             const response = await OrderService.createOrder(userId, orderData);
+            console.log("API Response:", response.orderId);
             if (response.status === 'ERR') {
                 message.error(`Out of stock!!!`);
             } else {
-                for (const item of selectedCartItems) {
-                    await CartService.removeCart(userId, item.product);
+                if (userId === '670cd572724ca7db55337cb4') {
+                    dispatch(removeSelectedItems(selectedCartItems)); 
+                    navigate(`/order/detailOrder/${response.orderId}`);
+                } else {
+                    for (const item of selectedCartItems) {
+                        await CartService.removeCart(userId, item.product);
+                    }
+                    dispatch(removeSelectedItems(selectedCartItems)); // xóa sản phẩm trong cart
+                    navigate('/myOrder');
                 }
-                dispatch(removeSelectedItems(selectedCartItems));// xoa san pham trong cart
                 message.success('Order created successfully');
                 localStorage.removeItem('shippingAddress');
                 localStorage.removeItem('paymentMethod');
                 localStorage.removeItem('selectedCartItems');
-                navigate('/myOrder');
+                localStorage.removeItem('cart');
+               
             }
         } catch (error) {
             message.error('Failed to create order: ' + error);
@@ -219,11 +222,11 @@ const CheckoutPage = () => {
                             <PayPalButton
                                 amount={calculateTotal()}
                                 onSuccess={onSuccessPayPal}
-                                onError={ () => {alert("Err")}}
+                                onError={() => { alert("Err") }}
                             />
                             <Button type="primary" style={{ width: '100%' }}>MoMo</Button>
                         </div>
-                        
+
                     ) : (
                         <div>
                             <Button type="primary" onClick={handleCheckout} style={{ width: '100%' }}>

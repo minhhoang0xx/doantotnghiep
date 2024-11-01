@@ -53,7 +53,7 @@ const createOrder = (userId, newOrder) => {
 
             if (createdOrder) {
                 // await EmailService.sendEmailCreateOrder(email, orderItems);
-                resolve({ status: 'OK', message: 'Order created successfully' });
+                resolve({ status: 'OK', message: 'Order created successfully', orderId: createdOrder._id });
             }
         } catch (e) {
             console.error(e); // Bắt lỗi chi tiết

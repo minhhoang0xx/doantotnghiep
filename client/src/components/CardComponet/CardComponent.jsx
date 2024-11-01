@@ -21,6 +21,7 @@ const CardComponent = (props) => {
     const handleAddToCart = async () => {
         if (user?.isAdmin) {
             message.error('Admin cannot add products to the cart.');
+            return;
         }
         if (countInStock <= 0) {
             message.error('Product is out of stock.');
