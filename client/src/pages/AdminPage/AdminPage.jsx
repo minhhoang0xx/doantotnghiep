@@ -1,7 +1,7 @@
 
-import React, { useState, useEffect  } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Layout, Menu, Table, Spin, Divider, Typography, Button, Checkbox, message, Input } from 'antd';
-import { UserOutlined, ProductOutlined, ContainerOutlined,EditOutlined, EyeOutlined, CheckCircleTwoTone, CloseCircleTwoTone } from '@ant-design/icons';
+import { UserOutlined, ProductOutlined, ContainerOutlined, EditOutlined, EyeOutlined, CheckCircleTwoTone, CloseCircleTwoTone } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import * as ProductService from "../../services/ProductService";
@@ -15,7 +15,7 @@ const { Title } = Typography;
 const { Sider, Content } = Layout;
 
 const AdminPage = () => {
-    const [currentView, setCurrentView] = useState(() => {return localStorage.getItem('currentView') || 'users'}); // check view hien tai
+    const [currentView, setCurrentView] = useState(() => { return localStorage.getItem('currentView') || 'users' }); // check view hien tai
     const [AddModal, setAddModal] = useState(false); // check Add modal co mo hay khong
     const [selectedRadio, setSelectedRadio] = useState([]); // mang luu ID da chon
     const [deleteModal, setDeleteModal] = useState(false); // check modal delete co mo hay khong
@@ -48,6 +48,10 @@ const AdminPage = () => {
     useEffect(() => {
         localStorage.setItem('currentView', currentView);
     }, [currentView]);
+    useEffect(() => {
+        fetchAllProduct();
+        fetchAllOrder();
+    }, [sort, filter]);
 
     const handleOpenModal = () => {
         setAddModal(true);
@@ -111,15 +115,13 @@ const AdminPage = () => {
         return res;
     };
     const fetchAllUser = async () => {
-        const res = await UserService.getAllUser(sort, filter);
+        const res = await UserService.getAllUser();
         return res;
     };
     const fetchAllOrder = async () => {
         const res = await OrderService.getAllOrder(sort, filter);
         console.log('res', res)
         return res;
-
-
     };
 
 
@@ -209,18 +211,22 @@ const AdminPage = () => {
                     checked={selectedRadio.includes(record._id)}
                     onChange={() => handleSelect(record._id)}
                 />
-            ),
-        },
+            )},
         {
             title: 'Image',
             dataIndex: 'image',
             key: 'image',
             render: (text) => <img src={text} alt="Product" style={{ width: '50px', height: '50px', objectFit: 'cover' }} />,
         },
-        { title: 'Name', dataIndex: 'name', key: 'name', sorter: true },
         {
-            title: 'Price', dataIndex: 'price', key: 'price', sorter: true,
-            render: (text) => `$${text}`, // Format giá tiền
+            title: 'Name', dataIndex: 'name', key: 'name',
+            sorter: (a, b) => a.name.localeCompare(b.name), // Sắp xếp theo tên
+            sortDirections: ['ascend', 'descend'],
+        },
+        {
+            title: 'Price', dataIndex: 'price', key: 'price', sorter: (a, b) => a.price - b.price, // Sắp xếp theo giá
+            sortDirections: ['ascend', 'descend'],
+            render: (text) => `$${text}`,
         },
         {
             title: 'Type', dataIndex: 'type', key: 'type',
@@ -230,13 +236,12 @@ const AdminPage = () => {
             filteredValue: filter ? [filter] : null,
             onFilter: (value, record) => record.type.includes(value),
         },
-        { title: 'Stock', dataIndex: 'countInStock', key: 'countInStock', sorter: true },
-        { title: 'Sold', dataIndex: 'sold', key: 'sold', sorter: true },
-        { title: 'Rating', dataIndex: 'rating', key: 'rating', sorter: true },
+        { title: 'Sold', dataIndex: 'sold', key: 'sold', sorter: (a, b) => a.sold - b.sold, sortDirections: ['ascend', 'descend'], },
+        { title: 'Rating', dataIndex: 'rating', key: 'rating', sorter: (a, b) => a.rating - b.rating, sortDirections: ['ascend', 'descend'], },
         // { title: 'Description', dataIndex: 'description', key: 'description', },
         {
             title: 'Action', render: (text, record) =>
-                (<Button icon={<EditOutlined />}  onClick={() => handleUpdate(record)}/>),
+                (<Button icon={<EditOutlined />} onClick={() => handleUpdate(record)} />),
         },
     ];
 
@@ -250,32 +255,32 @@ const AdminPage = () => {
                     checked={selectedRadio.includes(record._id)}
                     onChange={() => handleSelect(record._id)}
                 />
-            ),
-        },
+            ),},
         {
             title: 'User', dataIndex: 'user', key: 'user',
             render: (text, record) => record.user?.name || 'Unknown',
         },
-        { title: 'Total Price', dataIndex: 'totalPrice', key: 'totalPrice' },
+        { title: 'Total Price', dataIndex: 'totalPrice', key: 'totalPrice', sorter: (a, b) => a.totalPrice - b.totalPrice, sortDirections: ['ascend', 'descend'], },
         {
             title: 'Is Paid', dataIndex: 'isPaid', key: 'isPaid',
-            render: (text) => (text ? <CheckCircleTwoTone twoToneColor="#52c41a"/> : <CloseCircleTwoTone twoToneColor="#ff4d4f" />), // Hiển thị tình trạng thanh toán
+            render: (text) => (text ? <CheckCircleTwoTone twoToneColor="#52c41a" /> : <CloseCircleTwoTone twoToneColor="#ff4d4f" />), // Hiển thị tình trạng thanh toán
+            sorter: (a, b) => Number(a.isPaid) - Number(b.isPaid), sortDirections: ['ascend', 'descend'],
         },
         {
             title: 'Is Delivery', dataIndex: 'isDelivered', key: 'isDelivered',
-            render: (text) => (text ? <CheckCircleTwoTone twoToneColor="#52c41a"/> : <CloseCircleTwoTone twoToneColor="#ff4d4f" />), // Hiển thị tình trạng thanh toán
+            render: (text) => (text ? <CheckCircleTwoTone twoToneColor="#52c41a" /> : <CloseCircleTwoTone twoToneColor="#ff4d4f" />), // Hiển thị tình trạng thanh toán
+            sorter: (a, b) => Number(a.isDelivered) - Number(b.isDelivered), sortDirections: ['ascend', 'descend'],
         },
         {
-            title: 'Created At',dataIndex: 'paidAt',key: 'paidAt',
-            render: (text) => new Date(text).toLocaleString('en-GB', {
-                day: '2-digit', month: '2-digit', year: 'numeric',hour: '2-digit',minute: '2-digit',
-            }),
+            title: 'Created At', dataIndex: 'paidAt', key: 'paidAt',
+            render: (text) => new Date(text).toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', }),
+            sorter: (a, b) => new Date(a.paidAt) - new Date(b.paidAt), sortDirections: ['ascend', 'descend'],
         },
         {
             title: 'Action', render: (text, record) => (
                 <>
                     <Button icon={<EditOutlined />} onClick={() => handleUpdate(record)} style={{ marginRight: '8px' }} />
-                    <Button  icon={<EyeOutlined />} onClick={() => handleOrderDetail(record._id)}/>
+                    <Button icon={<EyeOutlined />} onClick={() => handleOrderDetail(record._id)} />
                 </>
             ),
         },
@@ -347,7 +352,7 @@ const AdminPage = () => {
                         </Button>
                     )}
                     <Button onClick={handleDeleteConfirm} disabled={selectedRadio.length === 0} style={{ backgroundColor: selectedRadio.length === 0 ? 'gray' : 'red', color: 'white', fontSize: '16px', border: 'none', borderRadius: '4px', padding: '10px 20px', cursor: selectedRadio.length === 0 ? 'not-allowed' : 'pointer', transition: 'background-color 0.3s ease', }} onMouseEnter={(e) => { if (selectedRadio.length > 0) { e.currentTarget.style.backgroundColor = 'darkred'; } }} onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = selectedRadio.length > 0 ? 'red' : 'gray'; }}>
-                    {currentView === 'orders' ? 'Order completed, removed?' : 'Delete'}
+                        {currentView === 'orders' ? 'Order completed, removed?' : 'Delete'}
                     </Button>
                     {loadingProducts || loadingUsers || loadingOrders ? (
                         <Spin size="large" />

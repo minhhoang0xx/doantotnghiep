@@ -5,7 +5,7 @@ export const axiosJWT = axios.create()
 export const getAllProduct = async (sort,filter) =>{
     const params = {};
     if (sort) {
-        params.sort = sort; 
+        params.sort = sort.join(','); 
     }
     if (filter) {
         params.filter = filter; 

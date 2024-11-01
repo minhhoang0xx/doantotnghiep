@@ -77,7 +77,8 @@ const deleteOrder = async (req, res) => {
 
 const getAllOrder = async (req, res) => {
     try {
-        const data = await OrderService.getAllOrder()
+        const {sort} = req.query
+        const data = await OrderService.getAllOrder(sort)
         return res.status(200).json(data)
     } catch (e) {
         return res.status(404).json({

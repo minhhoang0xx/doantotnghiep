@@ -18,7 +18,11 @@ export const UserOrder = async (userId) => {
   return res.data;
 };
 
-export const getAllOrder = async () => {
+export const getAllOrder = async (sort,filter) => {
+  const params = {};
+    if (sort) {
+        params.sort = sort.join(','); 
+    }
   const res = await axios.get(`${process.env.REACT_APP_API_URL}/order/getAllOrder`)
   return res.data
 };

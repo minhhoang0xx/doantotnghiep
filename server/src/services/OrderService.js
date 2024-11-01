@@ -168,9 +168,22 @@ const deleteOrder = (orderId, data) => {
     });
 };
 
-const getAllOrder = () => {
+const getAllOrder = (sort) => {
     return new Promise(async (resolve, reject) => {
         try {
+            const total = await Order.countDocuments(); // Đếm tổng số sản phẩm
+            if (sort && sort[1]) {
+                const objectSort = {};
+                objectSort[sort[1]] = sort[0]; // sort[0] là thứ tự, sort[1] là trường sắp xếp
+                const allOrderSort = await Order.find().sort(objectSort);
+
+                return resolve({
+                    status: 'OK',
+                    message: 'All product list (sorted)',
+                    data: allOrderSort,
+                    total: total,
+                });
+            }
             const allOrder = await Order.find().populate('user', 'name');
             resolve({
                 status: 'OK',
