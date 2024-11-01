@@ -23,54 +23,54 @@ const OrderPage = () => {
 
   // LAY GIO HANG TU API, LUU VAO REDUX, UPDATE SO LUONG
   // chay moi khi co su thay doi tk user
-// useEffect để load cart từ API hoặc localStorage
-useEffect(() => {
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      // Khi có người dùng đăng nhập, lấy giỏ hàng từ API
-      if (user) {
-        const res = await CartService.getCart(jwtTranslate(user)?.id);
-        console.log('user',res.data.cartItems)
-        if (res.data.cartItems) {
-          res.data.cartItems.forEach(item => {
-            console.log('item', item)
-            if (item.product && item.name && item.price && item.image) {
-              dispatch(addCartItem(item));
-            }
-          });
-          setQuantities(
-            res.data.cartItems.reduce((acc, item) => ({ ...acc, [item.product]: item.amount }), {})
-          );
-        }
-      } else {
-        // Khi chưa đăng nhập, lấy giỏ hàng từ localStorage
-        const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
-        console.log('stored', storedCart)
-        if (storedCart.length > 0) {
-          storedCart.forEach(item => {
-            if ( item.product && item.name && item.price && item.image) {
+  // useEffect để load cart từ API hoặc localStorage
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        // Khi có người dùng đăng nhập, lấy giỏ hàng từ API
+        if (user) {
+          const res = await CartService.getCart(jwtTranslate(user)?.id);
+          console.log('user', res.data.cartItems)
+          if (res.data.cartItems) {
+            res.data.cartItems.forEach(item => {
               console.log('item', item)
-              dispatch(addCartItem(item));
-            }
-          });
-          setQuantities(
-            storedCart.reduce((acc, item) => ({ ...acc, [item.product]: item.amount }),{})
-          );
-        }  else {
-          console.log('No items in local storage');
+              if (item.product && item.name && item.price && item.image) {
+                dispatch(addCartItem(item));
+              }
+            });
+            setQuantities(
+              res.data.cartItems.reduce((acc, item) => ({ ...acc, [item.product]: item.amount }), {})
+            );
+          }
+        } else {
+          // Khi chưa đăng nhập, lấy giỏ hàng từ localStorage
+          const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+          console.log('stored', storedCart)
+          if (storedCart.length > 0) {
+            storedCart.forEach(item => {
+              if (item.product && item.name && item.price && item.image) {
+                console.log('item', item)
+                dispatch(addCartItem(item));
+              }
+            });
+            setQuantities(
+              storedCart.reduce((acc, item) => ({ ...acc, [item.product]: item.amount }), {})
+            );
+          } else {
+            console.log('No items in local storage');
+          }
         }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-  fetchData();
-}, [user, dispatch]);
+    };
+    fetchData();
+  }, [user, dispatch]);
 
- 
+
   localStorage.removeItem('selectedCartItems');
   // localStorage.removeItem('cart')
   const handleSelectAllChange = (e) => {
@@ -82,12 +82,12 @@ useEffect(() => {
       setSelectedItems(new Set());
     }
   };
-  const handleItemSelect = (productId) => {
+  const handleItemSelect = (product) => {
     const newSelectedItems = new Set(selectedItems);
-    if (newSelectedItems.has(productId)) {
-      newSelectedItems.delete(productId);
+    if (newSelectedItems.has(product)) {
+      newSelectedItems.delete(product);
     } else {
-      newSelectedItems.add(productId);
+      newSelectedItems.add(product);
     }
     setSelectedItems(newSelectedItems);
     setSelectAll(newSelectedItems.size === cartItems.length);
@@ -108,28 +108,46 @@ useEffect(() => {
     });
   };
 
-  const handleQuantityChange = async (productId, value) => {
+  const handleQuantityChange = async (product, value) => {
     if (value < 1) return;
-    try {
-      await CartService.updateCart(jwtTranslate(user)?.id, productId, value); //Api update
-      dispatch(updateCartItem({ productId, newAmount: value })); // update  Redux
-      setQuantities((prev) => ({ ...prev, [productId]: value })); // update trạng thái
-    } catch (error) {
-      message.error('Failed to update cart item');
+    if (user) {
+      try {
+        await CartService.updateCart(jwtTranslate(user)?.id, product, value); //Api update
+        dispatch(updateCartItem({ product, newAmount: value })); // update  Redux
+        setQuantities((prev) => ({ ...prev, [product]: value })); // update trạng thái
+      } catch (error) {
+        message.error('Failed to update cart item');
+      }
+    } else {
+      const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+      const updatedCart = storedCart.map(item =>
+        item.product === product ? { ...item, amount: value } : item
+      );
+      localStorage.setItem('cart', JSON.stringify(updatedCart));
+      dispatch(updateCartItem({ product, newAmount: value })); 
+      setQuantities((prev) => ({ ...prev, [product]: value })); //set lai quantity
     }
   };
 
-  const handleRemoveCartItem = async (productId) => {
+  const handleRemoveCartItem = async (product) => {
+    if (user){
     try {
-      await CartService.removeCart(jwtTranslate(user)?.id, productId); // Gọi API 
-      dispatch(removeCartItem({ productId })); // xoa trong Redux
+      await CartService.removeCart(jwtTranslate(user)?.id, product); // Gọi API 
+      dispatch(removeCartItem({ product })); // xoa trong Redux
       message.success('Removed item from cart successfully');
       if (cartItems.length === 1) { // neu sp =1 thi xoa luon cart
         await CartService.deleteCart(jwtTranslate(user)?.id);
       }
     } catch (error) {
-      message.error('Failed to remove cart item'); // Hiển thị thông báo lỗi
+      message.error('Failed to remove cart item'); 
     }
+  } else {
+    const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+    const updatedCart = storedCart.filter(item => item.product !== product);
+    localStorage.setItem('cart', JSON.stringify(updatedCart));
+    dispatch(removeCartItem({ product })); // delete trong redux
+    message.success('Removed item from cart successfully');
+  }
   };
 
   // Hàm xử lý khi nhấn nút Checkout
@@ -142,8 +160,8 @@ useEffect(() => {
     const selectedCartItems = cartItems.filter(item => selectedItems.has(item.product));
     /////// // gán gia tri amount tranh loi logic
     const selectedQuantities = {};
-    selectedItems.forEach(productId => {
-      selectedQuantities[productId] = quantities[productId];
+    selectedItems.forEach(product => {
+      selectedQuantities[product] = quantities[product];
     });
     const updatedSelectedCartItems = selectedCartItems.map(item => {
       return {
@@ -158,12 +176,17 @@ useEffect(() => {
     return <div>Loading...</div>;
   }
   const calculateTotal = () => {
-    return cartItems.reduce((total, item) => total + item.price * (quantities[item.product]), 0);
+    return cartItems.reduce((total, item) => {
+      if (selectedItems.has(item.product)) {
+        return total + item.price * (quantities[item.product] || 1);
+      }
+      return total;
+    }, 0);
   };
 
   return (
     <div style={{ padding: '50px 0 0 0 ', background: '#f0f2f5' }}>
-      <Button type="primary"style={{position: 'absolute',top: 60, right: 10,fontSize: '16px',backgroundColor: '#4CAF50',border: 'none',padding: '10px 20px',borderRadius: '5px',}}
+      <Button type="primary" style={{ position: 'absolute', top: 60, right: 10, fontSize: '16px', backgroundColor: '#4CAF50', border: 'none', padding: '10px 20px', borderRadius: '5px', }}
         onClick={() => navigate('/myOrder')}>My Orders </Button>
       <div style={{ padding: '30px', backgroundColor: '#f0f2f5', minHeight: '100vh' }}>
         <Title level={2} style={{ textAlign: 'center', marginBottom: '40px', fontSize: '28px' }}>Your Cart</Title>
@@ -221,7 +244,7 @@ useEffect(() => {
                     <div>Shipping Fee: $30.00</div>
                   </div>
                   <div style={{ fontWeight: 'bold', color: 'rgb(254, 56, 52)', fontSize: '18px' }}>
-                    Total: ${calculateTotal()}
+                    Total: ${calculateTotal() + 30}
                   </div>
                   <Button type="primary" size="large" style={{ width: '100%', marginTop: '20px', fontSize: '16px' }} onClick={handleCheckout}>
                     Checkout

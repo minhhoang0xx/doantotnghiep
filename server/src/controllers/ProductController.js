@@ -39,15 +39,15 @@ const logOut = (req, res) => {
 
 const updateProduct = async (req,res)=>{
     try{
-        const productId = req.params.id
+        const product = req.params.id
         const data = req.body
-        if(!productId){
+        if(!product){
             return res.status(200).json({
                 status: 'ERR',
                 message: 'The Product ID is required'
             })
         }
-        const response = await ProductService.updateProduct(productId,data) // response de khac voi thang res khong bi nham
+        const response = await ProductService.updateProduct(product,data) // response de khac voi thang res khong bi nham
         return res.status(200).json(response) 
     }catch(e){
         return res.status(404).json({ 
@@ -60,14 +60,14 @@ const updateProduct = async (req,res)=>{
 
 const deleteProduct = async (req,res)=>{
     try{
-        const productId = req.params.id
-        if(!productId){
+        const product = req.params.id
+        if(!product){
             return res.status(200).json({
                 status: 'ERR',
                 message: 'The Product ID is required'
             })
         }
-        const response = await ProductService.deleteProduct(productId) // response de khac voi thang res khong bi nham
+        const response = await ProductService.deleteProduct(product) // response de khac voi thang res khong bi nham
         return res.status(200).json(response) 
     }catch(e){
         return res.status(404).json({ 
@@ -80,14 +80,14 @@ const deleteProduct = async (req,res)=>{
 
 const detailProduct = async (req,res)=>{
     try{
-        const productId = req.params.id
-        if(!productId){
+        const product = req.params.id
+        if(!product){
             return res.status(200).json({
                 status: 'ERR',
                 message: 'The Product ID is required'
             })
         }
-        const response = await ProductService.detailProduct(productId) // response de khac voi thang res khong bi nham
+        const response = await ProductService.detailProduct(product) // response de khac voi thang res khong bi nham
         return res.status(200).json(response) 
     }catch(e){
         return res.status(404).json({ 

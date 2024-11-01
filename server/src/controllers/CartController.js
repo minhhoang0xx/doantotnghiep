@@ -4,6 +4,7 @@ const createCart = async (req, res) => {
     try { 
         const userId = req.params.userId;
         const response = await CartService.createCart(userId, req.body);
+        console.log('alv', req.body)
         return res.status(200).json(response);
     } catch (e) {
         console.error('Error in createCart:', e); // Log lỗi
@@ -30,8 +31,8 @@ const getCart = async (req, res) => {
 const updateCart = async (req, res) => {
     try {
         const userId = req.params.userId;
-        const { productId, newAmount } = req.body; // Nhận productId và newAmount từ body
-        const response = await CartService.updateCartItem(userId, productId, newAmount);
+        const { product, newAmount } = req.body; // Nhận product và newAmount từ body
+        const response = await CartService.updateCartItem(userId, product, newAmount);
         return res.status(200).json(response);
     } catch (e) {
         console.error('Error in updateCart:', e); // Log lỗi
@@ -44,8 +45,8 @@ const updateCart = async (req, res) => {
 const removeCart = async (req, res) => {
     try {
         const userId = req.params.userId;
-        const productId = req.params.productId; // Nhận productId từ params
-        const response = await CartService.removeCartItem(userId, productId);
+        const product = req.params.product; // Nhận product từ params
+        const response = await CartService.removeCartItem(userId, product);
         return res.status(200).json(response);
     } catch (e) {
         console.error('Error in removeCart:', e); // Log lỗi

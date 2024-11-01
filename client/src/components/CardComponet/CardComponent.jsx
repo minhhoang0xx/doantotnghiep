@@ -4,7 +4,7 @@ import { Card, message } from 'antd';
 import Meta from "antd/es/card/Meta";
 import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from "react-router-dom";
-import { addCartItem } from '../../redux/slices/cartSlice'; 
+import { addCartItem } from '../../redux/slices/cartSlice';
 import * as CartService from "../../services/CartService"
 
 const CardComponent = (props) => {
@@ -19,33 +19,39 @@ const CardComponent = (props) => {
     };
 
     const handleAddToCart = async () => {
-        if (!user?.id) {
-            navigate('/sign-in', { state: location?.pathname });
-        } else if (user?.isAdmin) { 
+        if (user?.isAdmin) {
             message.error('Admin cannot add products to the cart.');
-        } else {
-            if (countInStock > 0) { // Kiểm tra xem sản phẩm còn hàng không
-                const data = { productId: _id, name, image, price, amount};
-                try {
-                    const res = await CartService.createCart(user?.id, data);
-    
-                    if (res && res._id) { 
-                        // Sau khi thêm vào cơ sở dữ liệu thành công, cập nhật Redux store
-                        dispatch(addCartItem({ cartItem: data }));
-                        message.success(`${name} added to cart!`);
-                    } else {
-                        console.log('Adding to cart:', data); // Log dữ liệu trước khi gửi
-                        message.error('Failed to add product to cart.'); // Thông báo lỗi
-                    }
-                } catch (error) {
-                    message.error('Error adding product to cart.'); // Thông báo lỗi
-                }
-            } else {
-                message.error('This product is out of stock.');
-            }
         }
-    };
-    
+        if (countInStock <= 0) {
+            message.error('Product is out of stock.');
+            return; // Thoát ra nếu sản phẩm hết hàng
+        }
+            const data = { product: _id, name, image, price, amount };
+            if (!user?.id) {
+                // Xử lý giỏ hàng trong localStorage nếu người dùng chưa đăng nhập
+                const existingCart = JSON.parse(localStorage.getItem('cart')) || [];
+                const checkcount = existingCart.findIndex(item => item.product === _id);
+                if (checkcount !== -1) {
+                    // TH đã tồn tại trong giỏ hàng
+                    existingCart[checkcount].amount += amount;
+                } else {
+                    existingCart.push(data);
+                }
+                localStorage.setItem('cart', JSON.stringify(existingCart));
+                message.success(`${name} added to session cart!`);
+            } else {
+                // Gọi API để lưu giỏ hàng cho người dùng đã đăng nhập
+                try {
+                    await CartService.createCart(user?.id, data);
+                    console.log('data', data)
+                    dispatch(addCartItem({ cartItem: data }));
+                    message.success(`${name} added to cart!`);
+                } catch (error) {
+                    message.error('Error adding product to cart.');
+                }
+            }
+        
+    }
     return (
         <Card
             hoverable // hover 
@@ -58,7 +64,7 @@ const CardComponent = (props) => {
             actions={[
 
                 <ShoppingCartOutlined key="addToCart" alt='Add To Cart' style={{ color: '#52c41a', fontSize: '24px' }} onClick={handleAddToCart} />,
-            ]} 
+            ]}
         >
             <Meta
                 title={<span style={{ fontWeight: 'bold', fontSize: '20px' }}>{name}</span>}

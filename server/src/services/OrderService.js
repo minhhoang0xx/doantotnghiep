@@ -35,7 +35,7 @@ const createOrder = (userId, newOrder) => {
                 });
             }
             console.log(shippingAddress)
-            const isPaid = paymentMethod === 'creditCard' || paymentMethod === 'paypal';
+            const isPaid = paymentMethod === 'momo' || paymentMethod === 'paypal';
            
             const createdOrder = await Order.create({
                 orderItems,

@@ -4,35 +4,35 @@ const Product = require('../models/ProductModel');
 
 const createCart = (userId, data) => {
     return new Promise(async (resolve, reject) => {
-        const { productId, name, image, price, amount } = data;
+        const { product, name, image, price, amount } = data;
+        console.log(data)
         try {
             // Tìm cart theo user
             let userCart = await Cart.findOne({ user: userId });
-            const product = await Product.findById(productId);
+            const productid = await Product.findById(product);
 
-            if (!product) {
+            if (!productid) {
                 return reject(new Error('Product not found'));
             }
 
             if (userCart) { // co cart roi
                // check xem san pham da co chua
-                const itemIndex = userCart.cartItems.findIndex((item) => item.product.toString() === productId);
+                const itemIndex = userCart.cartItems.findIndex((item) => item.product.toString() === productid._id.toString());
 
                 if (itemIndex > -1) {
                     // neu co roi thi + amount
                     userCart.cartItems[itemIndex].amount += amount;
                 } else {
                     // neu chua co thi tao. moi'
-                    userCart.cartItems.push({ product: productId, name, image, price, amount });
+                    userCart.cartItems.push({ product: productid, name, image, price, amount });
                 }
             } else {
                 // tao cart moi neu truoc do chua co
                 userCart = new Cart({
                     user: userId,
-                    cartItems: [{ product: productId, name, image, price, amount }],
+                    cartItems: [{ product: productid, name, image, price, amount }],
                 });
             }
-            console.log('Saving cart:', userCart); 
             await userCart.save();
             console.log('Cart saved successfully'); 
             resolve(userCart);
@@ -58,7 +58,7 @@ const getCart = (userId) => {
     });
 };
 
-const updateCartItem = (userId, productId, newAmount) => {
+const updateCartItem = (userId, product, newAmount) => {
     return new Promise(async (resolve, reject) => {
         try {
             const userCart = await Cart.findOne({ user: userId });
@@ -66,7 +66,7 @@ const updateCartItem = (userId, productId, newAmount) => {
                 return reject(new Error('Cart not found'));
             }
             // tim kiem vị trí của sản phẩm trong giỏ hàng
-            const itemIndex = userCart.cartItems.findIndex(item => item.product.toString() === productId);
+            const itemIndex = userCart.cartItems.findIndex(item => item.product.toString() === product);
             if (itemIndex === -1) {
                 return reject(new Error('Product not found in cart'));
             }
@@ -87,7 +87,7 @@ const updateCartItem = (userId, productId, newAmount) => {
     });
 };
 
-const removeCartItem = (userId, productId) => {
+const removeCartItem = (userId, product) => {
     return new Promise(async (resolve, reject) => {
         try {
             const userCart = await Cart.findOne({ user: userId });
@@ -95,7 +95,7 @@ const removeCartItem = (userId, productId) => {
                 return reject(new Error('Cart not found'));
             }
 
-            const itemIndex = userCart.cartItems.findIndex(item => item.product.toString() === productId);
+            const itemIndex = userCart.cartItems.findIndex(item => item.product.toString() === product);
             if (itemIndex === -1) {
                 return reject(new Error('Product not found in cart'));
             }

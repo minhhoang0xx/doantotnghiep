@@ -7,7 +7,7 @@ import { jwtDecode } from "jwt-decode";
 import { useDispatch } from 'react-redux'
 import { updateUser } from "../../redux/slices/userSlice";
 import { addCartItem } from "../../redux/slices/cartSlice";
-
+import * as CartService from "../../services/CartService";
 const SignInForm = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -54,129 +54,137 @@ const SignInForm = () => {
                 const decoded = jwtDecode(res?.access_token)
                 if (decoded?.id) {
                     handleGetDetailUser(decoded?.id, res?.access_token)
-                    const existingCart = JSON.parse(localStorage.getItem('cart')) || [];
-                    if (existingCart.length > 0) {
-                        existingCart.forEach(item => {
-                            dispatch(addCartItem({ cartItem: item }));
-                        });
-                        // Xóa giỏ hàng từ localStorage sau khi thêm vào Redux
+                    const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
+                    console.log("12345", storedCart)
+                    if (storedCart.length > 0) {
+                        for (const item of storedCart) {
+                            try {
+                                // Gửi từng sản phẩm qua API createCart
+                                await CartService.createCart(decoded?.id, item);
+                                console.log("Added item to cart:", item);
+                            } catch (error) {
+                                console.error("Error adding item to cart:", item, error);
+                                message.error(`Failed to add ${item.product} to cart.`);
+                            }
+                        }
                         localStorage.removeItem('cart');
                     }
                 }
-                    if (location.state) {
-                        navigate(location.state);
+                if (location.state) {
+                    navigate(location.state);
+                } else {
+                    if (decoded?.isAdmin) {
+                        navigate('/admin');
                     } else {
-                        if (decoded?.isAdmin) {
-                            navigate('/admin');
-                        } else {
-                            navigate('/');
-                        }
+                        navigate('/');
                     }
-                } else {
-                    message.error(res.message || 'Login failed!');
                 }
-            } catch (error) {
-                // check server co tra ve loi khong
-                if (error.response) {
-                    message.error(error.response.data.message || 'An error occurred. Please try again later.');
-                } else {
-                    message.error('An error occurred. Please try again later 2.');
-                }
-                console.error('Error during login:', error);
+            } else {
+                message.error(res.message || 'Login failed!');
             }
-        };
-        const onFinishFailed = (errorInfo) => {
-            console.log('Failed:', errorInfo);
-        };
+        } catch (error) {
+            // check server co tra ve loi khong
+            if (error.response) {
+                message.error(error.response.data.message || 'An error occurred. Please try again later.');
+            } else {
+                message.error('An error occurred. Please try again later 2.');
+            }
+            console.error('Error during login:', error);
+        }
+    };
+
+    const onFinishFailed = (errorInfo) => {
+        console.log('Failed:', errorInfo);
+    };
 
 
-        return (
+    return (
+        <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            flexDirection: 'column',
+            minHeight: '100vh',
+            width: '100%',
+            backgroundImage: 'url("https://media.istockphoto.com/id/843549772/vi/vec-to/m%C3%B4-h%C3%ACnh-tr%C6%B0%E1%BB%9Dng-h%E1%BB%8Dc-li%E1%BB%81n-m%E1%BA%A1ch-b%E1%BB%91i-c%E1%BA%A3nh-v%E1%BB%9Bi-c%C3%A1c-h%C3%ACnh-minh-h%E1%BB%8Da-v%C3%A0-bi%E1%BB%83u-t%C6%B0%E1%BB%A3ng-gi%C3%A1o-d%E1%BB%A5c-v%C3%A0-tr%C6%B0%E1%BB%9Dng.jpg?s=612x612&w=0&k=20&c=b5QKJ5TAV7D0_FVxz5ZjBNzHJrCc2yGDnMuEHZQNxLQ=")'
+        }}>
             <div style={{
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
                 flexDirection: 'column',
-                minHeight: '100vh',
-                width: '100%',
-                backgroundImage: 'url("https://media.istockphoto.com/id/843549772/vi/vec-to/m%C3%B4-h%C3%ACnh-tr%C6%B0%E1%BB%9Dng-h%E1%BB%8Dc-li%E1%BB%81n-m%E1%BA%A1ch-b%E1%BB%91i-c%E1%BA%A3nh-v%E1%BB%9Bi-c%C3%A1c-h%C3%ACnh-minh-h%E1%BB%8Da-v%C3%A0-bi%E1%BB%83u-t%C6%B0%E1%BB%A3ng-gi%C3%A1o-d%E1%BB%A5c-v%C3%A0-tr%C6%B0%E1%BB%9Dng.jpg?s=612x612&w=0&k=20&c=b5QKJ5TAV7D0_FVxz5ZjBNzHJrCc2yGDnMuEHZQNxLQ=")'
+                borderRadius: '20px',
+                padding: ' 10px 0',
+                boxShadow: '0 8px 16px rgba(0, 0, 10, 50)',
+                backgroundColor: '#f5f5f5',
+                width: '45%',
             }}>
-                <div style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    flexDirection: 'column',
-                    borderRadius: '20px',
-                    padding: ' 10px 0',
-                    boxShadow: '0 8px 16px rgba(0, 0, 10, 50)',
-                    backgroundColor: '#f5f5f5',
-                    width: '45%',
+                <span onClick={handleNavigateHome} style={{
+                    fontSize: '16px',
+                    color: '#333',
+                    textDecoration: 'none',
+                    marginRight: '620px',
+                    cursor: 'pointer',
                 }}>
-                    <span onClick={handleNavigateHome} style={{
-                        fontSize: '16px',
-                        color: '#333',
-                        textDecoration: 'none',
-                        marginRight: '620px',
-                        cursor: 'pointer',
-                    }}>
-                        Home
-                    </span>
-                    <h2 style={{
-                        fontSize: '32px',
-                        fontWeight: 'bold',
-                        margin: '20px',
-                        color: '#333',
-                        paddingBottom: '10px',
-                        marginTop: '10px',
-                    }}>
-                        LOGIN
-                    </h2>
-                    <Form
-                        name="SignIn"
-                        labelCol={{ span: 4 }}
-                        wrapperCol={{ span: 20 }}
-                        style={{ maxWidth: 500, width: '100%' }}
-                        initialValues={{ remember: true }}
-                        onFinish={onFinish}
-                        onFinishFailed={onFinishFailed}
-                        autoComplete="off"
+                    Home
+                </span>
+                <h2 style={{
+                    fontSize: '32px',
+                    fontWeight: 'bold',
+                    margin: '20px',
+                    color: '#333',
+                    paddingBottom: '10px',
+                    marginTop: '10px',
+                }}>
+                    LOGIN
+                </h2>
+                <Form
+                    name="SignIn"
+                    labelCol={{ span: 4 }}
+                    wrapperCol={{ span: 20 }}
+                    style={{ maxWidth: 500, width: '100%' }}
+                    initialValues={{ remember: true }}
+                    onFinish={onFinish}
+                    onFinishFailed={onFinishFailed}
+                    autoComplete="off"
 
+                >
+                    <Form.Item
+                        label="Email"
+                        name="email"
+                        rules={[{ required: true, message: 'Please input your Email!' }]}
                     >
-                        <Form.Item
-                            label="Email"
-                            name="email"
-                            rules={[{ required: true, message: 'Please input your Email!' }]}
-                        >
-                            <Input onChange={handleOnChangeEmail} />
-                        </Form.Item>
+                        <Input onChange={handleOnChangeEmail} />
+                    </Form.Item>
 
-                        <Form.Item
-                            label="Password"
-                            name="password"
-                            rules={[{ required: true, message: 'Please input your password!' }]}
-                        >
-                            <Input.Password onChange={handleOnChangePassword} />
-                        </Form.Item>
+                    <Form.Item
+                        label="Password"
+                        name="password"
+                        rules={[{ required: true, message: 'Please input your password!' }]}
+                    >
+                        <Input.Password onChange={handleOnChangePassword} />
+                    </Form.Item>
 
-                        <Form.Item
-                            name="remember"
-                            valuePropName="checked"
-                            wrapperCol={{ offset: 4, span: 20 }}
-                        >
-                            <Checkbox >Remember me</Checkbox>
+                    <Form.Item
+                        name="remember"
+                        valuePropName="checked"
+                        wrapperCol={{ offset: 4, span: 20 }}
+                    >
+                        <Checkbox >Remember me</Checkbox>
                         <p style={{ marginTop: '5px' }}>
                             Don't have an account? <span onClick={handleNavigateSignUp} style={{ color: 'blue', textDecoration: 'underline', cursor: 'pointer' }}>Sign up</span>
                         </p>
-                        </Form.Item>
+                    </Form.Item>
 
-                        <Form.Item wrapperCol={{ offset:4, span: 20 }}>
-                            <Button type="primary" htmlType="submit" style={{ width: '50%' }} >
-                                Submit
-                            </Button>
-                        </Form.Item>
-                    </Form>
-                </div>
+                    <Form.Item wrapperCol={{ offset: 4, span: 20 }}>
+                        <Button type="primary" htmlType="submit" style={{ width: '50%' }} >
+                            Submit
+                        </Button>
+                    </Form.Item>
+                </Form>
             </div>
-        );
-    };
+        </div>
+    );
+};
 
-    export default SignInForm;
+export default SignInForm;

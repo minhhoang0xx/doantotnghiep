@@ -3,13 +3,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button, Typography, Card, Form, Input, message, Image, Radio } from 'antd';
 import { jwtTranslate } from '../../ultils';
 import * as OrderService from "../../services/OrderService"; 
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { removeSelectedItems } from '../../redux/slices/cartSlice';
 import * as CartService from "../../services/CartService";
 const { Title } = Typography;
 
 
 const CheckoutPage = () => {
+    const location = useLocation();
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(false);
@@ -58,7 +59,8 @@ const CheckoutPage = () => {
         }
         const userId = jwtTranslate(user)?.id;
         if (!userId) {
-            message.error('User ID is not available. Please log in.');
+            message.warning('Please login to create order.');
+            navigate('/sign-in', { state: location?.pathname });
             return;
         }
         console.log("Selected Cart Items:", selectedCartItems);
@@ -135,7 +137,7 @@ const CheckoutPage = () => {
                             </Card>
                         ))}
                         <div style={{ textAlign: 'left', marginTop: '20px', fontSize: '18px', fontWeight: 'bold', color: 'darkorange' }}>
-                            Total: ${calculateTotal()}
+                            Total: ${calculateTotal() + 30}
                         </div>
                     </div>
                 )}
@@ -143,19 +145,20 @@ const CheckoutPage = () => {
                 {/* Form nhập địa chỉ giao hàng */}
                 <Form layout="vertical" style={{ marginTop: '20px' }}>
                     <Title level={4}>Shipping Address</Title>
-                    <Form.Item label="Full Name">
+                    <Form.Item label="Full Name" required rules={[{ required: true, message: 'Please enter your full name!' }]}>
                         <Input
                             value={shippingAddress.fullname}
                             onChange={(e) => handleAddressChange('fullname', e.target.value)}
                         />
                     </Form.Item>
-                    <Form.Item label="Address">
+                    <Form.Item label="Address" required rules={[{ required: true, message: 'Please enter your address!' }]}
+>
                         <Input
                             value={shippingAddress.address}
                             onChange={(e) => handleAddressChange('address', e.target.value)}
                         />
                     </Form.Item>
-                    <Form.Item label="Phone Number">
+                    <Form.Item label="Phone Number" required rules={[{ required: true, message: 'Please enter your phone number!' }]}>
                         <Input
                             value={shippingAddress.phone}
                             onChange={(e) => handleAddressChange('phone', e.target.value)}
@@ -165,7 +168,7 @@ const CheckoutPage = () => {
                     <Title level={4}>Payment Method</Title>
                     <Form.Item label="Choose Payment Method">
                         <Radio.Group onChange={handlePaymentChange} value={paymentMethod} style={{ display: 'block' }}>
-                            <Radio style={{ display: 'block', marginBottom: '10px' }} value="creditCard">Credit Card</Radio>
+                            <Radio style={{ display: 'block', marginBottom: '10px' }} value="momo">Momo</Radio>
                             <Radio style={{ display: 'block', marginBottom: '10px' }} value="paypal">PayPal</Radio>
                             <Radio style={{ display: 'block', marginBottom: '10px' }} value="cashOnDelivery">Cash on Delivery</Radio>
                         </Radio.Group>

@@ -30,7 +30,7 @@ const orderSlice = createSlice({
       
           // Cập nhật countInStock cho từng sản phẩm
           orderItems.forEach(item => {
-              const product = state.orders.find(orderItem => orderItem._id === item.productId);
+              const product = state.orders.find(orderItem => orderItem._id === item.product);
               if (product) {
                   product.countInStock += item.quantity; // Cộng lại số lượng vào countInStock
               }
