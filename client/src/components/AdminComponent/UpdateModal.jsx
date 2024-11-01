@@ -113,7 +113,7 @@ const UpdateModal = ({ isModalOpen, setIsModalOpen, currentData, refetchData, cu
                             name="isPaid"
                             valuePropName="checked"
                         >
-                            <Checkbox disabled={paymentMethod === 'momo' || paymentMethod === 'paypal'}>Pay</Checkbox>
+                            <Checkbox disabled={paymentMethod === 'paypal' }>Pay</Checkbox>
                         </Form.Item>
                         <Form.Item
                             label="Is Delivered"
