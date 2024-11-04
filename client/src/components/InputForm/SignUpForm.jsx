@@ -42,6 +42,7 @@ const SignUpForm = () => {
             minHeight: '100vh',
             width: '100%',
             backgroundImage: 'url("https://media.istockphoto.com/id/843549772/vi/vec-to/m%C3%B4-h%C3%ACnh-tr%C6%B0%E1%BB%9Dng-h%E1%BB%8Dc-li%E1%BB%81n-m%E1%BA%A1ch-b%E1%BB%91i-c%E1%BA%A3nh-v%E1%BB%9Bi-c%C3%A1c-h%C3%ACnh-minh-h%E1%BB%8Da-v%C3%A0-bi%E1%BB%83u-t%C6%B0%E1%BB%A3ng-gi%C3%A1o-d%E1%BB%A5c-v%C3%A0-tr%C6%B0%E1%BB%9Dng.jpg?s=612x612&w=0&k=20&c=b5QKJ5TAV7D0_FVxz5ZjBNzHJrCc2yGDnMuEHZQNxLQ=")',
+            backgroundPosition: 'center',
 
         }}>
             <div style={{
@@ -53,14 +54,16 @@ const SignUpForm = () => {
               padding: ' 10px 0',
               boxShadow: '0 8px 16px rgba(0, 0, 10, 50)',
               backgroundColor: '#f5f5f5',
-              width: '45%',
+              width: '90%',
+              maxWidth: '700px'
             }}>
                  <span onClick={handleNavigateHome} style={{
                     fontSize: '16px',
                     color: '#333',
                     textDecoration: 'none', 
-                    marginRight:'620px',
                     cursor: 'pointer',
+                    alignSelf: 'flex-start',
+                    marginLeft: '15px',
                 }}>
                     Home
                 </span>
@@ -76,9 +79,9 @@ const SignUpForm = () => {
                 </h2>
                 <Form
                     name="signUp"
-                    labelCol={{ span: 8 }}
-                    wrapperCol={{ span: 16 }}
-                    style={{ maxWidth: 500, width: '100%', marginRight: '40px'}}
+                    labelCol={{ span: 6 }}
+                    wrapperCol={{ span: 18 }}
+                    style={{ maxWidth: '80%', width: '80%' }}
                     onFinish={onFinishSignUp}
                     onFinishFailed={onFinishSignUpFailed}
                     autoComplete="off"
@@ -155,8 +158,8 @@ const SignUpForm = () => {
                     <Input />
                     </Form.Item>
 
-                    <Form.Item wrapperCol={{offset:8, span: 16 }}>
-                        <Button type="primary" htmlType="submit" style={{ width: '40%'}}>
+                    <Form.Item wrapperCol={{offset:6, span:18 }}>
+                        <Button type="primary" htmlType="submit" style={{ width: '50%'}}>
                             Sign Up
                         </Button>
                     </Form.Item>

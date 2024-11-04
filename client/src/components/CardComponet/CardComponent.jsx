@@ -55,15 +55,22 @@ const CardComponent = (props) => {
     }
     return (
         <Card
-            hoverable // hover 
-            style={{ width: '18.7%', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}
+            hoverable
+            style={{
+                width: '100%', 
+                maxWidth: '280px', 
+                borderRadius: '8px',
+                overflow: 'hidden',
+                boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                margin: '10px',
+                flex: '1 1 calc(50% - 20px)', // Responsive layout using flex
+            }}
             cover={
-                <div style={{ height: '200px', overflow: 'hidden' }} onClick={handleClick} >
+                <div style={{ height: '200px', overflow: 'hidden' }} onClick={handleClick}>
                     <img alt="Product Card" src={image} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
             }
             actions={[
-
                 <ShoppingCartOutlined key="addToCart" alt='Add To Cart' style={{ color: '#52c41a', fontSize: '24px' }} onClick={handleAddToCart} />,
             ]}
         >

@@ -13,40 +13,64 @@ background-position: center;
 `
 
 export const WrapperTitle = styled.h1`
-     color: #000000;
-     font-size: 24px;
-     font-weight: 300;
-     line-height: 32px;
-     word-break: break-word;
-`
+    color: #000000;
+    font-size: 34px;
+    font-weight: 500;
+    line-height: 32px;
+    word-break: break-word;
+    
+    @media (max-width: 768px) {
+        font-size: 20px;
+    }
+`;
 
 export const WrapperTextSell = styled.span`
-     color: #000000;
-     font-size: 15px;
-     line-height: 24px;
-`
+    color: #000000;
+    font-size: 15px;
+    line-height: 24px;
+    
+    @media (max-width: 768px) {
+        font-size: 13px;
+    }
+`;
 
 export const WrapperPrice = styled.div`
-     background-color: blue
-     border-radius: 4px;
-`
+    color: darkorange;
+    border-radius: 4px;
+
+
+    @media (max-width: 768px) {
+
+    }
+`;
 
 export const WrapperPriceText = styled.h1`
-     font-size: 32px;
-     line-height: 40px;
-     font-weight: 500;
-     padding: 10px 0 0 30px ;
-   
-`
+    font-size: 32px;
+    line-height: 40px;
+    font-weight: 500;
 
-export const WrapperQuantity = styled.h1`
-     font-size: 20px;
-     line-height: 30px;
-     font-weight: 400;
-     padding: 0 0 0 30px;
-`
-export const WrapperDetail = styled.span`
-     font-size: 15px;
-     font-weight: 400;
-     padding: 0 0 0 30px;
-`
+    
+    @media (max-width: 768px) {
+        font-size: 24px;
+    }
+`;
+
+export const WrapperQuantity = styled.div`
+    font-size: 20px;
+    line-height: 30px;
+    font-weight: 400;
+    
+    @media (max-width: 768px) {
+        font-size: 16px;
+    }
+`;
+
+export const WrapperDetail = styled.p`
+    font-size: 15px;
+    font-weight: 400;
+    margin-top: 10px;
+
+    @media (max-width: 768px) {
+        font-size: 14px;
+    }
+`;

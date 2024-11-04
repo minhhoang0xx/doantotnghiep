@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Table, message, Button, Image ,Typography } from 'antd';
+import { Table, message, Button, Image ,Typography, Row, Col } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import { CloseCircleOutlined } from '@ant-design/icons';
 import { useDispatch, useSelector } from 'react-redux';
@@ -61,7 +61,7 @@ const MyOrderPage = () => {
             key: 'orderItems',
             render: (orderItems, record) => (
                 <div style={{ display: 'flex', gap: '10px', cursor: 'pointer' }}  onClick={() => handleClick(record._id)}>
-                    {orderItems.slice(0, 3).map((item) => (
+                    {orderItems.slice(0,1).map((item) => (
                         <Image
                             key={item._id}
                             width={50}
@@ -71,7 +71,7 @@ const MyOrderPage = () => {
                             style={{ borderRadius: '8px', objectFit: 'cover' }}
                         />
                     ))}
-                    {orderItems.length > 3 && <span>+{orderItems.length - 3}</span>}
+                    {orderItems.length > 1 && <span>+{orderItems.length - 1}</span>}
                 </div>
             ),
         },
@@ -109,19 +109,21 @@ const MyOrderPage = () => {
     ];
 
     return (
-        <div style={{ padding: '100px 0 0 0', background: '#f0f2f5' , minHeight: '100vh' }}>
-            <div style={{ maxWidth: '80%', margin: '0 auto' }}>
-            <Title level={2} style={{ textAlign: 'center', marginBottom: '40px', fontSize: '28px' }}>My Order</Title>
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-                <Table
-                    loading={isLoading || loading}
-                    dataSource={Array.isArray(orders) ? orders : []}
-                    columns={columns}
-                    rowKey="_id"
-                    pagination={{ pageSize: 5 }}
-                    style={{ background: '#fff', padding: '20px', borderRadius: '8px' }}
-                />
-            </div>
+        <div style={{ padding: '50px 0', background: '#f0f2f5', minHeight: '100vh' }}>
+            <Row justify="center">
+                <Col xs={24} sm={24} md={20} lg={16}>
+                    <Title level={2} style={{ textAlign: 'center', marginBottom: '40px', fontSize: '28px' }}>My Order</Title>
+                    {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
+                    <Table
+                        loading={isLoading || loading}
+                        dataSource={Array.isArray(orders) ? orders : []}
+                        columns={columns}
+                        rowKey="_id"
+                        pagination={{ pageSize: 5 }}
+                        style={{ background: '#fff', padding: '20px', borderRadius: '8px' }}
+                    />
+                </Col>
+            </Row>
         </div>
     );
 };

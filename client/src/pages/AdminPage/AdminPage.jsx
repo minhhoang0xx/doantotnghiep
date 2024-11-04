@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Layout, Menu, Table, Spin, Divider, Typography, Button, Checkbox, message, Input } from 'antd';
+import { Layout, Menu, Table, Spin, Divider, Typography, Button, Checkbox, message, Input, Row, Col } from 'antd';
 import { UserOutlined, ProductOutlined, ContainerOutlined, EditOutlined, EyeOutlined, CheckCircleTwoTone, CloseCircleTwoTone } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -231,7 +231,8 @@ const AdminPage = () => {
         {
             title: 'Type', dataIndex: 'type', key: 'type',
             filters: [
-                { text: '1', value: '1' },
+                { text: '1212', value: '1212' },
+                { text: '4', value: '4' },
             ],
             filteredValue: filter ? [filter] : null,
             onFilter: (value, record) => record.type.includes(value),
@@ -287,126 +288,115 @@ const AdminPage = () => {
     ];
 
     return (
-
-        <Layout style={{ minHeight: '100vh' }}>
-            <Sider width='12%' style={{ background: '#fff' }}>
-                <div style={{ padding: '20px', textAlign: 'center', cursor: 'pointer' }} onClick={() => navigate('/')}>
-                    <Title level={4} style={{ margin: 0, color: '#333' }}>Hoang System Education</Title>
-                    <Button type="link"> Back to Home</Button>
-                </div>
-                <Menu
-                    mode="inline"
-                    selectedKeys={[currentView === 'users' ? '1' : currentView === 'products' ? '2' : '3']}
-                    items={[
-                        {
-                            key: '1',
-                            icon: <UserOutlined />,
-                            label: 'User',
-                            onClick: () => setCurrentView('users'), // Cập nhật trạng thái khi nhấp vào User
-                        },
-                        {
-                            key: '2',
-                            icon: <ProductOutlined />,
-                            label: 'Product',
-                            onClick: () => setCurrentView('products'), // Cập nhật trạng thái khi nhấp vào Product
-                        },
-                        {
-                            key: '3',
-                            icon: <ContainerOutlined />,
-                            label: 'Order',
-                            onClick: () => setCurrentView('orders'), // Cập nhật trạng thái khi nhấp vào Order
-                        },
-                    ]}
-                    style={{ height: '100%', borderRight: 0 }}
-                />
-            </Sider>
-            <Layout>
-                <Content style={{ padding: '24px', minHeight: '100vh' }}>
-                    <Divider orientation="left">
-                        {currentView === 'users' ? 'User List' : currentView === 'products' ? 'Product List' : 'Order List'}
-                    </Divider>
-                    {currentView === 'users' && (
-                        <Input.Search
-                            placeholder="Search Users by name or email"
-                            onSearch={value => setUserSearch(value)}
-                            style={{ marginBottom: 16 }}
-                        />
-                    )}
-                    {currentView === 'products' && (
-                        <Input.Search
-                            placeholder="Search Products by name"
-                            onSearch={value => setProductSearch(value)}
-                            style={{ marginBottom: 16 }}
-                        />
-                    )}
-                    {currentView === 'orders' && (
-                        <Input.Search
-                            placeholder="Search Orders"
-                            onSearch={value => setOrderSearch(value)}
-                            style={{ marginBottom: 16 }}
-                        />
-                    )}
-                    {currentView === 'products' && (
-                        <Button type="primary" onClick={handleOpenModal}>
-                            Add New Product
-                        </Button>
-                    )}
-                    <Button onClick={handleDeleteConfirm} disabled={selectedRadio.length === 0} style={{ backgroundColor: selectedRadio.length === 0 ? 'gray' : 'red', color: 'white', fontSize: '16px', border: 'none', borderRadius: '4px', padding: '10px 20px', cursor: selectedRadio.length === 0 ? 'not-allowed' : 'pointer', transition: 'background-color 0.3s ease', }} onMouseEnter={(e) => { if (selectedRadio.length > 0) { e.currentTarget.style.backgroundColor = 'darkred'; } }} onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = selectedRadio.length > 0 ? 'red' : 'gray'; }}>
-                        {currentView === 'orders' ? 'Order completed, removed?' : 'Delete'}
-                    </Button>
-                    {loadingProducts || loadingUsers || loadingOrders ? (
-                        <Spin size="large" />
-                    ) : currentView === 'users' ? (
-                        <Table
-                            columns={userColumns}
-                            dataSource={filteredUsers}
-                            rowKey={(record) => record._id}
-                            pagination={{ pageSize: 10 }}
-                        />
-                    ) : currentView === 'products' ? (
-                        <Table
-                            columns={productColumns}
-                            dataSource={filteredProducts} // Hiển thị dữ liệu từ API sản phẩm
-                            rowKey={(record) => record._id} // Đặt key là _id của mỗi sản phẩm
-                            pagination={{ pageSize: 10 }} // Phân trang, 10 sản phẩm mỗi trang
-                        />
-                    ) : (
-                        <Table
-                            columns={orderColumns}
-                            dataSource={filteredOrders} // Hiển thị dữ liệu từ API đơn hàng
-                            rowKey={(record) => record._id}
-                            pagination={{ pageSize: 10 }}
-                        />
-                    )}
-                    <AddProduct
-                        isModalOpen={AddModal}
-                        setIsModalOpen={setAddModal}
-                        refetchProducts={refetchProducts}
-                        products={products?.data || []}
+            <Layout style={{ minHeight: '100vh' }}>
+                <Sider width={200} className="site-layout-background" style={{ background: '#fff' }}>
+                    <div style={{ padding: '20px', textAlign: 'center', cursor: 'pointer' }} onClick={() => navigate('/')}>
+                        <Title level={4} style={{ margin: 0, color: '#333' }}>HOME</Title>
+                    </div>
+                    <Menu
+                        mode="inline"
+                        selectedKeys={[currentView === 'users' ? '1' : currentView === 'products' ? '2' : '3']}
+                        items={[
+                            {
+                                key: '1',
+                                icon: <UserOutlined />,
+                                label: 'User',
+                                onClick: () => setCurrentView('users'),
+                            },
+                            {
+                                key: '2',
+                                icon: <ProductOutlined />,
+                                label: 'Product',
+                                onClick: () => setCurrentView('products'),
+                            },
+                            {
+                                key: '3',
+                                icon: <ContainerOutlined />,
+                                label: 'Order',
+                                onClick: () => setCurrentView('orders'),
+                            },
+                        ]}
+                        style={{ height: '100%', borderRight: 0 }}
                     />
-                    <DeleteConfirm
-                        open={deleteModal}
-                        onConfirm={handleDelete}
-                        onCancel={() => setDeleteModal(false)}
-                    />
-                    <UpdateModal
-                        isModalOpen={updateModal}
-                        setIsModalOpen={setUpdateModal}
-                        currentData={currentData}
-                        refetchData={refetchData}
-                        currentView={currentView}
-                        paymentMethod={currentData?.paymentMethod}
-                    />
-                    <DetailOrderModal
-                        visible={orderDetailModal}
-                        onClose={() => setOrderDetailModal(false)}
-                        orderDetails={currentOrderDetails}
-                        loading={loading}
-                    />
-                </Content>
+                </Sider>
+                <Layout >
+                    <Content style={{ padding: '24px', minHeight: 280 }}>
+                        <Divider orientation="left">
+                            {currentView === 'users' ? 'User List' : currentView === 'products' ? 'Product List' : 'Order List'}
+                        </Divider>
+                        <Row gutter={16}>
+                            <Col xs={24} md={16}>
+                                {currentView === 'users' && (
+                                    <Input.Search
+                                        placeholder="Search Users by name or email"
+                                        onSearch={value => setUserSearch(value)}
+                                        style={{ marginBottom: 16 }}
+                                    />
+                                )}
+                                {currentView === 'products' && (
+                                    <Input.Search
+                                        placeholder="Search Products by name"
+                                        onSearch={value => setProductSearch(value)}
+                                        style={{ marginBottom: 16 }}
+                                    />
+                                )}
+                                {currentView === 'orders' && (
+                                    <Input.Search
+                                        placeholder="Search Orders"
+                                        onSearch={value => setOrderSearch(value)}
+                                        style={{ marginBottom: 16 }}
+                                    />
+                                )}
+                            </Col>
+                            <Col xs={24} md={8} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                {currentView === 'products' && (
+                                    <Button type="primary" onClick={handleOpenModal} style={{ marginLeft: 8 }}>
+                                        Add New Product
+                                    </Button>
+                                )}
+                                <Button onClick={handleDeleteConfirm} disabled={selectedRadio.length === 0} style={{ marginLeft: 8 }}>
+                                    {currentView === 'orders' ? 'Order completed, removed?' : 'Delete'}
+                                </Button>
+                            </Col>
+                        </Row>
+                        {loading ? (
+                            <Spin size="large" />
+                        ) : currentView === 'users' ? (
+                            <Table columns={userColumns} dataSource={filteredUsers} rowKey="_id" pagination={{ pageSize: 10 }} />
+                        ) : currentView === 'products' ? (
+                            <Table columns={productColumns} dataSource={filteredProducts} rowKey="_id" pagination={{ pageSize: 10 }} />
+                        ) : (
+                            <Table columns={orderColumns} dataSource={filteredOrders} rowKey="_id" pagination={{ pageSize: 10 }} />
+                        )}
+                        <AddProduct
+                            isModalOpen={AddModal}
+                            setIsModalOpen={setAddModal}
+                            refetchProducts={refetchProducts}
+                            products={products?.data || []}
+                        />
+                        <DeleteConfirm
+                            open={deleteModal}
+                            onConfirm={handleDelete}
+                            onCancel={() => setDeleteModal(false)}
+                        />
+                        <UpdateModal
+                            isModalOpen={updateModal}
+                            setIsModalOpen={setUpdateModal}
+                            currentData={currentData}
+                            refetchData={refetchData}
+                            currentView={currentView}
+                            paymentMethod={currentData?.paymentMethod}
+                        />
+                        <DetailOrderModal
+                            visible={orderDetailModal}
+                            onClose={() => setOrderDetailModal(false)}
+                            orderDetails={currentOrderDetails}
+                            loading={loading}
+                        />
+                    </Content>
+                </Layout>
             </Layout>
-        </Layout>
-    );
-};
+        );
+    };
 
 export default AdminPage;

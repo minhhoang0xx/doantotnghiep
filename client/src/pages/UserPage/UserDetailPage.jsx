@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Avatar, Form, Input, Button, message } from 'antd';
+import { Card, Avatar, Form, Input, Button, message, Row, Col  } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateUser } from '../../redux/slices/userSlice';
@@ -63,83 +63,74 @@ const handleUpdate = async () => {
     };
     
     return (
-        <div style={{ padding: '50px 0 0 0 ',background:'#f5f5f5' }}>
-        <div style={{ margin: '0 auto' }}>
-            <div style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                flexDirection: 'column',
-                minHeight: '100vh',
-                width: '100%',
-            }}>
-                <div style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    flexDirection: 'column',
-                    borderRadius: '20px',
-                    padding: '10px 0',
-                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.5)',
-                    backgroundColor: '#f5f5f5',
-                    width: '45%',
-                }}>
-                    <h2 style={{
-                        fontSize: '32px',
-                        fontWeight: 'bold',
-                        color: '#333',
-                        marginTop: '20px',
+        <div style={{ padding: '70px 0', background: '#f5f5f5' }}>
+            <Row justify="center" style={{ minHeight: '100vh' }}>
+                <Col xs={24} sm={20} md={16} lg={12} xl={10} xxl={8}>
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        borderRadius: '20px',
+                        paddingBottom: '30px',
+                        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.5)',
+                        backgroundColor: '#fff',
                     }}>
-                        User Information
-                    </h2>
-                    <Card
-                        style={{ width: '50%' }}
-                        actions={[
-                            <Button type="primary" htmlType="submit" form="userForm" onClick={handleUpdate}>
-                                Save
-                            </Button>,
-                        ]}
-                    >
-                        <div style={{ textAlign: 'center', marginBottom: 20 }}>
-                            <Avatar
-                                size={100}
-                                icon={<UserOutlined />}
-                                src={avatar || user?.avatar}
-                            />
-                        </div>
-
-                        <Form
-                            id="userForm"
-                            layout="vertical"
+                        <h2 style={{
+                            fontSize: '28px',
+                            fontWeight: 'bold',
+                            color: '#333',
+                            marginBottom: '20px',
+                            textAlign: 'center'
+                        }}>
+                            User Information
+                        </h2>
+                        <Card
+                            style={{ width: '100%', maxWidth: '500px' }}
+                            actions={[
+                                <Button type="primary" htmlType="submit" form="userForm" onClick={handleUpdate}>
+                                    Save
+                                </Button>,
+                            ]}
                         >
-                      
-                            <Form.Item label="Name">
-                                <Input placeholder="Enter your name" value={name} onChange={handleChangeName} />
-                            </Form.Item>
-
-                            <Form.Item label="Email">
-                                <Input placeholder="Enter your email" value={email} onChange={handleChangeEmail} />
-                            </Form.Item>
-
-                            <Form.Item label="Phone">
-                                <Input placeholder="Enter your phone number" value={phone} onChange={handleChangePhone} />
-                            </Form.Item>
-
-                            <Form.Item label="Address">
-                                <Input placeholder="Enter your address" value={address} onChange={handleChangeAddress} />
-                            </Form.Item>
-                            <Form.Item label="Avatar URL">
-                                <Input
-                                    placeholder="Enter your avatar URL"
-                                    value={avatar || user?.avatar}
-                                    onChange={handleChangeAvatar}
+                            <div style={{ textAlign: 'center', marginBottom: 20 }}>
+                                <Avatar
+                                    size={100}
+                                    icon={<UserOutlined />}
+                                    src={avatar || user?.avatar}
                                 />
-                            </Form.Item>
-                        </Form>
-                    </Card>
-                </div>
-            </div>
-        </div>
+                            </div>
+                            <Form
+                                id="userForm"
+                                layout="vertical"
+                            >
+                                <Form.Item label="Name">
+                                    <Input placeholder="Enter your name" value={name} onChange={(e) => setName(e.target.value)} />
+                                </Form.Item>
+
+                                <Form.Item label="Email">
+                                    <Input placeholder="Enter your email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                                </Form.Item>
+
+                                <Form.Item label="Phone">
+                                    <Input placeholder="Enter your phone number" value={phone} onChange={(e) => setPhone(e.target.value)} />
+                                </Form.Item>
+
+                                <Form.Item label="Address">
+                                    <Input placeholder="Enter your address" value={address} onChange={(e) => setAddress(e.target.value)} />
+                                </Form.Item>
+                                
+                                <Form.Item label="Avatar URL">
+                                    <Input
+                                        placeholder="Enter your avatar URL"
+                                        value={avatar || user?.avatar}
+                                        onChange={(e) => setAvatar(e.target.value)}
+                                    />
+                                </Form.Item>
+                            </Form>
+                        </Card>
+                    </div>
+                </Col>
+            </Row>
         </div>
     );
 };

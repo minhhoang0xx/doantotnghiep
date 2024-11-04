@@ -150,7 +150,7 @@ const CheckoutPage = () => {
     };
 
     return (
-        <div style={{ padding: '50px', background: '#f0f2f5' }}>
+        <div style={{ padding: '50px 0 0 0', background: '#f0f2f5' }}>
             <Title level={2} style={{ textAlign: 'center' }}>CHECK OUT</Title>
             <Card style={{ maxWidth: '600px', margin: '0 auto' }}>
                 <Title level={4}>Order Summary</Title>

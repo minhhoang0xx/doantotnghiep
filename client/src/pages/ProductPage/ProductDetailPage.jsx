@@ -3,13 +3,13 @@ import ProductDetailComponent from "../../components/ProductComponent/ProductDet
 
 const ProductDetailPage = () =>{
     return (
-        <div style={{ padding: '50px 0 0 0 ',background:'#f5f5f5' }}>
-        <div style={{padding:'0px 120px ', background:'#f5f5f5', height:'1000px'}}> 
-         <br></br>
+        <div style={{ padding: '50px 0 0 0', background: '#f5f5f5' }}>
+        <div style={{ padding: '0 16px', maxWidth: '1200px', margin: '0 auto' }}> 
+            <br />
             <h1>Detail</h1>
             <ProductDetailComponent />
         </div>
-        </div>
+    </div>
         )
 }
  export default ProductDetailPage

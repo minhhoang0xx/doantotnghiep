@@ -71,55 +71,45 @@ const ProductDetailComponent = () => {
             } catch (error) {
                 message.error('Error adding product to cart.');
             }
-    }
-};
-return (
-    <Row style={{ padding: '16px', background: 'white', borderRadius: '10px', boxShadow: '0px 2px 2px 2px rgba(0, 0, 0, 0.1)' }}>
-        <Col span={10} style={{ paddingRight: '16px' }} >
-            <WrapperImage src={product?.image} alt={product?.name} preview={true} />
-        </Col>
+        }
+    };
+    return (
+        <Row gutter={[16, 16]} style={{ padding: '16px', background: 'white', borderRadius: '10px', boxShadow: '0px 2px 2px 2px rgba(0, 0, 0, 0.1)' }}>
+            <Col xs={24} md={10} style={{ paddingRight: '16px', paddingLeft: '0px' }}>
+                <WrapperImage src={product?.image} alt={product?.name} preview={true} />
+            </Col>
+            <Col xs={24} md={14} style={{ border: '1px solid #ccc', borderRadius: '10px', padding: '16px' }}>
+                <div style={{ margin: '10px 0' }}>
+                    <WrapperTitle>{product?.name}</WrapperTitle>
 
-
-        <Col span={14} style={{ border: '1px solid #ccc', borderRadius: '10px' }}>
-            <WrapperTitle style={{ margin: '10px' }}>
-                {product?.name}
-            </WrapperTitle>
-            <div style={{ margin: '10px' }}>
-                <StarFilled style={{ fontSize: '12px', color: 'rgb(254,216,54)' }} />
-                <WrapperTextSell> | Sold {product?.sold}</WrapperTextSell>
-
-            </div>
-            <WrapperPrice>
-                <WrapperPriceText>Price: ${product?.price}</WrapperPriceText>
-            </WrapperPrice>
-            <WrapperQuantity>
-                <div>Quantity</div>
-                <div>
-                    <InputNumber min={1} max={100} value={quantity} onChange={onChange} changeOnWheel />
+                    <StarFilled style={{ fontSize: '12px', color: 'rgb(254,216,54)' }} />
+                    <WrapperTextSell> | Sold {product?.sold}</WrapperTextSell>
                     <br />
                     <span style={{ fontSize: '15px' }}>Stock: {product?.countInStock}</span>
                 </div>
-            </WrapperQuantity>
-            <WrapperDetail>{product?.description}</WrapperDetail>
-            <div>
+                <WrapperPrice>
+                    <WrapperPriceText>Price: ${product?.price}</WrapperPriceText>
+                </WrapperPrice>
+                <WrapperQuantity>
+                    <div>Quantity</div>
+                    <InputNumber min={1} max={product.countInStock} value={quantity} onChange={onChange} style={{ marginBottom: '8px' }} />
+                </WrapperQuantity>
+                <WrapperDetail>{product?.description}</WrapperDetail>
                 <ButtonComponent
                     size={'40px'}
                     styleButton={{
                         background: 'red',
                         height: '48px',
-                        width: '220px',
-                        margin: '30px',
-
+                        width: '100%',
+                        marginTop: '30px',
                     }}
                     icon={<ShoppingCartOutlined style={{ color: '#fff' }} />}
                     textButton={'Add to Cart'}
                     styleTextButton={{ color: 'white' }}
                     onClick={handleAddToCart}
-                ></ButtonComponent>
-            </div>
-
-        </Col>
-    </Row>
-)
-}
+                />
+            </Col>
+        </Row>
+    );
+};
 export default ProductDetailComponent

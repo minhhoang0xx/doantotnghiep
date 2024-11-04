@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Checkbox, Row, Col, InputNumber, Typography, Steps, message, Modal } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { useLocation,useNavigate } from 'react-router-dom';
 import { addCartItem, removeCartItem, updateCartItem, clearCart } from '../../redux/slices/cartSlice';
 import * as CartService from "../../services/CartService";
 import { jwtTranslate } from "../../ultils";
@@ -13,6 +13,7 @@ const { Step } = Steps;
 const OrderPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const cartItems = useSelector((state) => state.cart.cartItems || []); // Lấy list product trong cart từ Redux
   console.log('Current cart items:', cartItems);
   const [quantities, setQuantities] = useState({});
@@ -124,41 +125,46 @@ const OrderPage = () => {
         item.product === product ? { ...item, amount: value } : item
       );
       localStorage.setItem('cart', JSON.stringify(updatedCart));
-      dispatch(updateCartItem({ product, newAmount: value })); 
+      dispatch(updateCartItem({ product, newAmount: value }));
       setQuantities((prev) => ({ ...prev, [product]: value })); //set lai quantity
     }
   };
 
   const handleRemoveCartItem = async (product) => {
-    if (user){
-    try {
-      await CartService.removeCart(jwtTranslate(user)?.id, product); // Gọi API 
-      dispatch(removeCartItem({ product })); // xoa trong Redux
-      message.success('Removed item from cart successfully');
-      if (cartItems.length === 1) { // neu sp =1 thi xoa luon cart
-        await CartService.deleteCart(jwtTranslate(user)?.id);
+    if (user) {
+      try {
+        await CartService.removeCart(jwtTranslate(user)?.id, product); // Gọi API 
+        dispatch(removeCartItem({ product })); // xoa trong Redux
+        message.success('Removed item from cart successfully');
+        if (cartItems.length === 1) { // neu sp =1 thi xoa luon cart
+          await CartService.deleteCart(jwtTranslate(user)?.id);
+        }
+      } catch (error) {
+        message.error('Failed to remove cart item');
       }
-    } catch (error) {
-      message.error('Failed to remove cart item'); 
+    } else {
+      const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
+      const updatedCart = storedCart.filter(item => item.product !== product);
+      localStorage.setItem('cart', JSON.stringify(updatedCart));
+      dispatch(removeCartItem({ product })); // delete trong redux
+      message.success('Removed item from cart successfully');
     }
-  } else {
-    const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const updatedCart = storedCart.filter(item => item.product !== product);
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
-    dispatch(removeCartItem({ product })); // delete trong redux
-    message.success('Removed item from cart successfully');
-  }
   };
 
-  // Hàm xử lý khi nhấn nút Checkout
+
   const handleCheckout = () => {
     if (selectedItems.size === 0) {
       message.warning('Please select at least one item to proceed to checkout.');
       return;
     }
+  //   if (!user) {
+  //     message.warning('Please log in to proceed to checkout.'); 
+  //     navigate('/sign-in', { state: location?.pathname });
+  //     return; 
+  // }
     // Tạo một danh sách các sản phẩm đã chọn
     const selectedCartItems = cartItems.filter(item => selectedItems.has(item.product));
-    /////// // gán gia tri amount tranh loi logic
+    //////// gán gia tri amount tranh loi logic
     const selectedQuantities = {};
     selectedItems.forEach(product => {
       selectedQuantities[product] = quantities[product];
@@ -186,8 +192,13 @@ const OrderPage = () => {
 
   return (
     <div style={{ padding: '50px 0 0 0 ', background: '#f0f2f5' }}>
-      <Button type="primary" style={{ position: 'absolute', top: 60, right: 10, fontSize: '16px', backgroundColor: '#4CAF50', border: 'none', padding: '10px 20px', borderRadius: '5px', }}
-        onClick={() => navigate('/myOrder')}>My Orders </Button>
+      <Button
+        type="primary"
+        style={{ position: 'absolute', top: 60, right: 10, fontSize: '16px', backgroundColor: '#4CAF50', border: 'none', padding: '10px 20px', borderRadius: '5px', }}
+        onClick={() => navigate('/myOrder')}
+      >
+        My Orders
+      </Button>
       <div style={{ padding: '30px', backgroundColor: '#f0f2f5', minHeight: '100vh' }}>
         <Title level={2} style={{ textAlign: 'center', marginBottom: '40px', fontSize: '28px' }}>Your Cart</Title>
         {cartItems.length === 0 ? (
@@ -195,7 +206,7 @@ const OrderPage = () => {
         ) : (
           <div style={{ background: '#fff', borderRadius: '10px', padding: '20px', maxWidth: '85%', margin: '0 auto', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)' }}>
             <Row gutter={16} style={{ display: 'flex' }}>
-              <Col span={16}>
+              <Col xs={24} sm={16}>
                 <div style={{ marginBottom: '20px' }}>
                   <h4 style={{ fontSize: '22px' }}>Cart Status</h4>
                   <Steps current={0}>
@@ -206,47 +217,46 @@ const OrderPage = () => {
                 </div>
 
                 <Row gutter={16} style={{ fontWeight: 'bold', fontSize: '16px', padding: '10px 0', borderBottom: '1px solid #ddd' }}>
-                  <Col span={2}><Checkbox checked={selectAll} onChange={handleSelectAllChange} /></Col>
-                  <Col span={8}>Product</Col>
-                  <Col span={4}>Price</Col>
-                  <Col span={4}>Quantity</Col>
-                  <Col span={4}>Total</Col>
-                  <Col span={2}><DeleteOutlined style={{ cursor: 'pointer' }} onClick={handleDeleteAll} /></Col>
+                  <Col xs={2} sm={2}><Checkbox checked={selectAll} onChange={handleSelectAllChange} /></Col>
+                  <Col xs={8} sm={8}>Product</Col>
+                  <Col xs={4} sm={4}>Price</Col>
+                  <Col xs={4} sm={4}>Quantity</Col>
+                  <Col xs={4} sm={4}>Total</Col>
+                  <Col xs={2} sm={2}><DeleteOutlined style={{ cursor: 'pointer' }} onClick={handleDeleteAll} /></Col>
                 </Row>
 
                 {cartItems.map((item) => (
                   <Row key={item.product} gutter={16} style={{ padding: '10px 0', borderBottom: '1px solid #eee', alignItems: 'center' }}>
-                    <Col span={2}><Checkbox checked={selectedItems.has(item.product)} onChange={() => handleItemSelect(item.product)} /></Col>
-                    <Col span={8} style={{ display: 'flex', alignItems: 'center' }}>
-                      <img src={item.image} alt={item.name} style={{ width: '77px', height: '79px', objectFit: 'cover', marginRight: '10px', borderRadius: '8px' }} />
-                      <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#333' }}>{item.name}</div>
+                    <Col xs={2} sm={2}><Checkbox checked={selectedItems.has(item.product)} onChange={() => handleItemSelect(item.product)} /></Col>
+                    <Col xs={8} sm={8} style={{ display: 'flex', alignItems: 'center' }}>
+                      <img src={item.image} alt={item.name} style={{ width: '50px', height: '50px', marginRight: '10px', borderRadius: '5px' }} />
+                      <span>{item.name}</span>
                     </Col>
-                    <Col span={4}>${item.price}</Col>
-                    <Col span={4} style={{ display: 'flex', alignItems: 'center' }}>
-                      <InputNumber min={1} value={quantities[item.product] || 1} onChange={(value) => handleQuantityChange(item.product, value)} />
+                    <Col xs={4} sm={4}>${item.price}</Col>
+                    <Col xs={4} sm={4}>
+                      <InputNumber
+                        min={1}
+                        value={quantities[item.product]}
+                        onChange={(value) => handleQuantityChange(item.product, value)}
+                      />
                     </Col>
-                    <Col span={4}>${(item.price * (quantities[item.product] || 1))}</Col>
-                    <Col span={2}><DeleteOutlined style={{ cursor: 'pointer' }} onClick={() => handleRemoveCartItem(item.product)} /></Col>
+                    <Col xs={4} sm={4}>${item.price * (quantities[item.product] || 1)}</Col>
+                    <Col xs={2} sm={2}><DeleteOutlined style={{ cursor: 'pointer' }} onClick={() => handleRemoveCartItem(item.product)} /></Col>
                   </Row>
                 ))}
               </Col>
-
-              <Col span={8}>
-                <div style={{ padding: '20px', background: '#fafafa', borderRadius: '10px', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)', position: 'relative', height: '95%' }}>
-                  <div style={{ marginBottom: '20px', fontSize: '16px' }}>
-                    <span>Address: </span>
-                    <span style={{ fontWeight: 'bold' }}>Your Address</span>
-                    <Button type="link">Change</Button>
-                  </div>
-                  <div style={{ marginBottom: '20px', fontSize: '14px' }}>
-                    <div>Subtotal: ${calculateTotal()}</div>
-                    <div>Discount: $0.00</div>
-                    <div>Shipping Fee: $30.00</div>
-                  </div>
-                  <div style={{ fontWeight: 'bold', color: 'rgb(254, 56, 52)', fontSize: '18px' }}>
-                    Total: ${calculateTotal() + 30}
-                  </div>
-                  <Button type="primary" size="large" style={{ width: '100%', marginTop: '20px', fontSize: '16px' }} onClick={handleCheckout}>
+              <Col xs={24} sm={8} style={{ paddingLeft: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+                <div style={{ padding: '20px', background: '#f9f9f9', borderRadius: '10px', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)', width: '100%' }}>
+                  <h4 style={{ marginBottom: '20px' }}>Cart Summary</h4>
+                  <p style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span>Total Amount:</span>
+                    <span>${calculateTotal().toFixed(2)}</span>
+                  </p>
+                  <Button
+                    type="primary"
+                    style={{ width: '100%', background: '#4CAF50', border: 'none', marginTop: '10px' }}
+                    onClick={handleCheckout}
+                  >
                     Checkout
                   </Button>
                 </div>
