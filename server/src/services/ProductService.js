@@ -94,58 +94,43 @@ const deleteProduct= async (id) => {
 const getAllProduct = (limit, page, sort, filter) => {
     return new Promise(async (resolve, reject) => {
         try {
-            const total = await Product.countDocuments(); // Đếm tổng số sản phẩm
-            if (filter) {
+            const total = await Product.countDocuments();
+            let query = {};
+            
+            // Xử lý lọc
+            if (filter && filter.length > 0 && filter[1] !== 'all') {
                 const label = filter[0];
-                const allObjectFilter = await Product.find({ [label]: { '$regex': filter[1], '$options': 'i' } })
-                    .limit(limit)
-                    .skip(page * limit); // $regex để lọc theo từ khóa liên quan nhất
-                // [label] phải để như vậy nếu không sẽ coi label là key trực tiếp
-                return resolve({
-                    status: 'OK',
-                    message: 'Filter list',
-                    data: allObjectFilter,
-                    total: total,
-                    pageCurrent: Number(page + 1),
-                    totalPage: Math.ceil(total / limit)
-                });
+                const value = filter[1];
+                query[label] = { '$regex': value, '$options': 'i' };
+                //reget: lay gai tri tuong ung // option : i (khoing phan bien A a)
             }
 
-            if (sort && sort[1]) {
-                const objectSort = {};
-                objectSort[sort[1]] = sort[0]; // sort[0] là thứ tự, sort[1] là trường sắp xếp
-                const allProductSort = await Product.find()
-                    .limit(limit)
-                    .skip(page * limit)
-                    .sort(objectSort);
-
-                return resolve({
-                    status: 'OK',
-                    message: 'All product list (sorted)',
-                    data: allProductSort,
-                    total: total,
-                    pageCurrent: Number(page + 1),
-                    totalPage: Math.ceil(total / limit)
-                });
+            // Xử lý sắp xếp
+            let sortQuery = {};
+            if (sort && sort.length > 0) {
+                sortQuery[sort[1]] = sort[0] === 'asc' ? 1 : -1; // Xác định thứ tự sắp xếp
             }
 
-            // Trường hợp không có filter và sort, chỉ thực hiện phân trang
-            const allProduct = await Product.find().limit(limit).skip(page * limit);
+            // Lấy sản phẩm theo filter và sort
+            const allProducts = await Product.find(query)
+                .limit(limit)
+                .skip(page * limit)
+                .sort(sortQuery);
 
             return resolve({
                 status: 'OK',
                 message: 'All product list',
-                data: allProduct,
+                data: allProducts,
                 total: total,
                 pageCurrent: Number(page + 1),
                 totalPage: Math.ceil(total / limit)
             });
-
         } catch (err) {
             reject(err);
         }
     });
 };
+
 
 const detailProduct = (id) => {
     return new Promise(async (resolve, reject) => {

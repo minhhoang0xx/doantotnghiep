@@ -198,7 +198,6 @@ const getAllOrder = (sort) => {
 
 const doneOrder = (id) => {
     return new Promise(async (resolve, reject) => {
-        console.log('123123123')
         try {
             const doneOrder = await Order.findByIdAndDelete(id);
             if (!doneOrder) {

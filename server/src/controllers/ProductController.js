@@ -98,21 +98,27 @@ const detailProduct = async (req,res)=>{
     }
 }
 
-const getAllProduct = async (req,res)=>{
-    try{
-        /////////////////////////
-        const {limit,page, sort, filter} = req.query
-        //////////////////////////
-        const response = await ProductService.getAllProduct(Number(limit) || 12, Number(page) || 0, sort, filter) // response de khac voi thang res khong bi nham
-        return res.status(200).json(response) 
-    }catch(e){
+const getAllProduct = async (req, res) => {
+    try {
+        const { limit, page, sort, filter } = req.query;
+        const parsedSort = sort ? JSON.parse(sort) : null; 
+        const parsedFilter = filter ? JSON.parse(filter) : null; 
+        
+        const response = await ProductService.getAllProduct(
+            Number(limit) || 15, 
+            Number(page) || 0, 
+            parsedSort, 
+            parsedFilter
+        );
+        return res.status(200).json(response); 
+    } catch (e) {
         return res.status(404).json({ 
-            status: 'error0',
+            status: 'error',
             message: e.message,
             error: e
-        })
+        });
     }
-}
+};
 
 const refreshToken = async (req,res)=>{
     try{

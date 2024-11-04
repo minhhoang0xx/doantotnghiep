@@ -3,7 +3,7 @@ require('dotenv').config();
 
 const generalAccessToken = (payload) =>{
     const access_token = jwt.sign(
-        {...payload},process.env.KEY, {expiresIn: '1h'}
+        {...payload},process.env.KEY, {expiresIn: '6h'}
     )// ...payload trải các thuộc tính của đối tượng ra và có thể bổ sung hoặc thay đổi chúng trước khi truyền vào hàm.
     // payload truyền toàn bộ đối tượng vào hàm mà không thay đổi cấu trúc của nó.
     return access_token

@@ -17,7 +17,7 @@ const DetailOrderModal = ({ visible, onClose, orderDetails, loading }) => {
     return (
         <Modal
             title="Order Details"
-            visible={visible}
+            open={visible}
             onCancel={onClose}
             footer={null}
             width={800}

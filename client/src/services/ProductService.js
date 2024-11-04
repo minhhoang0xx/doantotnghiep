@@ -2,10 +2,10 @@ import axios from 'axios'
 
 export const axiosJWT = axios.create()
 
-export const getAllProduct = async (sort,filter) =>{
-    const params = {};
+export const getAllProduct = async (limit, page,sort,filter) =>{
+    const params = {limit, page};
     if (sort) {
-        params.sort = sort.join(','); 
+        params.sort = sort.join(','); // Join mảng sort thành chuỗi
     }
     if (filter) {
         params.filter = filter; 
