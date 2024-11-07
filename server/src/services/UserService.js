@@ -181,6 +181,46 @@ const detailUser = (id) => {
     })
     
 }
+const updatePassword = (userId, { oldPassword, newPassword }) => {
+    console.log('123123')
+    return new Promise(async (resolve, reject) => {
+        try {
+            // Tìm user theo userId
+            const user = await User.findOne({ _id: userId });
+            if (!user) {
+                return resolve({
+                    status: 'error',
+                    message: 'User not found',
+                });
+            }
+
+            // Xác nhận mật khẩu cũ (nếu cần)
+            const isMatch = await bcrypt.compare(oldPassword, user.password);
+            if (!isMatch) {
+                return resolve({
+                    status: 'error',
+                    message: 'Old password is incorrect',
+                });
+            }
+
+            // Mã hóa mật khẩu mới
+            const hashedPassword = await bcrypt.hash(newPassword, 10);
+            // Cập nhật mật khẩu mới trong cơ sở dữ liệu
+            user.password = hashedPassword;
+            await user.save();
+
+            resolve({
+                status: 'OK',
+                message: 'Password updated successfully',
+            });
+        } catch (err) {
+            reject({
+                status: 'error',
+                message: err.message,
+            });
+        }
+    });
+};
 
 
 module.exports = {
@@ -190,5 +230,6 @@ module.exports = {
     deleteUser,
     getAllUser,
     detailUser,
+    updatePassword
 
 }

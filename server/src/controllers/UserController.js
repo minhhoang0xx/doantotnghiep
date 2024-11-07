@@ -177,6 +177,31 @@ const refreshToken = async (req,res)=>{
         })
     }
 }
+
+const updatePassword = async (req, res) => {
+
+    try {
+        const { oldPassword, newPassword } = req.body;
+        const userId = req.params.id;
+
+        // Kiểm tra các giá trị đầu vào
+        if (!oldPassword || !newPassword) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Old password and new password are required',
+            });
+        }
+
+        // Gọi hàm updatePassword từ UserService
+        const response = await UserService.updatePassword(userId, { oldPassword, newPassword });
+        return res.status(200).json(response);
+    } catch (e) {
+        return res.status(500).json({
+            status: 'error',
+            message: e.message,
+        });
+    }
+};
 module.exports = {
     createUser,
     loginUser,
@@ -185,5 +210,6 @@ module.exports = {
     deleteUser,
     getAllUser,
     detailUser,
-    refreshToken
+    refreshToken,
+    updatePassword
 }

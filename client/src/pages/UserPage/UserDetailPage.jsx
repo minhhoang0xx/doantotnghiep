@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Card, Avatar, Form, Input, Button, message, Row, Col  } from 'antd';
+import { Card, Avatar, Form, Input, Button, message, Row, Col, Modal  } from 'antd';
 import { UserOutlined } from '@ant-design/icons';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateUser } from '../../redux/slices/userSlice';
@@ -13,7 +13,10 @@ const UserDetailPage = () => {
     const [phone, setPhone] = useState('');
     const [address, setAddress] = useState('');
     const [avatar, setAvatar] = useState('');
-
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [oldPassword, setOldPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
 
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem('user'));
@@ -33,13 +36,6 @@ const UserDetailPage = () => {
         }
     }, [user, dispatch]);
 
-    const handleChangeName = (e) => setName(e.target.value);
-    const handleChangeEmail = (e) => setEmail(e.target.value);
-    const handleChangePhone = (e) => setPhone(e.target.value);
-    const handleChangeAddress = (e) => setAddress(e.target.value);
-    const handleChangeAvatar = (e) => setAvatar(e.target.value);
-
-  
 
 const handleUpdate = async () => {
         const updatedUser = { name, email, phone, address, avatar, 
@@ -59,6 +55,34 @@ const handleUpdate = async () => {
         } catch (error) {
             console.error('Update error:', error);
             message.error('Update failed!');
+        }
+    };
+    const handlePasswordUpdate = async () => {
+        if (newPassword !== confirmPassword) {
+            message.error("New passwords don't match!");
+            return;
+        }
+        const userId = user?.id || JSON.parse(localStorage.getItem('user'))?.id;
+        const data = {oldPassword, newPassword}
+        try {
+            const result = await UserService.updatePassword(userId, data);
+            if (result.status === 'OK') {
+               
+                const updatedUser = { ...user, password: newPassword };
+                dispatch(updateUser(updatedUser));
+                localStorage.setItem('user', JSON.stringify(updatedUser));
+                    
+                message.success('Password updated successfully!');
+                setIsModalOpen(false);
+                setOldPassword('');
+                setNewPassword('');
+                setConfirmPassword('');
+            } else {
+                message.error('Password update failed123!');
+            }
+        } catch (error) {
+            console.error('Password update error:', error);
+            message.error('Password update failed!');
         }
     };
     
@@ -90,6 +114,9 @@ const handleUpdate = async () => {
                                 <Button type="primary" htmlType="submit" form="userForm" onClick={handleUpdate}>
                                     Save
                                 </Button>,
+                                <Button type="default" onClick={() => setIsModalOpen(true)}>
+                                Change Password
+                            </Button>,
                             ]}
                         >
                             <div style={{ textAlign: 'center', marginBottom: 20 }}>
@@ -131,6 +158,25 @@ const handleUpdate = async () => {
                     </div>
                 </Col>
             </Row>
+            <Modal
+                title="Change Password"
+                visible={isModalOpen}
+                onOk={handlePasswordUpdate}
+                onCancel={() => setIsModalOpen(false)}
+                okText="Update Password"
+            >
+                <Form layout="vertical">
+                    <Form.Item label="Current Password">
+                        <Input.Password value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} />
+                    </Form.Item>
+                    <Form.Item label="New Password">
+                        <Input.Password value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+                    </Form.Item>
+                    <Form.Item label="Confirm New Password">
+                        <Input.Password value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+                    </Form.Item>
+                </Form>
+            </Modal>
         </div>
     );
 };
