@@ -29,9 +29,9 @@ const SignUpForm = () => {
     const onFinishSignUpFailed = (errorInfo) => {
         console.log('Sign Up Failed:', errorInfo);
     };
+    
 
-    
-    
+
     return (
         
         <div style={{
@@ -157,6 +157,20 @@ const SignUpForm = () => {
                     >
                     <Input />
                     </Form.Item>
+                     {/* <Form.Item
+                        label="Avatar"
+                        name="avatar"
+                        valuePropName="fileList"
+                        getValueFromEvent={(e) => e && e.fileList}
+                    >
+                        <Upload 
+                            beforeUpload={() => false} // Ngăn tải file tự động, chỉ tải lên khi submit form
+                            onChange={handleUploadChange}
+                            accept="image/*" // Chỉ chấp nhận file ảnh
+                        >
+                            <Button icon={<UploadOutlined />}>Upload Avatar</Button>
+                        </Upload>
+                    </Form.Item> */}
 
                     <Form.Item wrapperCol={{offset:6, span:18 }}>
                         <Button type="primary" htmlType="submit" style={{ width: '50%'}}>
