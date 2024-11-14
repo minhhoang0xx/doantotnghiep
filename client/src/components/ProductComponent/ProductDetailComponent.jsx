@@ -8,6 +8,9 @@ import * as ProductService from "../../services/ProductService";
 import { useDispatch, useSelector } from 'react-redux';
 import { addCartItem } from '../../redux/slices/cartSlice';
 import * as CartService from "../../services/CartService";
+import LikeButtonComponent from "../FBcomponent/LikeButtonComponent";
+import CommentComponent from "../FBcomponent/CommentComponent";
+import {initFacebookSDK} from "../../ultils"
 
 const ProductDetailComponent = () => {
     const { id } = useParams(); // Lấy id sản phẩm từ URL
@@ -18,6 +21,9 @@ const ProductDetailComponent = () => {
     const user = useSelector((state) => state.user)
     const location = useLocation();
 
+    useEffect(() =>{
+        initFacebookSDK()
+    })
     useEffect(() => {
         const fetchProductDetail = async () => {
             const res = await ProductService.detailProduct(id); // Gọi API để lấy chi tiết sản phẩm
@@ -81,7 +87,7 @@ const ProductDetailComponent = () => {
             <Col xs={24} md={14} style={{ border: '1px solid #ccc', borderRadius: '10px', padding: '16px' }}>
                 <div style={{ margin: '10px 0' }}>
                     <WrapperTitle>{product?.name}</WrapperTitle>
-
+                
                     <StarFilled style={{ fontSize: '12px', color: 'rgb(254,216,54)' }} />
                     <WrapperTextSell> | Sold {product?.sold}</WrapperTextSell>
                     <br />
@@ -95,6 +101,7 @@ const ProductDetailComponent = () => {
                     <InputNumber min={1} max={product.countInStock} value={quantity} onChange={onChange} style={{ marginBottom: '8px' }} />
                 </WrapperQuantity>
                 <WrapperDetail>{product?.description}</WrapperDetail>
+                <LikeButtonComponent dataHref={"https://developers.facebook.com/docs/plugins/"}/>
                 <ButtonComponent
                     size={'40px'}
                     styleButton={{
@@ -109,6 +116,7 @@ const ProductDetailComponent = () => {
                     onClick={handleAddToCart}
                 />
             </Col>
+            <CommentComponent dataHref={"https://developers.facebook.com/docs/plugins/comments#configurator"} width="100%"/>
         </Row>
     );
 };

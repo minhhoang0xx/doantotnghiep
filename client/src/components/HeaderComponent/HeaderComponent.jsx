@@ -30,7 +30,7 @@ const HeaderComponent = () => {
     }
     const handleNavigate = (path) => {
         navigate(path);
-        setIsDrawerVisible(false); 
+        setIsDrawerVisible(false);
     };
     const handleNavigateHome = () => {
         navigate('/')
@@ -52,7 +52,7 @@ const HeaderComponent = () => {
         navigate('/contact')
         setIsDrawerVisible(false);
     }
-  
+
     const handleNavigateSearch = (id) => {
         navigate(`/product/detailProduct/${id}`);
         setSearch('');
@@ -160,18 +160,25 @@ const HeaderComponent = () => {
                     <Col xs={24} sm={5}>
                         <WrapperAccount>
                             <div style={{ display: 'flex', alignItems: 'center' }}>
-                                <div
-                                    onClick={user?.name ? () => navigate('/userDetail') : handleNavigateLogin}
-                                    style={{ cursor: 'pointer', marginRight: '10px' }}
-                                >
-                                    <UserOutlined style={{ fontSize: '30px' }} />
-                                </div>
-                                {storageData && (
+                                {/* đã đăng nhập */}
+                                {storageData ? (
                                     <div
                                         onClick={() => navigate('/userDetail')}
-                                        style={{ fontSize: '16px', marginRight: '10px', cursor: 'pointer' }}
+                                        style={{ cursor: 'pointer', marginRight: '10px' }}
                                     >
-                                        {user.name}
+                                        <img
+                                            src={user?.avatar}
+                                            alt="User Avatar"
+                                            style={{ width: '30px', height: '30px', borderRadius: '50%' }}
+                                        />
+                                    </div>
+                                ) : (
+                                    // chưa đăng nhập
+                                    <div
+                                        onClick={handleNavigateLogin}
+                                        style={{ cursor: 'pointer', marginRight: '10px' }}
+                                    >
+                                        <UserOutlined style={{ fontSize: '30px' }} />
                                     </div>
                                 )}
                             </div>

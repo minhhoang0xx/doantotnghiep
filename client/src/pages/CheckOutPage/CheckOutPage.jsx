@@ -97,6 +97,7 @@ const CheckoutPage = () => {
         setIsLoading(true);
         if (selectedCartItems.length === 0) {
             message.warning('Your cart is empty.');
+            setIsLoading(false);
             return;
         }
         const userId = user ? jwtTranslate(user)?.id : '670cd572724ca7db55337cb4';
@@ -117,7 +118,6 @@ const CheckoutPage = () => {
             totalPrice: calculateTotal(),
             isPaid: false,
             paidAt: null,
-            // email: 'hoanglmgch210529@fpt.edu.vn'
         };
         console.log("Order Data:", orderData);
         try {
@@ -231,7 +231,7 @@ const CheckoutPage = () => {
 
                     ) : (
                         <div>
-                            <Button type="primary" onClick={handleCheckout} style={{ width: '100%' }}>
+                            <Button type="primary" onClick={handleCheckout} style={{ width: '100%' }} disabled={isLoading} loading={isLoading}>
                                 Place Order
                             </Button>
                         </div>
