@@ -1,6 +1,6 @@
 const Order = require("../models/OrderModel");
-const Product = require("../models/ProductModel")
-// const EmailService = require("./")
+const Product = require("../models/ProductModel");
+ const EmailService = require("../services/EmailService");
 const createOrder = (userId, newOrder) => {
     return new Promise(async (resolve, reject) => {
         const { orderItems, shippingAddress, paymentMethod, itemsPrice, shippingPrice, totalPrice, email } = newOrder;
@@ -52,7 +52,7 @@ const createOrder = (userId, newOrder) => {
             });
 
             if (createdOrder) {
-                // await EmailService.sendEmailCreateOrder(email, orderItems);
+                 //await EmailService.sendEmailCreateOrder(email, orderItems);
                 resolve({ status: 'OK', message: 'Order created successfully', orderId: createdOrder._id });
             }
         } catch (e) {

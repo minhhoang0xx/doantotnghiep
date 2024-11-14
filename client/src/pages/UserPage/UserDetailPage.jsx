@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Card, Avatar, Form, Input, Button, message, Row, Col, Modal } from 'antd';
-import { UserOutlined } from '@ant-design/icons';
+import { UserOutlined, UploadOutlined } from '@ant-design/icons';
 import { useSelector, useDispatch } from 'react-redux';
 import { updateUser } from '../../redux/slices/userSlice';
 import * as UserService from '../../services/UserService';
-
+import { WrapperUploadFile } from "./style";
+import { getBase64 } from "../../ultils";
 const UserDetailPage = () => {
     const dispatch = useDispatch();
     const user = useSelector((state) => state.user);
@@ -18,7 +19,13 @@ const UserDetailPage = () => {
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [form] = Form.useForm();
-
+    const handleOnchangeAvatarDetails = async ({ fileList }) => {
+        const file = fileList[0];
+        if (file && !file.url && !file.preview) {
+            file.preview = await getBase64(file.originFileObj);
+        }
+        setAvatar(file ? file.preview : null);
+    };
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem('user'));
         console.log('Stored User from localStorage:', storedUser);
@@ -37,7 +44,7 @@ const UserDetailPage = () => {
         }
     }, [user, dispatch]);
 
-useEffect(() => {
+    useEffect(() => {
         form.setFieldsValue({
             name: name,
             email: email,
@@ -58,6 +65,7 @@ useEffect(() => {
             name, email, phone, address, avatar,
             _id: user?.id || JSON.parse(localStorage.getItem('user'))?.id // set _id vi lay dtb tu mongo
         };
+        console.log(updatedUser)
         try {
             const update = await UserService.updateUser(updatedUser._id, updatedUser);
 
@@ -67,7 +75,7 @@ useEffect(() => {
                 localStorage.setItem('user', JSON.stringify(newUser)); // luu vao localStrorage
                 message.success('Update successful!');
             } else {
-                message.error('Update failed!');
+                message.error(update.message);
             }
         } catch (error) {
             console.error('Update error:', error);
@@ -128,7 +136,7 @@ useEffect(() => {
                         <Card
                             style={{ width: '100%', maxWidth: '500px' }}
                             actions={[
-                                <Button type="primary" htmlType="submit"  onClick={handleUpdate}>
+                                <Button type="primary" htmlType="submit" onClick={handleUpdate}>
                                     Save
                                 </Button>,
                                 <Button type="default" onClick={() => setIsModalOpen(true)}>
@@ -157,11 +165,11 @@ useEffect(() => {
 
                                 </Form.Item>
 
-                                <Form.Item label="Phone"name="phone"
-                        rules={[
-                            { required: true, message: 'Please input your phone number!' },
-                            { pattern: /^[0-9]{10}$/, message: 'Phone number is incorrect!' }]}>
-                                    <Input placeholder="Enter your phone number" value={phone} onChange={(e) => setPhone(e.target.value)} maxLength={10}  />
+                                <Form.Item label="Phone" name="phone"
+                                    rules={[
+                                        { required: true, message: 'Please input your phone number!' },
+                                        { pattern: /^[0-9]{10}$/, message: 'Phone number is incorrect!' }]}>
+                                    <Input placeholder="Enter your phone number" value={phone} onChange={(e) => setPhone(e.target.value)} maxLength={10} />
                                 </Form.Item>
 
                                 <Form.Item label="Address" name="address" rules={[{ required: true, message: 'Please enter your address!' }]}>
@@ -169,11 +177,16 @@ useEffect(() => {
                                 </Form.Item>
 
                                 <Form.Item label="Avatar URL">
-                                    <Input
-                                        placeholder="Enter your avatar URL"
-                                        value={avatar || user?.avatar}
-                                        onChange={(e) => setAvatar(e.target.value)}
-                                    />
+                                    <WrapperUploadFile onChange={handleOnchangeAvatarDetails} maxCount={1} accept="image/*">
+                                        <Button icon={<UploadOutlined />}>Upload Avatar</Button>
+                                    </WrapperUploadFile>
+                                    {avatar && (
+                                        <img
+                                            src={avatar}
+                                            style={{ height: "60px", width: "60px", objectFit: "cover", marginLeft: "10px" }}
+                                            alt="avatar"
+                                        />
+                                    )}
                                 </Form.Item>
                             </Form>
                         </Card>
@@ -192,8 +205,8 @@ useEffect(() => {
                         <Input.Password value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} />
                     </Form.Item>
                     <Form.Item
-                       label="New Password"
-                       name="newPassword"
+                        label="New Password"
+                        name="newPassword"
                         rules={[
                             { required: true, message: 'Please input your password!' },
                             { min: 6, message: 'Password must be at least 6 characters!' }
@@ -216,7 +229,7 @@ useEffect(() => {
                             })
                         ]}
                     >
-                   <Input.Password  />
+                        <Input.Password />
                     </Form.Item>
                 </Form>
             </Modal>

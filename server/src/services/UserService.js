@@ -5,7 +5,7 @@ const { generalRefreshToken } = require('./JwtService');
 
 const createUser = (newUser) => {
     return new Promise(async (resolve, reject) => {
-        const {name,email,password,confirmPassword,phone, address, avatar} = newUser
+        const {name,email,password,phone, address, avatar} = newUser
        
         try {
             const checkUser = await User.findOne({
@@ -22,7 +22,6 @@ const createUser = (newUser) => {
                 name,
                 email,
                 password: hash,
-                confirmPassword :hash,
                 phone,
                 address,
                 avatar,
@@ -92,7 +91,7 @@ const updateUser = (id,data) => {
             const checkUser = await User.findOne({
                 _id : id, // truy van cua mongoDB phair laf _id
             })
-            console.log(checkUser)
+            console.log('1111111111',checkUser)
             if(checkUser === null){
                 resolve({
                     status: 'error',
@@ -100,8 +99,8 @@ const updateUser = (id,data) => {
                 })
             }
 
-            const updatedUser = await User.findByIdAndUpdate(id, data, {new: true})
-            console.log(updatedUser)
+            const updatedUser = await User.findByIdAndUpdate(id, data)
+            console.log('123123123',updatedUser)
             resolve ({
                 status: 'OK',
                 message: 'succes',

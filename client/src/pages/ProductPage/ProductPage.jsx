@@ -7,7 +7,7 @@ import * as ProductService from "../../services/ProductService";
 const { Option } = Select;
 
 const ProductPage = () => {
-        const [sort, setSort] = useState(['', '']);
+        const [sort, setSort] = useState(['desc', 'createdAt']);
         const [filter, setFilter] = useState(['type', 'all']);
         const [page, setPage] = useState(0);
         const pageSize = 15;

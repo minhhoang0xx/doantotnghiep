@@ -181,6 +181,8 @@ const CheckoutPage = () => {
                                 </div>
                             </Card>
                         ))}
+                        <p>Shipping cost: $30</p>
+                        <p>Items cost: ${calculateTotal()}</p>
                         <div style={{ textAlign: 'left', marginTop: '20px', fontSize: '18px', fontWeight: 'bold', color: 'darkorange' }}>
                             Total: ${calculateTotal() + 30}
                         </div>

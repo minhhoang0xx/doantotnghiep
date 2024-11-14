@@ -22,8 +22,6 @@ const createUser = async (req,res)=>{
                 message: 'Your password is incorrect'
             })
         } 
-        // const avatar = req.file ? req.file.path : null;
-        // console.log('Avatar path:', avatar);
         const response = await UserService.createUser(req.body) // response de khac voi thang res khong bi nham
         return res.status(200).json(response) 
     }catch(e){
@@ -87,28 +85,15 @@ const logOut = (req, res) => {
 const updateUser = async (req,res)=>{
     try{
         const userId = req.params.id;
-        const { name, email, phone, address, avatar } = req.body;
-
+        const { name, email, phone, address, avatar,isAdmin } = req.body;
         if (!userId) {
             return res.status(400).json({
                 status: 'ERR',
                 message: 'The user ID is required'
             });
         }
-        if (!name || !email || !phone || !address) {
-            return res.status(400).json({
-                status: 'ERR',
-                message: 'Name, email, phone, and address are required fields'
-            });
-        }
-        if (!/^\d{10}$/.test(phone)) {
-            return res.status(400).json({
-                status: 'ERR',
-                message: 'Phone number must be 10 digits'
-            });
-        }
+        const data = { name, email, phone, address, avatar,isAdmin };
 
-        const data = { name, email, phone, address, avatar };
         if(!userId){
             return res.status(200).json({
                 status: 'ERR',

@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Modal, Form, Input, message, InputNumber } from 'antd';
 import * as ProductService from '../../services/ProductService';
+import { getBase64 } from "../../ultils";
+import { WrapperUploadFile, ResponsiveButton } from "./style";
+import { UploadOutlined } from '@ant-design/icons';
 
 const AddProduct = ({ isModalOpen, setIsModalOpen, refetchProducts, products }) => {
     const [loading, setLoading] = useState(false);
+    const [image, setImage] = useState(null);
     const [form] = Form.useForm();
     useEffect(() => {
         if (isModalOpen) {
@@ -14,6 +18,10 @@ const AddProduct = ({ isModalOpen, setIsModalOpen, refetchProducts, products }) 
     const onFinish = async (data) => {
         setLoading(true);
         try {
+            const payload = {
+                ...data,
+                image: image ? image : null,
+            };
             const isNameExists = products.some(product => product.name === data.name);
             if (isNameExists) {
                 message.error('Product name already exists!');
@@ -21,7 +29,7 @@ const AddProduct = ({ isModalOpen, setIsModalOpen, refetchProducts, products }) 
             }
             console.log('Sending data to API:', data);
             // Gửi dữ liệu sản phẩm đến API
-            const response = await ProductService.createProduct(data);
+            const response = await ProductService.createProduct(payload);
             console.log('API response:', response);
             message.success('Product added successfully!');
             setIsModalOpen(false);
@@ -35,6 +43,13 @@ const AddProduct = ({ isModalOpen, setIsModalOpen, refetchProducts, products }) 
 
     const onFinishFailed = (errorInfo) => {
         console.log('Add Product Failed:', errorInfo);
+    };
+    const handleOnchangeImage = async ({ fileList }) => {
+        const file = fileList[0];
+        if (file && !file.url && !file.preview) {
+            file.preview = await getBase64(file.originFileObj);
+        }
+        setImage(file ? file.preview : null);
     };
 
     return (
@@ -60,7 +75,7 @@ const AddProduct = ({ isModalOpen, setIsModalOpen, refetchProducts, products }) 
                 >
                     <Input />
                 </Form.Item>
-                <Form.Item
+                {/* <Form.Item
                     label="Image"
                     name="image"
                     rules={[{ required: true, message: 'Please input product image URL!' }, {
@@ -68,7 +83,19 @@ const AddProduct = ({ isModalOpen, setIsModalOpen, refetchProducts, products }) 
                     }]}
                 >
                     <Input />
-                </Form.Item>
+                </Form.Item> */}
+                <Form.Item label="Image" name="image" rules={[{ required: true, message: 'Please input Image!' }]}>
+                        <WrapperUploadFile onChange={handleOnchangeImage} maxCount={1} accept="image/*">
+                            <Button icon={<UploadOutlined />}>Upload Image</Button>
+                        </WrapperUploadFile>
+                        {image && (
+                            <img
+                                src={image}
+                                style={{ height: "60px", width: "60px", objectFit: "cover", marginLeft: "10px" }}
+                                alt="image"
+                            />
+                        )}
+                    </Form.Item>
                 <Form.Item
                     label="Type"
                     name="type"

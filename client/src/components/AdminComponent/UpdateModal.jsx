@@ -1,12 +1,15 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Form, Input, InputNumber, message, Button, Checkbox } from 'antd';
 import * as ProductService from '../../services/ProductService';
 import * as UserService from '../../services/UserService';
 import * as OrderService from '../../services/OrderService';
+import { UploadOutlined } from '@ant-design/icons';
+import { getBase64 } from "../../ultils";
+import { WrapperUploadFile, ResponsiveButton } from "./style";
 
 const UpdateModal = ({ isModalOpen, setIsModalOpen, currentData, refetchData, currentView, paymentMethod }) => {
     const [form] = Form.useForm();
-
+    const [image, setImage] = useState(null);
     useEffect(() => {
         if (isModalOpen && currentData) {
             form.setFieldsValue(currentData); // Đặt giá trị form với dữ liệu hiện tại
@@ -15,9 +18,13 @@ const UpdateModal = ({ isModalOpen, setIsModalOpen, currentData, refetchData, cu
 
     const onFinish = async (data) => {
         try {
+            const payload = {
+                ...data,
+                image: image ? image : null,
+            };
             let response;
             if (currentView === 'products') {
-                response = await ProductService.updateProduct(currentData._id, data);
+                response = await ProductService.updateProduct(currentData._id, payload);
             } else if (currentView === 'users') {
                 response = await UserService.updateUser(currentData._id, data); // Tương tự cho user
             }
@@ -31,6 +38,13 @@ const UpdateModal = ({ isModalOpen, setIsModalOpen, currentData, refetchData, cu
         } catch (error) {
             message.error('Failed to update: ' + (error.response?.data?.message || 'Unknown error'));
         }
+    };
+    const handleOnchangeImage = async ({ fileList }) => {
+        const file = fileList[0];
+        if (file && !file.url && !file.preview) {
+            file.preview = await getBase64(file.originFileObj);
+        }
+        setImage(file ? file.preview : null);
     };
 
     return (
@@ -94,13 +108,25 @@ const UpdateModal = ({ isModalOpen, setIsModalOpen, currentData, refetchData, cu
                         >
                             <Input.TextArea />
                         </Form.Item>
-                        <Form.Item
+                        {/* <Form.Item
                             label="Image"
                             name="image"
                             rules={[{ required: true, message: 'Please input Image!' }]}
                         >
                             <Input.TextArea />
-                        </Form.Item>
+                        </Form.Item> */}
+                        <Form.Item label="Image" name="image" rules={[{ required: true, message: 'Please input Image!' }]}>
+                        <WrapperUploadFile onChange={handleOnchangeImage} maxCount={1} accept="image/*">
+                            <Button icon={<UploadOutlined />}>Upload Avatar</Button>
+                        </WrapperUploadFile>
+                        {image && (
+                            <img
+                                src={image}
+                                style={{ height: "60px", width: "60px", objectFit: "cover", marginLeft: "10px" }}
+                                alt="image"
+                            />
+                        )}
+                    </Form.Item>
 
                     </>
                 )}
