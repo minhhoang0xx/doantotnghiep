@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Layout, Menu, Table, Spin, Divider, Typography, Button, Checkbox, message, Input, Row, Col } from 'antd';
+import { Layout, Menu, Table,Progress, Statistic, Spin, Divider, Typography, Button, Checkbox, message, Input, Row, Col, Card } from 'antd';
 import { UserOutlined, ProductOutlined, ContainerOutlined, EditOutlined, EyeOutlined, CheckCircleTwoTone, CloseCircleTwoTone } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -11,6 +11,7 @@ import AddProduct from '../../components/AdminComponent/AddProduct';
 import DeleteConfirm from '../../components/AdminComponent/DeleteConfirm';
 import UpdateModal from '../../components/AdminComponent/UpdateModal';
 import DetailOrderModal from '../../components/AdminComponent/DetailOrderModal';
+import { StyledCard, MetricTitle, MetricValue, DashboardRow, DashboardCol } from './style';
 const { Title } = Typography;
 const { Sider, Content } = Layout;
 
@@ -29,7 +30,17 @@ const AdminPage = () => {
     const [orderSearch, setOrderSearch] = useState('');
     const [sort, setSort] = useState(null);
     const [filter, setFilter] = useState(null);
+    const [dataStats, setDataStats] = useState({
+        totalProducts: 0,
+        totalUsers: 0,
+        totalOrders: 0,
+        totalRevenue: 0,
+        totalDelivering: 0,
+        totalPay: 0,
+    });
     const navigate = useNavigate();
+
+
 
     const handleOrderDetail = async (orderId) => {
         setLoading(true);
@@ -45,6 +56,7 @@ const AdminPage = () => {
             setLoading(false);
         }
     };
+
     useEffect(() => {
         localStorage.setItem('currentView', currentView);
     }, [currentView]);
@@ -143,8 +155,6 @@ const AdminPage = () => {
         retryDelay: 1000,
     });
 
-
-
     const { data: orders, isLoading: loadingOrders, refetch: refetchOrders } = useQuery({
         queryKey: ['orders'],
         queryFn: fetchAllOrder,
@@ -152,7 +162,41 @@ const AdminPage = () => {
         retry: 3,
         retryDelay: 1000,
     });
+    // Lấy thông tin thống kê
+    useEffect(() => {
+        fetchData();
+    }, []);
 
+    const fetchData = async () => {
+        setLoading(true);
+        try {
+            const [userRes, productRes, orderRes] = await Promise.all([
+                UserService.getAllUser(),
+                ProductService.getAllProduct(),
+                OrderService.getAllOrder()
+            ]);
+            setDataStats({
+                totalUsers: userRes?.data?.length || 0,
+                totalProducts: productRes?.data?.length || 0,
+                totalOrders: orderRes?.data?.length || 0,
+                totalRevenue: orderRes?.data?.reduce((acc, order) => acc + order.totalPrice, 0) || 0,
+                totalDelivery: orderRes?.data?.filter(order => order.isDelivered).length || 0,
+                totalPay: orderRes?.data?.filter(order => order.isPaid).length || 0,
+            });
+        } catch (error) {
+            message.error('Error loading data: ' + error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+    const dashboardData = [
+        { metric: 'Total Products', value: dataStats.totalProducts || 0 },
+        { metric: 'Total Users', value: dataStats.totalUsers || 0 },
+        { metric: 'Total Orders', value: dataStats.totalOrders || 0 },
+        { metric: 'Total Revenue', value: `$${dataStats.totalRevenue}` || '$0' },
+        { metric: 'Total Delivering', value: dataStats.totalDelivery || 0 },
+        { metric: 'Total Paid', value: dataStats.totalPay || 0 },
+    ];
     /// Search
     const filteredUsers = users?.data.filter(user =>
         user.name.toLowerCase().includes(userSearch.toLowerCase()) ||
@@ -211,7 +255,8 @@ const AdminPage = () => {
                     checked={selectedRadio.includes(record._id)}
                     onChange={() => handleSelect(record._id)}
                 />
-            )},
+            )
+        },
         {
             title: 'Image',
             dataIndex: 'image',
@@ -247,7 +292,7 @@ const AdminPage = () => {
     ];
 
 
-    // Cấu trúc của cột trong bảng đơn hàng
+    // Cấu trúc của cột trong bảng đơn hàng   
     const orderColumns = [
         {
             title: 'Select',
@@ -256,7 +301,8 @@ const AdminPage = () => {
                     checked={selectedRadio.includes(record._id)}
                     onChange={() => handleSelect(record._id)}
                 />
-            ),},
+            ),
+        },
         {
             title: 'User', dataIndex: 'user', key: 'user',
             render: (text, record) => record.user?.name || 'Unknown',
@@ -288,115 +334,110 @@ const AdminPage = () => {
     ];
 
     return (
-            <Layout style={{ minHeight: '100vh' }}>
-                <Sider width={200} className="site-layout-background" style={{ background: '#fff' }}>
-                    <div style={{ padding: '20px', textAlign: 'center', cursor: 'pointer' }} onClick={() => navigate('/')}>
-                        <Title level={4} style={{ margin: 0, color: '#333' }}>HOME</Title>
-                    </div>
-                    <Menu
-                        mode="inline"
-                        selectedKeys={[currentView === 'users' ? '1' : currentView === 'products' ? '2' : '3']}
-                        items={[
-                            {
-                                key: '1',
-                                icon: <UserOutlined />,
-                                label: 'User',
-                                onClick: () => setCurrentView('users'),
-                            },
-                            {
-                                key: '2',
-                                icon: <ProductOutlined />,
-                                label: 'Product',
-                                onClick: () => setCurrentView('products'),
-                            },
-                            {
-                                key: '3',
-                                icon: <ContainerOutlined />,
-                                label: 'Order',
-                                onClick: () => setCurrentView('orders'),
-                            },
-                        ]}
-                        style={{ height: '100%', borderRight: 0 }}
-                    />
-                </Sider>
-                <Layout >
-                    <Content style={{ padding: '24px', minHeight: 280 }}>
-                        <Divider orientation="left">
-                            {currentView === 'users' ? 'User List' : currentView === 'products' ? 'Product List' : 'Order List'}
-                        </Divider>
-                        <Row gutter={16}>
-                            <Col xs={24} md={16}>
-                                {currentView === 'users' && (
-                                    <Input.Search
-                                        placeholder="Search Users by name or email"
-                                        onSearch={value => setUserSearch(value)}
-                                        style={{ marginBottom: 16 }}
-                                    />
-                                )}
-                                {currentView === 'products' && (
-                                    <Input.Search
-                                        placeholder="Search Products by name"
-                                        onSearch={value => setProductSearch(value)}
-                                        style={{ marginBottom: 16 }}
-                                    />
-                                )}
-                                {currentView === 'orders' && (
-                                    <Input.Search
-                                        placeholder="Search Orders"
-                                        onSearch={value => setOrderSearch(value)}
-                                        style={{ marginBottom: 16 }}
-                                    />
-                                )}
-                            </Col>
-                            <Col xs={24} md={8} style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                                {currentView === 'products' && (
-                                    <Button type="primary" onClick={handleOpenModal} style={{ marginLeft: 8 }}>
-                                        Add New Product
-                                    </Button>
-                                )}
-                                <Button onClick={handleDeleteConfirm} disabled={selectedRadio.length === 0} style={{ marginLeft: 8 }}>
-                                    {currentView === 'orders' ? 'Order completed, removed?' : 'Delete'}
+        <Layout style={{ minHeight: '100vh' }}>
+            <Sider width={200} className="site-layout-background" style={{ background: '#fff' }}>
+                <div style={{ padding: '20px', textAlign: 'center', cursor: 'pointer' }} onClick={() => navigate('/')}>
+                    <Title level={4} style={{ margin: 0, color: '#333' }}>HOME</Title>
+                </div>
+                <Menu
+                    mode="inline"
+                    selectedKeys={[currentView === 'dashboard' ? '0' : currentView === 'users' ? '1' : currentView === 'products' ? '2' : '3']}
+                    items={[
+                        {
+                            key: '0',
+                            icon: <UserOutlined />,
+                            label: 'Dashboard',
+                            onClick: () => setCurrentView('dashboard'),
+                        },
+                        {
+                            key: '1',
+                            icon: <UserOutlined />,
+                            label: 'User',
+                            onClick: () => setCurrentView('users'),
+                        },
+                        {
+                            key: '2',
+                            icon: <ProductOutlined />,
+                            label: 'Product',
+                            onClick: () => setCurrentView('products'),
+                        },
+                        {
+                            key: '3',
+                            icon: <ContainerOutlined />,
+                            label: 'Order',
+                            onClick: () => setCurrentView('orders'),
+                        },
+                    ]}
+                    style={{ height: '100%', borderRight: 0 }}
+                />
+            </Sider>
+            <Layout >
+                <Content style={{ padding: '24px', minHeight: 280 }}>
+                    <Divider orientation="left">
+                        {currentView === 'dashboard' ? 'Dashboard' : currentView === 'users' ? 'User List' : currentView === 'products' ? 'Product List' : 'Order List'}
+                    </Divider>
+                    <Row gutter={16}>
+                        <Col xs={24} md={16}>
+                            {currentView === 'users' && (
+                                <Input.Search
+                                    placeholder="Search Users by name or email"
+                                    onSearch={value => setUserSearch(value)}
+                                    style={{ marginBottom: 16 }}
+                                />
+                            )}
+                            {currentView === 'products' && (
+                                <Input.Search
+                                    placeholder="Search Products by name"
+                                    onSearch={value => setProductSearch(value)}
+                                    style={{ marginBottom: 16 }}
+                                />
+                            )}
+                            {currentView === 'orders' && (
+                                <Input.Search
+                                    placeholder="Search Orders"
+                                    onSearch={value => setOrderSearch(value)}
+                                    style={{ marginBottom: 16 }}
+                                />
+                            )}
+                        </Col>
+                        <Col xs={24} md={8} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                            {currentView === 'products' && (
+                                <Button type="primary" onClick={handleOpenModal} style={{ marginLeft: 8 }}>
+                                    Add New Product
                                 </Button>
-                            </Col>
-                        </Row>
-                        {loading ? (
-                            <Spin size="large" />
-                        ) : currentView === 'users' ? (
-                            <Table columns={userColumns} dataSource={filteredUsers} rowKey="_id" pagination={{ pageSize: 10 }} />
-                        ) : currentView === 'products' ? (
-                            <Table columns={productColumns} dataSource={filteredProducts} rowKey="_id" pagination={{ pageSize: 10 }} />
-                        ) : (
-                            <Table columns={orderColumns} dataSource={filteredOrders} rowKey="_id" pagination={{ pageSize: 10 }} />
-                        )}
-                        <AddProduct
-                            isModalOpen={AddModal}
-                            setIsModalOpen={setAddModal}
-                            refetchProducts={refetchProducts}
-                            products={products?.data || []}
-                        />
-                        <DeleteConfirm
-                            open={deleteModal}
-                            onConfirm={handleDelete}
-                            onCancel={() => setDeleteModal(false)}
-                        />
-                        <UpdateModal
-                            isModalOpen={updateModal}
-                            setIsModalOpen={setUpdateModal}
-                            currentData={currentData}
-                            refetchData={refetchData}
-                            currentView={currentView}
-                            paymentMethod={currentData?.paymentMethod}
-                        />
-                        <DetailOrderModal
-                            visible={orderDetailModal}
-                            onClose={() => setOrderDetailModal(false)}
-                            orderDetails={currentOrderDetails}
-                            loading={loading}
-                        />
-                    </Content>
-                </Layout>
+                            )}
+                            <Button color="danger" variant="solid" onClick={handleDeleteConfirm} disabled={selectedRadio.length === 0} style={{ marginLeft: 8}}>
+                                {currentView === 'orders' ? 'Order completed, removed?' : 'Delete'}
+                            </Button>
+                        </Col>
+                    </Row>
+                    {loading ? (
+                        <Spin size="large" />
+                    ) : currentView === 'dashboard' ? (
+                        <DashboardRow gutter={[16, 24]}>
+                        {dashboardData.map((data, index) => (
+                            <DashboardCol xs={24} sm={12} md={8} key={index}>
+                                <StyledCard title={data.metric} bordered={false}>
+                                    <MetricValue level={2}>{data.value}</MetricValue>
+                                </StyledCard>
+                            </DashboardCol>
+                        ))}
+                    </DashboardRow>
+                    ) : currentView === 'users' ? (
+                        <Table columns={userColumns} dataSource={filteredUsers} rowKey="_id" pagination={{ pageSize: 10 }} />
+                    ) : currentView === 'products' ? (
+                        <Table columns={productColumns} dataSource={filteredProducts} rowKey="_id" pagination={{ pageSize: 10 }} />
+                    ) : (
+                        <Table columns={orderColumns} dataSource={filteredOrders} rowKey="_id" pagination={{ pageSize: 10 }} />
+                    )}
+                    <AddProduct isModalOpen={AddModal} setIsModalOpen={setAddModal} refetchProducts={refetchProducts} products={products?.data || []} />
+                    <DeleteConfirm open={deleteModal} onConfirm={handleDelete} onCancel={() => setDeleteModal(false)} />
+                    <UpdateModal isModalOpen={updateModal} setIsModalOpen={setUpdateModal} currentData={currentData} refetchData={refetchData} currentView={currentView} paymentMethod={currentData?.paymentMethod} />
+                    <DetailOrderModal visible={orderDetailModal} onClose={() => setOrderDetailModal(false)} orderDetails={currentOrderDetails} loading={loading} />
+                </Content>
             </Layout>
-        );
-    };
+        </Layout>
+    );
+};
 
 export default AdminPage;

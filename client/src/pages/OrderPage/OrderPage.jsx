@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Checkbox, Row, Col, InputNumber, Typography, Steps, message, Modal } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
-import { useLocation,useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { addCartItem, removeCartItem, updateCartItem, clearCart } from '../../redux/slices/cartSlice';
 import * as CartService from "../../services/CartService";
 import { jwtTranslate } from "../../ultils";
@@ -157,11 +157,11 @@ const OrderPage = () => {
       message.warning('Please select at least one item to proceed to checkout.');
       return;
     }
-  //   if (!user) {
-  //     message.warning('Please log in to proceed to checkout.'); 
-  //     navigate('/sign-in', { state: location?.pathname });
-  //     return; 
-  // }
+    if (!user) {
+      message.warning('Please log in to proceed to checkout.');
+      navigate('/sign-in', { state: location?.pathname });
+      return;
+    }
     // Tạo một danh sách các sản phẩm đã chọn
     const selectedCartItems = cartItems.filter(item => selectedItems.has(item.product));
     //////// gán gia tri amount tranh loi logic
@@ -194,7 +194,17 @@ const OrderPage = () => {
     <div style={{ padding: '50px 0 0 0 ', background: '#f0f2f5' }}>
       <Button
         type="primary"
-        style={{ position: 'absolute', top: 60, right: 10, fontSize: '16px', backgroundColor: '#4CAF50', border: 'none', padding: '10px 20px', borderRadius: '5px', }}
+        style={{
+          position: 'absolute',
+          top: 60,
+          right: 10,
+          fontSize: '16px',
+          backgroundColor: '#4CAF50',
+          border: 'none',
+          padding: '10px 20px',
+          borderRadius: '5px',
+  
+        }}
         onClick={() => navigate('/myOrder')}
       >
         My Orders

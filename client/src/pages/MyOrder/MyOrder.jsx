@@ -13,7 +13,7 @@ const MyOrderPage = () => {
     const dispatch = useDispatch();
     const { orders, isLoading, error } = useSelector((state) => state.order);
     const user = localStorage.getItem('access_token'); 
-    const userId = jwtTranslate(user)?.id || '670cd572724ca7db55337cb4';
+    const userId = jwtTranslate(user)?.id || '';
     const [loading, setLoading] = useState(true);
     const handleClick = (orderId) => {
         navigate(`/order/detailOrder/${orderId}`);
