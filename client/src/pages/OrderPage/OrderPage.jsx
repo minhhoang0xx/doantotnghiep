@@ -216,7 +216,7 @@ const OrderPage = () => {
         ) : (
           <div style={{ background: '#fff', borderRadius: '10px', padding: '20px', maxWidth: '85%', margin: '0 auto', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)' }}>
             <Row gutter={16} style={{ display: 'flex' }}>
-              <Col xs={24} sm={16}>
+              <Col sm={24} md={16}>
                 <div style={{ marginBottom: '20px' }}>
                   <h4 style={{ fontSize: '22px' }}>Cart Status</h4>
                   <Steps current={0}>
@@ -227,35 +227,35 @@ const OrderPage = () => {
                 </div>
 
                 <Row gutter={16} style={{ fontWeight: 'bold', fontSize: '16px', padding: '10px 0', borderBottom: '1px solid #ddd' }}>
-                  <Col xs={2} sm={2}><Checkbox checked={selectAll} onChange={handleSelectAllChange} /></Col>
-                  <Col xs={8} sm={8}>Product</Col>
-                  <Col xs={4} sm={4}>Price</Col>
-                  <Col xs={4} sm={4}>Quantity</Col>
-                  <Col xs={4} sm={4}>Total</Col>
-                  <Col xs={2} sm={2}><DeleteOutlined style={{ cursor: 'pointer' }} onClick={handleDeleteAll} /></Col>
+                  <Col sm={2} md={2}><Checkbox checked={selectAll} onChange={handleSelectAllChange} /></Col>
+                  <Col sm={8} md={8}>Product</Col>
+                  <Col sm={4} md={4}>Price</Col>
+                  <Col sm={4} md={4}>Quantity</Col>
+                  <Col sm={4} md={4}>Total</Col>
+                  <Col sm={2} md={2}><DeleteOutlined style={{ cursor: 'pointer' }} onClick={handleDeleteAll} /></Col>
                 </Row>
 
                 {cartItems.map((item) => (
                   <Row key={item.product} gutter={16} style={{ padding: '10px 0', borderBottom: '1px solid #eee', alignItems: 'center' }}>
-                    <Col xs={2} sm={2}><Checkbox checked={selectedItems.has(item.product)} onChange={() => handleItemSelect(item.product)} /></Col>
-                    <Col xs={8} sm={8} style={{ display: 'flex', alignItems: 'center' }}>
+                    <Col sm={2} md={2}><Checkbox checked={selectedItems.has(item.product)} onChange={() => handleItemSelect(item.product)} /></Col>
+                    <Col sm={8} md={8} style={{ display: 'flex', alignItems: 'center' }}>
                       <img src={item.image} alt={item.name} style={{ width: '50px', height: '50px', marginRight: '10px', borderRadius: '5px' }} />
                       <span>{item.name}</span>
                     </Col>
-                    <Col xs={4} sm={4}>${item.price}</Col>
-                    <Col xs={4} sm={4}>
+                    <Col sm={4} md={4}>${item.price}</Col>
+                    <Col sm={4} md={4}>
                       <InputNumber
                         min={1}
                         value={quantities[item.product]}
                         onChange={(value) => handleQuantityChange(item.product, value)}
                       />
                     </Col>
-                    <Col xs={4} sm={4}>${item.price * (quantities[item.product] || 1)}</Col>
-                    <Col xs={2} sm={2}><DeleteOutlined style={{ cursor: 'pointer' }} onClick={() => handleRemoveCartItem(item.product)} /></Col>
+                    <Col sm={4} md={4}>${item.price * (quantities[item.product] || 1)}</Col>
+                    <Col sm={2} md={2}><DeleteOutlined style={{ cursor: 'pointer' }} onClick={() => handleRemoveCartItem(item.product)} /></Col>
                   </Row>
                 ))}
               </Col>
-              <Col xs={24} sm={8} style={{ paddingLeft: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+              <Col sm={24} md={8} style={{ paddingLeft: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
                 <div style={{ padding: '20px', background: '#f9f9f9', borderRadius: '10px', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)', width: '100%' }}>
                   <h4 style={{ marginBottom: '20px' }}>Cart Summary</h4>
                   <p style={{ display: 'flex', justifyContent: 'space-between' }}>
