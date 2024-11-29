@@ -10,7 +10,7 @@ const ProductPage = () => {
         const [sort, setSort] = useState(['desc', 'createdAt']);
         const [filter, setFilter] = useState(['type', 'all']);
         const [page, setPage] = useState(0);
-        const pageSize = 15;
+        const pageSize = 100;
 
         const fetchProductAll = async () => {
                 const res = await ProductService.getAllProduct();

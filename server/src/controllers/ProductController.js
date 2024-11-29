@@ -105,7 +105,7 @@ const getAllProduct = async (req, res) => {
         const parsedFilter = filter ? JSON.parse(filter) : null; 
         
         const response = await ProductService.getAllProduct(
-            Number(limit) || 15, 
+            Number(limit) || 100, 
             Number(page) || 0, 
             parsedSort, 
             parsedFilter
