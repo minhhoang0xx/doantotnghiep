@@ -108,13 +108,6 @@ const UpdateModal = ({ isModalOpen, setIsModalOpen, currentData, refetchData, cu
                         >
                             <Input.TextArea />
                         </Form.Item>
-                        {/* <Form.Item
-                            label="Image"
-                            name="image"
-                            rules={[{ required: true, message: 'Please input Image!' }]}
-                        >
-                            <Input.TextArea />
-                        </Form.Item> */}
                         <Form.Item label="Image" name="image" rules={[{ required: true, message: 'Please input Image!' }]}>
                         <WrapperUploadFile onChange={handleOnchangeImage} maxCount={1} accept="image/*">
                             <Button icon={<UploadOutlined />}>Upload Avatar</Button>

@@ -276,8 +276,10 @@ const AdminPage = () => {
         {
             title: 'Type', dataIndex: 'type', key: 'type',
             filters: [
-                { text: '1212', value: '1212' },
-                { text: '4', value: '4' },
+                { text: 'Math', value: 'Math' },
+                { text: 'Foreign language', value: 'Foreign language' },
+                { text: 'Reading tab', value: 'Reading tab' },
+                { text: 'others', value: 'others' },
             ],
             filteredValue: filter ? [filter] : null,
             onFilter: (value, record) => record.type.includes(value),

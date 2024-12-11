@@ -74,8 +74,11 @@ const ProductPage = () => {
                                         onChange={handleFilterChange}
                                 >
                                         <Option value="all">All Items</Option>
-                                        <Option value="1212">1212</Option>
-                                        <Option value="1">1</Option>
+                                        <Option value="Math">Math</Option>
+                                        <Option value="Foreign language">Foreign language</Option>
+                                        <Option value="Reading tab">Reading tab</Option>
+                                        <Option value="others">others</Option>
+
                                 </Select>
                                 <Select
                                         defaultValue="Sort"
